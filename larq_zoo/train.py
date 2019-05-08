@@ -1,4 +1,5 @@
 from larq_flock import cli, build_train
+from os import path
 import click
 
 
@@ -10,14 +11,15 @@ def train(build_model, dataset, hparams, output_dir, epochs, tensorboard):
     from larq_zoo.utils import get_distribution_scope
     import tensorflow as tf
 
-    callbacks = [lq.callbacks.QuantizationLogger(update_freq=1000)]
+    callbacks = [lq.callbacks.QuantizationLogger(update_freq=10000)]
+    if hasattr(hparams, "learning_rate_schedule"):
+        callbacks.append(
+            tf.keras.callbacks.LearningRateScheduler(hparams.learning_rate_schedule)
+        )
     if tensorboard:
         callbacks.append(
             tf.keras.callbacks.TensorBoard(
-                log_dir=output_dir,
-                write_graph=False,
-                update_freq=1000,
-                histogram_freq=10,
+                log_dir=output_dir, write_graph=False, update_freq=10000
             )
         )
 
@@ -40,6 +42,9 @@ def train(build_model, dataset, hparams, output_dir, epochs, tensorboard):
         verbose=2 if tensorboard else 1,
         callbacks=callbacks,
     )
+
+    model.save(path.join(output_dir, f"{model.__name__}.h5"))
+    model.save_weights(path.join(output_dir, f"{model.__name__}_weights.h5"))
 
 
 if __name__ == "__main__":
