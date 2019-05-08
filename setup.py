@@ -7,7 +7,7 @@ def readme():
 
 
 setup(
-    name="larq-swarm",
+    name="larq-zoo",
     version="0.1.0",
     author="Plumerai",
     author_email="lukas@plumerai.co.uk",
@@ -17,11 +17,15 @@ setup(
     url="https://github.com/plumerai/larq-zoo",
     packages=find_packages(),
     license="Apache 2.0",
-    install_requires=["larq-swarm>=0.1.0"],
+    install_requires=["larq-flock>=0.1.0"],
     extras_require={
         "tensorflow": ["tensorflow>=1.13.1"],
         "tensorflow_gpu": ["tensorflow-gpu>=1.13.1"],
     },
+    entry_points="""
+        [console_scripts]
+        lqz=larq_zoo.train:cli
+    """,
     classifiers=[
         "Development Status :: 2 - Pre-Alpha",
         "Intended Audience :: Developers",
