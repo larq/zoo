@@ -43,8 +43,8 @@ def train(build_model, dataset, hparams, output_dir, epochs, tensorboard):
         callbacks=callbacks,
     )
 
-    model.save(path.join(output_dir, f"{model.__name__}.h5"))
-    model.save_weights(path.join(output_dir, f"{model.__name__}_weights.h5"))
+    model.save(path.join(output_dir, f"{build_model.__name__}.h5"))
+    model.save_weights(path.join(output_dir, f"{build_model.__name__}_weights.h5"))
 
 
 if __name__ == "__main__":
