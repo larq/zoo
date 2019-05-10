@@ -64,9 +64,8 @@ def default():
             return 1e-5
 
     return HParams(
-        optimizer=tf.keras.optimizers.Adam,
+        optimizer=tf.keras.optimizers.Adam(5e-3),
         learning_rate_schedule=lr_schedule,
-        learning_rate=5e-3,
         batch_size=256,
         filters=64,
         dense_units=4096,
