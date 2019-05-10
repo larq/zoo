@@ -11,22 +11,24 @@ def train(build_model, dataset, hparams, output_dir, epochs, tensorboard):
     from larq_zoo.utils import get_distribution_scope
     import tensorflow as tf
 
-    callbacks = [lq.callbacks.QuantizationLogger(update_freq=10000)]
+    callbacks = [
+        tf.keras.callbacks.ModelCheckpoint(
+            filepath=path.join(output_dir, "model.ckpt"), save_weights_only=True
+        )
+    ]
     if hasattr(hparams, "learning_rate_schedule"):
         callbacks.append(
             tf.keras.callbacks.LearningRateScheduler(hparams.learning_rate_schedule)
         )
     if tensorboard:
         callbacks.append(
-            tf.keras.callbacks.TensorBoard(
-                log_dir=output_dir, write_graph=False, update_freq=10000
-            )
+            tf.keras.callbacks.TensorBoard(log_dir=output_dir, profile_batch=0, write_graph=False)
         )
 
     with get_distribution_scope(hparams.batch_size):
         model = build_model(hparams, dataset)
         model.compile(
-            optimizer=hparams.optimizer(hparams.learning_rate),
+            optimizer=hparams.optimizer,
             loss="categorical_crossentropy",
             metrics=["categorical_accuracy", "top_k_categorical_accuracy"],
         )
