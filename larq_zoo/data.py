@@ -17,15 +17,20 @@ www.robots.ox.ac.uk/~vgg/research/very_deep/
 import tensorflow as tf
 from larq_flock import registry
 
-_R_MEAN = 123.68 / 255
-_G_MEAN = 116.78 / 255
-_B_MEAN = 103.94 / 255
+_R_MEAN = 123.68
+_G_MEAN = 116.78
+_B_MEAN = 103.94
+
+_R_STD = 0.229 * 255
+_G_STD = 0.224 * 255
+_B_STD = 0.225 * 255
 
 _RESIZE_SIDE_MIN = 256
 _RESIZE_SIDE_MAX = 512
 
 
 @registry.register_preprocess("imagenet2012", (224, 224, 3))
+# @registry.register_preprocess("oxford_iiit_pet", (224, 224, 3))
 def default(image, training):
     return preprocess_image(
         image=image, output_height=224, output_width=224, is_training=training
@@ -120,6 +125,13 @@ def _mean_image_subtraction(image, means):
     means = tf.expand_dims(tf.expand_dims(means, 0), 0)
 
     return image - means
+
+
+def _scale_normalization(image, stds):
+    # We have a 1-D tensor of means; convert to 3-D.
+    stds = tf.expand_dims(tf.expand_dims(stds, 0), 0)
+
+    return image / stds
 
 
 def _smallest_size_at_least(height, width, smallest_side):
@@ -220,4 +232,5 @@ def preprocess_image(
     image.set_shape([output_height, output_width, num_channels])
 
     image = tf.cast(image, tf.float32)
-    return _mean_image_subtraction(image, [_R_MEAN, _G_MEAN, _B_MEAN])
+    image = _mean_image_subtraction(image, [_R_MEAN, _G_MEAN, _B_MEAN])
+    return _scale_normalization(image, [_R_STD, _G_STD, _B_STD])
