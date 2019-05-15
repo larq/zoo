@@ -72,4 +72,3 @@ def get_input_layer(input_shape, input_tensor):
     if not tf.keras.backend.is_keras_tensor(input_tensor):
         return tf.keras.layers.Input(tensor=input_tensor, shape=input_shape)
     return input_tensor
-
