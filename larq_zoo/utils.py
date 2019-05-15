@@ -2,11 +2,27 @@ import os
 import sys
 import tensorflow as tf
 import contextlib
+import json
 from tensorflow.python.eager.context import num_gpus
 from keras_applications.imagenet_utils import _obtain_input_shape
 from collections import namedtuple
 
 ImagenetDataset = namedtuple("ImagenetDataset", ["input_shape", "num_classes"])
+
+
+def get_current_epoch(output_dir):
+    try:
+        with open(os.path.join(output_dir, "stats.json"), "r") as f:
+            return json.load(f)["epoch"]
+    except:
+        return 0
+
+
+class ModelCheckpoint(tf.keras.callbacks.ModelCheckpoint):
+    def on_epoch_end(self, epoch, logs=None):
+        super().on_epoch_end(epoch, logs=logs)
+        with open(os.path.join(os.path.dirname(self.filepath), "stats.json"), "w") as f:
+            return json.dump({"epoch": epoch}, f)
 
 
 def get_distribution_scope(batch_size):
@@ -56,4 +72,3 @@ def get_input_layer(input_shape, input_tensor):
     if not tf.keras.backend.is_keras_tensor(input_tensor):
         return tf.keras.layers.Input(tensor=input_tensor, shape=input_shape)
     return input_tensor
-
