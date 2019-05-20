@@ -12,15 +12,17 @@ def train(build_model, dataset, hparams, output_dir, epochs, tensorboard):
     import tensorflow as tf
 
     initial_epoch = utils.get_current_epoch(output_dir)
-    model_path = path.join(output_dir, "model.h5")
-    callbacks = [utils.ModelCheckpoint(filepath=model_path)]
+    model_path = path.join(output_dir, "model")
+    callbacks = [utils.ModelCheckpoint(filepath=model_path, save_weights_only=True)]
     if hasattr(hparams, "learning_rate_schedule"):
         callbacks.append(
             tf.keras.callbacks.LearningRateScheduler(hparams.learning_rate_schedule)
         )
     if tensorboard:
         callbacks.append(
-            tf.keras.callbacks.TensorBoard(log_dir=output_dir, write_graph=False)
+            tf.keras.callbacks.TensorBoard(
+                log_dir=output_dir, write_graph=False, histogram_freq=10
+            )
         )
 
     with tf.device("/cpu:0"):
@@ -28,18 +30,17 @@ def train(build_model, dataset, hparams, output_dir, epochs, tensorboard):
         validation_data = dataset.validation_data(hparams.batch_size)
 
     with utils.get_distribution_scope(hparams.batch_size):
-        if initial_epoch == 0:
-            model = build_model(hparams, dataset)
-            model.compile(
-                optimizer=hparams.optimizer,
-                loss="categorical_crossentropy",
-                metrics=["categorical_accuracy", "top_k_categorical_accuracy"],
-            )
-        else:
-            model = tf.keras.models.load_model(model_path)
-            click.echo(f"Loaded model from epoch {initial_epoch}")
+        model = build_model(hparams, dataset)
+        model.compile(
+            optimizer=hparams.optimizer,
+            loss="categorical_crossentropy",
+            metrics=["categorical_accuracy", "top_k_categorical_accuracy"],
+        )
+        lq.models.summary(model)
 
-    lq.models.summary(model)
+        if initial_epoch > 0:
+            model.load_weights(model_path)
+            click.echo(f"Loaded model from epoch {initial_epoch}")
 
     model.fit(
         train_data,
