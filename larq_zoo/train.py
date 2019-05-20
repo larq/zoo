@@ -21,7 +21,10 @@ def train(build_model, dataset, hparams, output_dir, epochs, tensorboard):
     if tensorboard:
         callbacks.append(
             tf.keras.callbacks.TensorBoard(
-                log_dir=output_dir, write_graph=False, histogram_freq=10
+                log_dir=output_dir,
+                write_graph=False,
+                histogram_freq=10,
+                update_freq=250,
             )
         )
 

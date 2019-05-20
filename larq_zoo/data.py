@@ -30,7 +30,7 @@ _RESIZE_SIDE_MAX = 512
 
 
 @registry.register_preprocess("imagenet2012", (224, 224, 3))
-# @registry.register_preprocess("oxford_iiit_pet", (224, 224, 3))
+@registry.register_preprocess("oxford_iiit_pet", (224, 224, 3))
 def default(image, training):
     return preprocess_image(
         image=image, output_height=224, output_width=224, is_training=training
