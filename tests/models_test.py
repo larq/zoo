@@ -1,7 +1,9 @@
 import pytest
 import functools
 import larq_zoo as lqz
-from tensorflow.keras.backend import clear_session
+import os
+import numpy as np
+from tensorflow import keras
 
 
 def keras_test(func):
@@ -15,7 +17,7 @@ def keras_test(func):
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
         output = func(*args, **kwargs)
-        clear_session()
+        keras.backend.clear_session()
         return output
 
     return wrapper
@@ -26,6 +28,20 @@ def parametrize(func):
     return pytest.mark.parametrize(
         "app,last_feature_dim", [(lqz.BinaryAlexNet, 256), (lqz.BiRealNet, 512)]
     )(func)
+
+
+@keras_test
+def test_prediction():
+    file = os.path.join(os.path.dirname(__file__), "fixtures", "elephant.jpg")
+    img = keras.preprocessing.image.load_img(file)
+    img = keras.preprocessing.image.img_to_array(img)
+    img = lqz.preprocess_input(img)
+    model = lqz.BiRealNet()
+    preds = model.predict(np.expand_dims(img, axis=0))
+
+    # Test correct label is in top 3 (weak correctness test).
+    names = [p[1] for p in lqz.decode_predictions(preds, top=3)[0]]
+    assert "African_elephant" in names
 
 
 @parametrize
