@@ -53,7 +53,13 @@ def train(build_model, dataset, hparams, output_dir, epochs, tensorboard):
         callbacks=callbacks,
     )
 
-    model.save_weights(path.join(output_dir, f"{build_model.__name__}_weights.h5"))
+    model_name = build_model.__name__
+    model.save_weights(path.join(output_dir, f"{model_name}_weights.h5"))
+
+    # Save weights without top
+    notop_model = build_model(hparams, dataset, include_top=False)
+    notop_model.set_weights(model.get_weights()[: len(notop_model.get_weights())])
+    notop_model.save_weights(path.join(output_dir, f"{model_name}_weights_notop.h5"))
 
 
 if __name__ == "__main__":
