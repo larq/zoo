@@ -15,7 +15,7 @@ www.robots.ox.ac.uk/~vgg/research/very_deep/
 """
 
 import tensorflow as tf
-from larq_flock import registry
+from zoo_keeper import registry
 
 _R_MEAN = 123.68
 _G_MEAN = 116.78
