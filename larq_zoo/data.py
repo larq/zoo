@@ -14,6 +14,7 @@ More information can be obtained from the VGG website:
 www.robots.ox.ac.uk/~vgg/research/very_deep/
 """
 
+import numpy as np
 import tensorflow as tf
 from zoo_keeper import registry
 
@@ -29,12 +30,27 @@ _RESIZE_SIDE_MIN = 256
 _RESIZE_SIDE_MAX = 512
 
 
+def preprocess_input(image):
+    """Preprocesses a Tensor or Numpy array encoding a image.
+
+    # Arguments
+    image: Numpy array or symbolic Tensor, 3D.
+
+    # Returns
+    Preprocessed Tensor or Numpy array.
+    """
+    if len(image.shape) != 3:
+        raise ValueError("Input must be of size [height, width, C>0]")
+    result = preprocess_image(tf.convert_to_tensor(image), 224, 224, is_training=False)
+    if isinstance(image, np.ndarray):
+        return tf.keras.backend.get_value(result)
+    return result
+
+
 @registry.register_preprocess("imagenet2012", (224, 224, 3))
 @registry.register_preprocess("oxford_iiit_pet", (224, 224, 3))
 def default(image, training):
-    return preprocess_image(
-        image=image, output_height=224, output_width=224, is_training=training
-    )
+    return preprocess_image(image, 224, 224, is_training=training)
 
 
 def _get_h_w(image):
