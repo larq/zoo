@@ -23,30 +23,32 @@ def keras_test(func):
 
 def parametrize(func):
     func = keras_test(func)
-    return pytest.mark.parametrize("app,last_dim", [(lqz.BinaryAlexNet, 256)])(func)
+    return pytest.mark.parametrize("app,last_feature_dim", [(lqz.BinaryAlexNet, 256)])(
+        func
+    )
 
 
 @parametrize
-def test_basic(app, last_dim):
+def test_basic(app, last_feature_dim):
     model = app(weights=None)
     assert model.output_shape == (None, 1000)
 
 
 @parametrize
-def test_no_top(app, last_dim):
+def test_no_top(app, last_feature_dim):
     model = app(weights=None, include_top=False)
-    assert model.output_shape == (None, None, None, last_dim)
+    assert model.output_shape == (None, None, None, last_feature_dim)
 
 
 @parametrize
-def test_no_top_variable_shape_1(app, last_dim):
+def test_no_top_variable_shape_1(app, last_feature_dim):
     input_shape = (None, None, 1)
     model = app(weights=None, include_top=False, input_shape=input_shape)
-    assert model.output_shape == (None, None, None, last_dim)
+    assert model.output_shape == (None, None, None, last_feature_dim)
 
 
 @parametrize
-def test_no_top_variable_shape_4(app, last_dim):
+def test_no_top_variable_shape_4(app, last_feature_dim):
     input_shape = (None, None, 4)
     model = app(weights=None, include_top=False, input_shape=input_shape)
-    assert model.output_shape == (None, None, None, last_dim)
+    assert model.output_shape == (None, None, None, last_feature_dim)
