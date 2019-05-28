@@ -23,9 +23,9 @@ def keras_test(func):
 
 def parametrize(func):
     func = keras_test(func)
-    return pytest.mark.parametrize("app,last_feature_dim", [(lqz.BinaryAlexNet, 256)])(
-        func
-    )
+    return pytest.mark.parametrize(
+        "app,last_feature_dim", [(lqz.BinaryAlexNet, 256), (lqz.BiRealNet, 512)]
+    )(func)
 
 
 @parametrize
