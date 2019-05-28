@@ -19,10 +19,16 @@ def train(build_model, dataset, hparams, output_dir, epochs, tensorboard):
             tf.keras.callbacks.LearningRateScheduler(hparams.learning_rate_schedule)
         )
     if tensorboard:
-        callbacks.append(
-            tf.keras.callbacks.TensorBoard(
-                log_dir=output_dir, write_graph=False, histogram_freq=10
-            )
+        callbacks.extend(
+            [
+                lq.callbacks.QuantizationLogger(update_freq=250),
+                tf.keras.callbacks.TensorBoard(
+                    log_dir=output_dir,
+                    write_graph=False,
+                    histogram_freq=0,
+                    update_freq=250,
+                ),
+            ]
         )
 
     with tf.device("/cpu:0"):
