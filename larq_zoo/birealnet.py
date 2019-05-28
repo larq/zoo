@@ -9,17 +9,13 @@ def birealnet(args, dataset, input_tensor=None, include_top=True):
     def residual_block(x, double_filters=False, filters=None):
         assert not (double_filters and filters)
 
-        # figure out dimensions
+        # compute dimensions
         in_filters = x.get_shape().as_list()[-1]
         out_filters = filters or in_filters if not double_filters else 2 * in_filters
 
-        reduce_size = in_filters != out_filters
-
-        # shortcut
         shortcut = x
-        if reduce_size:
-            shortcut = tf.keras.layers.AvgPool2D(2, strides=2, padding="same")(shortcut)
         if in_filters != out_filters:
+            shortcut = tf.keras.layers.AvgPool2D(2, strides=2, padding="same")(shortcut)
             shortcut = tf.keras.layers.Conv2D(
                 out_filters,
                 1,
@@ -28,7 +24,6 @@ def birealnet(args, dataset, input_tensor=None, include_top=True):
             )(shortcut)
             shortcut = tf.keras.layers.BatchNormalization(momentum=0.8)(shortcut)
 
-        # actual convolution
         x = lq.layers.QuantConv2D(
             out_filters,
             3,
@@ -68,6 +63,7 @@ def birealnet(args, dataset, input_tensor=None, include_top=True):
         for _ in range(1, 4):
             out = residual_block(out)
 
+    # layer 18
     if include_top:
         out = tf.keras.layers.GlobalAvgPool2D()(out)
         out = tf.keras.layers.Dense(dataset.num_classes, activation="softmax")(out)
