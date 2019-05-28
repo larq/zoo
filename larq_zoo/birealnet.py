@@ -126,6 +126,11 @@ def BiRealNet(
 
     # Raises
     ValueError: in case of invalid argument for `weights`, or invalid input shape.
+
+    # References
+    - [Bi-Real Net: Enhancing the Performance of 1-bit CNNs With Improved
+      Representational Capability and Advanced Training
+      Algorithm](https://arxiv.org/abs/1808.00278)
     """
     input_shape = utils.validate_input(input_shape, weights, include_top, classes)
 
