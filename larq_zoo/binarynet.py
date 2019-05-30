@@ -1,4 +1,4 @@
-from zoo_keeper import registry, HParams
+from zookeeper import registry, HParams
 import larq as lq
 import tensorflow as tf
 from larq_zoo import utils
