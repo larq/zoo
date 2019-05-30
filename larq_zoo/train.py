@@ -1,4 +1,4 @@
-from zoo_keeper import cli, build_train
+from zookeeper import cli, build_train
 from os import path
 import click
 

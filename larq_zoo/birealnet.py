@@ -1,5 +1,5 @@
 import os
-from zoo_keeper import registry, HParams
+from zookeeper import registry, HParams
 import larq as lq
 import tensorflow as tf
 from larq_zoo import utils
@@ -73,25 +73,27 @@ def birealnet(args, dataset, input_tensor=None, include_top=True):
 
 
 @registry.register_hparams(birealnet)
-def default():
-    try:
-        # This schedule can definitely be improved for faster convergence
-        lr = tf.keras.optimizers.schedules.PolynomialDecay(
-            5e-3, 750684, end_learning_rate=5e-6, power=1.0
-        )
-    except AttributeError:
-        # For compatibility with TF 1.13
-        lr = 5e-3
+class default(HParams):
+    filters = 64
+    learning_rate = 5e-3
+    decay_schedule = "linear"
+    batch_size = 512
+    input_quantizer = "approx_sign"
+    kernel_quantizer = "magnitude_aware_sign"
+    kernel_constraint = "weight_clip"
+    kernel_initializer = "glorot_normal"
 
-    return HParams(
-        filters=64,
-        optimizer=tf.keras.optimizers.Adam(lr),
-        batch_size=512,
-        input_quantizer="approx_sign",
-        kernel_quantizer="magnitude_aware_sign",
-        kernel_constraint="weight_clip",
-        kernel_initializer="glorot_normal",
-    )
+    @property
+    def optimizer(self):
+        if self.decay_schedule == "linear_cosine":
+            lr = tf.keras.experimental.LinearCosineDecay(self.learning_rate, 750684)
+        elif self.decay_schedule == "linear":
+            lr = tf.keras.optimizers.schedules.PolynomialDecay(
+                self.learning_rate, 750684, end_learning_rate=0, power=1.0
+            )
+        else:
+            lr = self.learning_rate
+        return tf.keras.optimizers.Adam(lr)
 
 
 def BiRealNet(
