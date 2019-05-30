@@ -30,6 +30,7 @@ def parametrize(func):
     )(func)
 
 
+@pytest.mark.skip(reason="Enable once repo is public")
 @keras_test
 def test_prediction():
     file = os.path.join(os.path.dirname(__file__), "fixtures", "elephant.jpg")
