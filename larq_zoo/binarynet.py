@@ -61,8 +61,13 @@ def binary_alex_net(hparams, dataset, input_tensor=None, include_top=True):
 
 
 @registry.register_hparams(binary_alex_net)
-def default():
-    def lr_schedule(epoch):
+class default(HParams):
+    batch_size = 256
+    filters = 64
+    dense_units = 4096
+    optimizer = tf.keras.optimizers.Adam(5e-3)
+
+    def learning_rate_schedule(epoch):
         if epoch < 20:
             return 5e-3
         elif epoch < 30:
@@ -73,14 +78,6 @@ def default():
             return 1e-4
         else:
             return 1e-5
-
-    return HParams(
-        optimizer=tf.keras.optimizers.Adam(5e-3),
-        learning_rate_schedule=lr_schedule,
-        batch_size=256,
-        filters=64,
-        dense_units=4096,
-    )
 
 
 def BinaryAlexNet(
