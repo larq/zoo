@@ -10,12 +10,15 @@ jobs:
       vmImage: "Ubuntu-16.04"
     strategy:
       matrix:
-        Python37:
-          python.version: "3.7"
+        Python36_TF113:
+          python.version: "3.6"
           tensorflow.version: "1.13.1"
-        Python37TF2:
+        Python37_TF114:
           python.version: "3.7"
-          tensorflow.version: "2.0.0-alpha0"
+          tensorflow.version: "1.14.0"
+        Python37_TF2:
+          python.version: "3.7"
+          tensorflow.version: "2.0.0-beta1"
           coverage: "true"
 
     steps:
