@@ -5,17 +5,19 @@ These models can be used for prediction, feature extraction, and fine-tuning.
 
 Weights can be downloaded automatically when instantiating a model. They are stored at `~/.larq/models/`.
 
-## Available models for image classification with weights trained on ImageNet
+## Available models
 
-The Top-1 and Top-5 accuracy refers to the model's performance on the [ImageNet](http://image-net.org/) validation dataset.
+The following models are trained on the [ImageNet](http://image-net.org/) dataset. The Top-1 and Top-5 accuracy refers to the model's performance on the ImageNet validation dataset.
+
+The model definitions and the train loop are available in the [Larq Zoo repository](https://github.com/plumerai/larq-zoo).
 
 | Model                     | Top-1 Accuracy | Top-5 Accuracy |
 | ------------------------- | -------------- | -------------- |
-| [Bi-Real Net](#BiRealNet) | ? %            | ? %            |
+| [Bi-Real Net](#birealnet) | ? %            | ? %            |
 
 ---
 
-## Usage examples for image classification models
+## Examples
 
 ### Classify ImageNet classes with Bi-Real Net
 
@@ -154,7 +156,7 @@ input_tensor = tf.keras.layers.Input(shape=(224, 224, 3))
 model = lqz.BiRealNet(input_tensor=input_tensor, weights="imagenet")
 ```
 
-## Larq Zoo API Documentation
+## API Documentation
 
 ### BiRealNet<a class="headerlink code-link" style="float:right;" href="https://github.com/plumerai/larq-zoo/blob/master/larq_zoo/birealnet.py#L99" title="Source code"></a>
 
