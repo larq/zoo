@@ -3,6 +3,7 @@ import sys
 import tensorflow as tf
 import contextlib
 import json
+from tensorflow.python.keras.backend import is_keras_tensor
 from tensorflow.python.eager.context import num_gpus
 from keras_applications.imagenet_utils import _obtain_input_shape
 from collections import namedtuple
@@ -69,6 +70,6 @@ def validate_input(input_shape, weights, include_top, classes):
 def get_input_layer(input_shape, input_tensor):
     if input_tensor is None:
         return tf.keras.layers.Input(shape=input_shape)
-    if not tf.keras.backend.is_keras_tensor(input_tensor):
+    if not is_keras_tensor(input_tensor):
         return tf.keras.layers.Input(tensor=input_tensor, shape=input_shape)
     return input_tensor

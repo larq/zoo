@@ -52,6 +52,13 @@ def test_basic(app, last_feature_dim):
 
 
 @parametrize
+def test_keras_tensor_input(app, last_feature_dim):
+    input_tensor = keras.layers.Input(shape=(224, 224, 3))
+    model = app(weights=None, input_tensor=input_tensor)
+    assert model.output_shape == (None, 1000)
+
+
+@parametrize
 def test_no_top(app, last_feature_dim):
     model = app(weights=None, include_top=False)
     assert model.output_shape == (None, None, None, last_feature_dim)
