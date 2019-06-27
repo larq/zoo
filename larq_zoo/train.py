@@ -5,7 +5,7 @@ import click
 
 @cli.command()
 @click.option("--tensorboard/--no-tensorboard", default=True)
-@build_train
+@build_train()
 def train(build_model, dataset, hparams, output_dir, epochs, tensorboard):
     import larq as lq
     from larq_zoo import utils
