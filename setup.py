@@ -17,7 +17,7 @@ setup(
     url="https://github.com/plumerai/larq-zoo",
     packages=find_packages(),
     license="Apache 2.0",
-    install_requires=["numpy~=1.15", "larq>=0.2,<0.4", "zookeeper~=0.2.0"],
+    install_requires=["numpy~=1.15", "larq>=0.2,<0.5", "zookeeper~=0.2.0"],
     extras_require={
         "tensorflow": ["tensorflow>=1.13.1"],
         "tensorflow_gpu": ["tensorflow-gpu>=1.13.1"],
