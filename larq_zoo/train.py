@@ -6,7 +6,7 @@ import click
 @cli.command()
 @click.option("--tensorboard/--no-tensorboard", default=True)
 @build_train()
-def train(build_model, dataset, hparams, output_dir, epochs, tensorboard):
+def train(build_model, dataset, hparams, output_dir, tensorboard):
     import larq as lq
     from larq_zoo import utils
     import tensorflow as tf
@@ -42,7 +42,7 @@ def train(build_model, dataset, hparams, output_dir, epochs, tensorboard):
 
     model.fit(
         train_data,
-        epochs=epochs,
+        epochs=hparams.epochs,
         steps_per_epoch=dataset.train_examples // hparams.batch_size,
         validation_data=validation_data,
         validation_steps=dataset.validation_examples // hparams.batch_size,
