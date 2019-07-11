@@ -62,6 +62,7 @@ def binary_alex_net(hparams, dataset, input_tensor=None, include_top=True):
 
 @registry.register_hparams(binary_alex_net)
 class default(HParams):
+    epochs = 100
     batch_size = 256
     filters = 64
     dense_units = 4096
