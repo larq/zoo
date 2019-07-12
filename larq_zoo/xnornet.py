@@ -85,12 +85,14 @@ def xnornet(hparams, dataset, input_tensor=None, include_top=True):
 
 
 def clamp(x):
+    """ Clips an input between -1 and +1
+    """
     x = tf.clip_by_value(x, -1, 1)
     return x
 
 
 @lq.utils.register_keras_custom_object
-def xnor_weight(x):
+def xnor_weight_scale(x):
 
     x = clamp(x)
 
@@ -105,7 +107,7 @@ class default(HParams):
     kernel_size = 3
     dense_units = 1024
     input_quantizer = "ste_sign"
-    kernel_quantizer = "xnor_weight"
+    kernel_quantizer = "xnor_weight_scale"
     kernel_constraint = "weight_clip"
     regularization_quantity = 1e-5  # TBD
     use_bias = False
