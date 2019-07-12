@@ -3,6 +3,14 @@
 Larq Zoo provides reference implementations of deep neural networks with extremely low precision weights and activations that are made available alongside pre-trained weights.
 These models can be used for prediction, feature extraction, and fine-tuning.
 
+## Installation
+
+Larq Zoo is not included in Larq by default. To start using is, you can install it with Python's [pip](https://pip.pypa.io/en/stable/) package manager:
+
+```shell
+pip install larq-zoo
+```
+
 Weights can be downloaded automatically when instantiating a model. They are stored at `~/.larq/models/`.
 
 ## Available models
