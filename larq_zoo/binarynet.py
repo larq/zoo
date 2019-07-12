@@ -1,84 +1,108 @@
-from zookeeper import registry, HParams
-import larq as lq
+import collections
 import tensorflow as tf
+import larq as lq
 from larq_zoo import utils
+from zookeeper import registry, HParams
+
+
+def create_model(nested_list):
+    """Utility function to build a model from a nested list of layers."""
+
+    def unpack(l):
+        for el in l:
+            if isinstance(el, collections.Iterable) and not isinstance(
+                el, (str, bytes)
+            ):
+                yield from unpack(el)
+            else:
+                yield el
+
+    model = tf.keras.models.Sequential()
+    for layer in unpack(nested_list):
+        model.add(layer)
+    return model
 
 
 @registry.register_model
-def binary_alex_net(hparams, dataset, input_tensor=None, include_top=True):
-    kwargs = dict(
+def binary_alexnet(hparams, dataset):
+    """
+    Implementation of ["Binarized Neural Networks"](https://papers.nips.cc/paper/6573-binarized-neural-networks)
+    by Hubara et al., NIPS, 2016.
+    """
+    kwhparams = dict(
         input_quantizer="ste_sign",
         kernel_quantizer="ste_sign",
         kernel_constraint="weight_clip",
         use_bias=False,
     )
-    img_input = utils.get_input_layer(dataset.input_shape, input_tensor)
 
-    x = lq.layers.QuantConv2D(
-        hparams.filters,
-        11,
-        strides=4,
-        padding="same",
-        kernel_quantizer="ste_sign",
-        kernel_constraint="weight_clip",
-        use_bias=False,
-    )(img_input)
-    x = tf.keras.layers.MaxPool2D(pool_size=3, strides=2)(x)
-    x = tf.keras.layers.BatchNormalization(scale=False)(x)
+    # Generalized definition of the conv block.
+    def conv_block(
+        features,
+        kernel_size,
+        strides=1,
+        pool=False,
+        first_layer=False,
+        no_inflation=False,
+    ):
+        layers = []
+        conv_kwargs = {"input_shape": dataset.input_shape} if first_layer else {}
+        layers.append(
+            lq.layers.QuantConv2D(
+                features * (1 if no_inflation else hparams.inflation_ratio),
+                kernel_size=kernel_size,
+                strides=strides,
+                padding="same",
+                input_quantizer=None if first_layer else "ste_sign",
+                kernel_quantizer="ste_sign",
+                kernel_constraint="weight_clip",
+                use_bias=False,
+                **conv_kwargs
+            )
+        )
+        if pool:
+            layers.append(tf.keras.layers.MaxPool2D(pool_size=3, strides=2))
+        layers.append(tf.keras.layers.BatchNormalization(scale=False, momentum=0.9))
+        return layers
 
-    x = lq.layers.QuantConv2D(hparams.filters * 3, 5, padding="same", **kwargs)(x)
-    x = tf.keras.layers.MaxPool2D(pool_size=3, strides=2)(x)
-    x = tf.keras.layers.BatchNormalization(scale=False)(x)
+    # Generalized definition of a fully connected block.
+    def fc_block(units):
+        return [
+            lq.layers.QuantDense(units, **kwhparams),
+            tf.keras.layers.BatchNormalization(scale=False, momentum=0.9),
+        ]
 
-    x = lq.layers.QuantConv2D(6 * hparams.filters, 3, padding="same", **kwargs)(x)
-    x = tf.keras.layers.BatchNormalization(scale=False)(x)
-
-    x = lq.layers.QuantConv2D(4 * hparams.filters, 3, padding="same", **kwargs)(x)
-    x = tf.keras.layers.BatchNormalization(scale=False)(x)
-
-    x = lq.layers.QuantConv2D(4 * hparams.filters, 3, padding="same", **kwargs)(x)
-    x = tf.keras.layers.MaxPool2D(pool_size=3, strides=2)(x)
-    x = tf.keras.layers.BatchNormalization(scale=False)(x)
-
-    if include_top:
-        x = tf.keras.layers.Flatten()(x)
-        x = lq.layers.QuantDense(hparams.dense_units, **kwargs)(x)
-        x = tf.keras.layers.BatchNormalization(scale=False)(x)
-        x = lq.layers.QuantDense(hparams.dense_units, **kwargs)(x)
-        x = tf.keras.layers.BatchNormalization(scale=False)(x)
-        x = lq.layers.QuantDense(dataset.num_classes, **kwargs)(x)
-        x = tf.keras.layers.BatchNormalization(scale=False)(x)
-        x = tf.keras.layers.Activation("softmax", name="predictions")(x)
-
-    # Ensure that the model takes into account
-    # any potential predecessors of `input_tensor`.
-    if input_tensor is not None:
-        inputs = tf.keras.utils.get_source_inputs(input_tensor)
-    else:
-        inputs = img_input
-
-    return tf.keras.models.Model(inputs, x, name="binary_alex_net")
+    return create_model(
+        [
+            conv_block(64, 11, strides=4, pool=True, first_layer=True),
+            conv_block(192, 5, pool=True),
+            conv_block(384, 3),
+            conv_block(384, 3),
+            conv_block(256, 3, pool=True, no_inflation=True),
+            tf.keras.layers.Flatten(),
+            fc_block(4096),
+            fc_block(4096),
+            fc_block(dataset.num_classes),
+            tf.keras.layers.Activation("softmax"),
+        ]
+    )
 
 
-@registry.register_hparams(binary_alex_net)
+@registry.register_hparams(binary_alexnet)
 class default(HParams):
     epochs = 100
-    batch_size = 256
-    filters = 64
-    dense_units = 4096
-    optimizer = tf.keras.optimizers.Adam(5e-3)
+    inflation_ratio = 1
+    batch_size = 512
+    learning_rate = 0.01
+    lr_decay_stepsize = 10
+    xavier_scaling = False
 
-    def learning_rate_schedule(epoch):
-        if epoch < 20:
-            return 5e-3
-        elif epoch < 30:
-            return 1e-3
-        elif epoch < 35:
-            return 5e-4
-        elif epoch < 40:
-            return 1e-4
-        else:
-            return 1e-5
+    def learning_rate_schedule(self, epoch):
+        return self.learning_rate * 0.5 ** (epoch // self.lr_decay_stepsize)
+
+    @property
+    def optimizer(self):
+        return tf.keras.optimizers.Adam(self.learning_rate)
 
 
 def BinaryAlexNet(
@@ -113,7 +137,7 @@ def BinaryAlexNet(
     """
     input_shape = utils.validate_input(input_shape, weights, include_top, classes)
 
-    model = binary_alex_net(
+    model = binary_alexnet(
         default(),
         utils.ImagenetDataset(input_shape, classes),
         input_tensor=input_tensor,
