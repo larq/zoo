@@ -1,4 +1,3 @@
-import collections
 import tensorflow as tf
 import larq as lq
 from larq_zoo import utils
@@ -42,7 +41,7 @@ def binary_alexnet(hparams, dataset, input_tensor=None, include_top=True):
         x = tf.keras.layers.BatchNormalization(scale=False, momentum=0.9)(x)
         return x
 
-    def fc_block(x, units):
+    def dense_block(x, units):
         x = lq.layers.QuantDense(units, **kwhparams)(x)
         x = tf.keras.layers.BatchNormalization(scale=False, momentum=0.9)(x)
         return x
@@ -51,18 +50,20 @@ def binary_alexnet(hparams, dataset, input_tensor=None, include_top=True):
     img_input = utils.get_input_layer(dataset.input_shape, input_tensor)
 
     # feature extractor
-    out = conv_block(img_input, 64, 11, strides=4, pool=True, first_layer=True)
-    out = conv_block(out, 192, 5, pool=True)
-    out = conv_block(out, 384, 3)
-    out = conv_block(out, 384, 3)
-    out = conv_block(out, 256, 3, pool=True, no_inflation=True)
+    out = conv_block(
+        img_input, features=64, kernel_size=11, strides=4, pool=True, first_layer=True
+    )
+    out = conv_block(out, features=192, kernel_size=5, pool=True)
+    out = conv_block(out, features=384, kernel_size=3)
+    out = conv_block(out, features=384, kernel_size=3)
+    out = conv_block(out, features=256, kernel_size=3, pool=True, no_inflation=True)
 
     # classifier
     if include_top:
         out = tf.keras.layers.Flatten()(out)
-        out = fc_block(out, 4096)
-        out = fc_block(out, 4096)
-        out = fc_block(out, dataset.num_classes)
+        out = dense_block(out, units=4096)
+        out = dense_block(out, units=4096)
+        out = dense_block(out, dataset.num_classes)
         out = tf.keras.layers.Activation("softmax")(out)
 
     return tf.keras.Model(inputs=img_input, outputs=out)
