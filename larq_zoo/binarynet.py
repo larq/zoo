@@ -1,84 +1,88 @@
-from zookeeper import registry, HParams
-import larq as lq
 import tensorflow as tf
+import larq as lq
 from larq_zoo import utils
+from zookeeper import registry, HParams
 
 
 @registry.register_model
-def binary_alex_net(hparams, dataset, input_tensor=None, include_top=True):
-    kwargs = dict(
+def binary_alexnet(hparams, dataset, input_tensor=None, include_top=True):
+    """
+    Implementation of ["Binarized Neural Networks"](https://papers.nips.cc/paper/6573-binarized-neural-networks)
+    by Hubara et al., NIPS, 2016.
+    """
+    kwhparams = dict(
         input_quantizer="ste_sign",
         kernel_quantizer="ste_sign",
         kernel_constraint="weight_clip",
         use_bias=False,
     )
+
+    def conv_block(
+        x,
+        features,
+        kernel_size,
+        strides=1,
+        pool=False,
+        first_layer=False,
+        no_inflation=False,
+    ):
+        x = lq.layers.QuantConv2D(
+            features * (1 if no_inflation else hparams.inflation_ratio),
+            kernel_size=kernel_size,
+            strides=strides,
+            padding="same",
+            input_quantizer=None if first_layer else "ste_sign",
+            kernel_quantizer="ste_sign",
+            kernel_constraint="weight_clip",
+            use_bias=False,
+        )(x)
+        if pool:
+            x = tf.keras.layers.MaxPool2D(pool_size=3, strides=2)(x)
+        x = tf.keras.layers.BatchNormalization(scale=False, momentum=0.9)(x)
+        return x
+
+    def dense_block(x, units):
+        x = lq.layers.QuantDense(units, **kwhparams)(x)
+        x = tf.keras.layers.BatchNormalization(scale=False, momentum=0.9)(x)
+        return x
+
+    # get input
     img_input = utils.get_input_layer(dataset.input_shape, input_tensor)
 
-    x = lq.layers.QuantConv2D(
-        hparams.filters,
-        11,
-        strides=4,
-        padding="same",
-        kernel_quantizer="ste_sign",
-        kernel_constraint="weight_clip",
-        use_bias=False,
-    )(img_input)
-    x = tf.keras.layers.MaxPool2D(pool_size=3, strides=2)(x)
-    x = tf.keras.layers.BatchNormalization(scale=False)(x)
+    # feature extractor
+    out = conv_block(
+        img_input, features=64, kernel_size=11, strides=4, pool=True, first_layer=True
+    )
+    out = conv_block(out, features=192, kernel_size=5, pool=True)
+    out = conv_block(out, features=384, kernel_size=3)
+    out = conv_block(out, features=384, kernel_size=3)
+    out = conv_block(out, features=256, kernel_size=3, pool=True, no_inflation=True)
 
-    x = lq.layers.QuantConv2D(hparams.filters * 3, 5, padding="same", **kwargs)(x)
-    x = tf.keras.layers.MaxPool2D(pool_size=3, strides=2)(x)
-    x = tf.keras.layers.BatchNormalization(scale=False)(x)
-
-    x = lq.layers.QuantConv2D(6 * hparams.filters, 3, padding="same", **kwargs)(x)
-    x = tf.keras.layers.BatchNormalization(scale=False)(x)
-
-    x = lq.layers.QuantConv2D(4 * hparams.filters, 3, padding="same", **kwargs)(x)
-    x = tf.keras.layers.BatchNormalization(scale=False)(x)
-
-    x = lq.layers.QuantConv2D(4 * hparams.filters, 3, padding="same", **kwargs)(x)
-    x = tf.keras.layers.MaxPool2D(pool_size=3, strides=2)(x)
-    x = tf.keras.layers.BatchNormalization(scale=False)(x)
-
+    # classifier
     if include_top:
-        x = tf.keras.layers.Flatten()(x)
-        x = lq.layers.QuantDense(hparams.dense_units, **kwargs)(x)
-        x = tf.keras.layers.BatchNormalization(scale=False)(x)
-        x = lq.layers.QuantDense(hparams.dense_units, **kwargs)(x)
-        x = tf.keras.layers.BatchNormalization(scale=False)(x)
-        x = lq.layers.QuantDense(dataset.num_classes, **kwargs)(x)
-        x = tf.keras.layers.BatchNormalization(scale=False)(x)
-        x = tf.keras.layers.Activation("softmax", name="predictions")(x)
+        out = tf.keras.layers.Flatten()(out)
+        out = dense_block(out, units=4096)
+        out = dense_block(out, units=4096)
+        out = dense_block(out, dataset.num_classes)
+        out = tf.keras.layers.Activation("softmax")(out)
 
-    # Ensure that the model takes into account
-    # any potential predecessors of `input_tensor`.
-    if input_tensor is not None:
-        inputs = tf.keras.utils.get_source_inputs(input_tensor)
-    else:
-        inputs = img_input
-
-    return tf.keras.models.Model(inputs, x, name="binary_alex_net")
+    return tf.keras.Model(inputs=img_input, outputs=out)
 
 
-@registry.register_hparams(binary_alex_net)
+@registry.register_hparams(binary_alexnet)
 class default(HParams):
     epochs = 100
-    batch_size = 256
-    filters = 64
-    dense_units = 4096
-    optimizer = tf.keras.optimizers.Adam(5e-3)
+    inflation_ratio = 1
+    batch_size = 512
+    learning_rate = 0.01
+    lr_decay_stepsize = 10
 
-    def learning_rate_schedule(epoch):
-        if epoch < 20:
-            return 5e-3
-        elif epoch < 30:
-            return 1e-3
-        elif epoch < 35:
-            return 5e-4
-        elif epoch < 40:
-            return 1e-4
-        else:
-            return 1e-5
+    def learning_rate_schedule(self, epoch):
+        return self.learning_rate * 0.5 ** (epoch // self.lr_decay_stepsize)
+
+    @property
+    def optimizer(self):
+        return tf.keras.optimizers.Adam(self.learning_rate)
 
 
 def BinaryAlexNet(
@@ -113,7 +117,7 @@ def BinaryAlexNet(
     """
     input_shape = utils.validate_input(input_shape, weights, include_top, classes)
 
-    model = binary_alex_net(
+    model = binary_alexnet(
         default(),
         utils.ImagenetDataset(input_shape, classes),
         input_tensor=input_tensor,
