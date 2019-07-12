@@ -93,6 +93,10 @@ def clamp(x):
 
 @lq.utils.register_keras_custom_object
 def xnor_weight_scale(x):
+    """ Clips the weights between -1 and +1 and then
+        calculates a scale factor per weight filter. See
+        https://arxiv.org/abs/1603.05279 for more details
+    """
 
     x = clamp(x)
 
@@ -109,7 +113,7 @@ class default(HParams):
     input_quantizer = "ste_sign"
     kernel_quantizer = "xnor_weight_scale"
     kernel_constraint = "weight_clip"
-    regularization_quantity = 1e-5  # TBD
+    regularization_quantity = 1e-7  # To be firmed up once run is finished
     use_bias = False
     bn_scale = False
     bn_momentum = 0.9
