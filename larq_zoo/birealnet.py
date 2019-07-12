@@ -147,7 +147,7 @@ def BiRealNet(
         cache_dir = os.path.join(os.path.expanduser("~"), ".larq")
         if include_top:
             weights_path = tf.keras.utils.get_file(
-                "birealnet_weights.h5",
+                "birealnet_weights-v0.1.0.h5",
                 url + "birealnet_weights.h5",
                 cache_dir=cache_dir,
                 cache_subdir="models",
@@ -155,7 +155,7 @@ def BiRealNet(
             )
         else:
             weights_path = tf.keras.utils.get_file(
-                "birealnet_weights_notop.h5",
+                "birealnet_weights_notop-v0.1.0.h5",
                 url + "birealnet_weights_notop.h5",
                 cache_dir=cache_dir,
                 cache_subdir="models",
