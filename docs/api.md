@@ -1,13 +1,13 @@
 # Larq Zoo API Documentation
 
-## BinaryAlexNet<a class="headerlink code-link" style="float:right;" href="https://github.com/larq/zoo/blob/master/larq_zoo/binarynet.py#L99" title="Source code"></a>
+## BinaryAlexNet<a class="headerlink code-link" style="float:right;" href="https://github.com/larq/zoo/blob/master/larq_zoo/binarynet.py#L88" title="Source code"></a>
 
 ```python
 BinaryAlexNet(include_top=True,
-          weights="imagenet",
-          input_tensor=None,
-          input_shape=None,
-          classes=1000)
+              weights="imagenet",
+              input_tensor=None,
+              input_shape=None,
+              classes=1000)
 ```
 
 Instantiates the Binary AlexNet architecture.
@@ -41,7 +41,7 @@ A Keras model instance.
 - [Binarized Neural Networks](https://papers.nips.cc/paper/6573-binarized-neural-networks)
 
 
-## BiRealNet<a class="headerlink code-link" style="float:right;" href="https://github.com/larq/zoo/blob/master/larq_zoo/birealnet.py#L99" title="Source code"></a>
+## BiRealNet<a class="headerlink code-link" style="float:right;" href="https://github.com/larq/zoo/blob/master/larq_zoo/birealnet.py#L100" title="Source code"></a>
 
 ```python
 BiRealNet(include_top=True,
