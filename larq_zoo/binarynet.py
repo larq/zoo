@@ -5,26 +5,8 @@ from larq_zoo import utils
 from zookeeper import registry, HParams
 
 
-def create_model(nested_list):
-    """Utility function to build a model from a nested list of layers."""
-
-    def unpack(l):
-        for el in l:
-            if isinstance(el, collections.Iterable) and not isinstance(
-                el, (str, bytes)
-            ):
-                yield from unpack(el)
-            else:
-                yield el
-
-    model = tf.keras.models.Sequential()
-    for layer in unpack(nested_list):
-        model.add(layer)
-    return model
-
-
 @registry.register_model
-def binary_alexnet(hparams, dataset):
+def binary_alexnet(hparams, dataset, input_tensor=None, include_top=True):
     """
     Implementation of ["Binarized Neural Networks"](https://papers.nips.cc/paper/6573-binarized-neural-networks)
     by Hubara et al., NIPS, 2016.
@@ -36,8 +18,8 @@ def binary_alexnet(hparams, dataset):
         use_bias=False,
     )
 
-    # Generalized definition of the conv block.
     def conv_block(
+        x,
         features,
         kernel_size,
         strides=1,
@@ -45,47 +27,45 @@ def binary_alexnet(hparams, dataset):
         first_layer=False,
         no_inflation=False,
     ):
-        layers = []
-        conv_kwargs = {"input_shape": dataset.input_shape} if first_layer else {}
-        layers.append(
-            lq.layers.QuantConv2D(
-                features * (1 if no_inflation else hparams.inflation_ratio),
-                kernel_size=kernel_size,
-                strides=strides,
-                padding="same",
-                input_quantizer=None if first_layer else "ste_sign",
-                kernel_quantizer="ste_sign",
-                kernel_constraint="weight_clip",
-                use_bias=False,
-                **conv_kwargs
-            )
-        )
+        x = lq.layers.QuantConv2D(
+            features * (1 if no_inflation else hparams.inflation_ratio),
+            kernel_size=kernel_size,
+            strides=strides,
+            padding="same",
+            input_quantizer=None if first_layer else "ste_sign",
+            kernel_quantizer="ste_sign",
+            kernel_constraint="weight_clip",
+            use_bias=False,
+        )(x)
         if pool:
-            layers.append(tf.keras.layers.MaxPool2D(pool_size=3, strides=2))
-        layers.append(tf.keras.layers.BatchNormalization(scale=False, momentum=0.9))
-        return layers
+            x = tf.keras.layers.MaxPool2D(pool_size=3, strides=2)(x)
+        x = tf.keras.layers.BatchNormalization(scale=False, momentum=0.9)(x)
+        return x
 
-    # Generalized definition of a fully connected block.
-    def fc_block(units):
-        return [
-            lq.layers.QuantDense(units, **kwhparams),
-            tf.keras.layers.BatchNormalization(scale=False, momentum=0.9),
-        ]
+    def fc_block(x, units):
+        x = lq.layers.QuantDense(units, **kwhparams)(x)
+        x = tf.keras.layers.BatchNormalization(scale=False, momentum=0.9)(x)
+        return x
 
-    return create_model(
-        [
-            conv_block(64, 11, strides=4, pool=True, first_layer=True),
-            conv_block(192, 5, pool=True),
-            conv_block(384, 3),
-            conv_block(384, 3),
-            conv_block(256, 3, pool=True, no_inflation=True),
-            tf.keras.layers.Flatten(),
-            fc_block(4096),
-            fc_block(4096),
-            fc_block(dataset.num_classes),
-            tf.keras.layers.Activation("softmax"),
-        ]
-    )
+    # get input
+    img_input = utils.get_input_layer(dataset.input_shape, input_tensor)
+
+    # feature extractor
+    out = conv_block(img_input, 64, 11, strides=4, pool=True, first_layer=True)
+    out = conv_block(out, 192, 5, pool=True)
+    out = conv_block(out, 384, 3)
+    out = conv_block(out, 384, 3)
+    out = conv_block(out, 256, 3, pool=True, no_inflation=True)
+
+    # classifier
+    if include_top:
+        out = tf.keras.layers.Flatten()(out)
+        out = fc_block(out, 4096)
+        out = fc_block(out, 4096)
+        out = fc_block(out, dataset.num_classes)
+        out = tf.keras.layers.Activation("softmax")(out)
+
+    return tf.keras.Model(inputs=img_input, outputs=out)
 
 
 @registry.register_hparams(binary_alexnet)
@@ -95,7 +75,6 @@ class default(HParams):
     batch_size = 512
     learning_rate = 0.01
     lr_decay_stepsize = 10
-    xavier_scaling = False
 
     def learning_rate_schedule(self, epoch):
         return self.learning_rate * 0.5 ** (epoch // self.lr_decay_stepsize)
