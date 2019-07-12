@@ -68,7 +68,7 @@ def xnornet(hparams, dataset, input_tensor=None, include_top=True):
         x = tf.keras.layers.Activation("relu")(x)
         x = tf.keras.layers.Flatten()(x)
         x = tf.keras.layers.Dense(
-            units=dataset.num_classes,
+            dataset.num_classes,
             use_bias=False,
             kernel_regularizer=hparams.kernel_regularizer,
         )(x)
@@ -104,7 +104,6 @@ class default(HParams):
     filters = 128
     kernel_size = 3
     dense_units = 1024
-    batch_size = 256
     input_quantizer = "ste_sign"
     kernel_quantizer = "xnor_weight"
     kernel_constraint = "weight_clip"
@@ -112,29 +111,31 @@ class default(HParams):
     use_bias = False
     bn_scale = False
     bn_momentum = 0.9
+    epochs = 100
+    batch_size = 1200
     initial_lr = 0.001
 
     def learning_rate_schedule(self, epoch):
-        epoch_dec_1 = 18 + 1
-        epoch_dec_2 = 29 + 1
-        epoch_dec_3 = 43 + 1
-        epoch_dec_4 = 52 + 1
-        epoch_dec_5 = 65 + 1
-        epoch_dec_6 = 75 + 1
-        epoch_dec_7 = 85 + 1
+        epoch_dec_1 = 19
+        epoch_dec_2 = 30
+        epoch_dec_3 = 44
+        epoch_dec_4 = 53
+        epoch_dec_5 = 66
+        epoch_dec_6 = 76
+        epoch_dec_7 = 86
         if epoch < epoch_dec_1:
             internal_learning_rate = self.initial_lr
-        elif epoch > (epoch_dec_1 - 1) and epoch < epoch_dec_2:
+        elif epoch < epoch_dec_2:
             internal_learning_rate = self.initial_lr * 0.5
-        elif epoch > (epoch_dec_2 - 1) and epoch < epoch_dec_3:
+        elif epoch < epoch_dec_3:
             internal_learning_rate = self.initial_lr * 0.1
-        elif epoch > (epoch_dec_3 - 1) and epoch < epoch_dec_4:
+        elif epoch < epoch_dec_4:
             internal_learning_rate = self.initial_lr * 0.1 * 0.5
-        elif epoch > (epoch_dec_4 - 1) and epoch < epoch_dec_5:
+        elif epoch < epoch_dec_5:
             internal_learning_rate = self.initial_lr * 0.01
-        elif epoch > (epoch_dec_5 - 1) and epoch < epoch_dec_6:
+        elif epoch < epoch_dec_6:
             internal_learning_rate = self.initial_lr * 0.01 * 0.5
-        elif epoch > (epoch_dec_6 - 1) and epoch < epoch_dec_7:
+        elif epoch < epoch_dec_7:
             internal_learning_rate = self.initial_lr * 0.01 * 0.1
         else:
             internal_learning_rate = self.initial_lr * 0.001 * 0.1
