@@ -3,11 +3,11 @@
 Larq Zoo provides reference implementations of deep neural networks with extremely low precision weights and activations that are made available alongside pre-trained weights.
 These models can be used for prediction, feature extraction, and fine-tuning.
 
-We believe that a collection of tested implementations with pretrained weights is greatly beneficial for the field of Extremely Quantized Neural Networks. To improve reproducibility we have implemented a few commonly used models found in the literature. If you have developed or reimplemented a Binarized or other Extremely Quantized Neural Network and want to share it with the community so future papers can build on top of your work, please add it to Larq Zoo or get in touch with us if you need any help.
+We believe that a collection of tested implementations with pretrained weights is greatly beneficial for the field of Extremely Quantized Neural Networks. To improve reproducibility we have implemented a few commonly used models found in the literature. If you have developed or reimplemented a Binarized or other Extremely Quantized Neural Network and want to share it with the community such that future papers can build on top of your work, please add it to Larq Zoo or get in touch with us if you need any help.
 
 ## Installation
 
-Larq Zoo is not included in Larq by default. To start using is, you can install it with Python's [pip](https://pip.pypa.io/en/stable/) package manager:
+Larq Zoo is not included in Larq by default. To start using it, you can install it with Python's [pip](https://pip.pypa.io/en/stable/) package manager:
 
 ```shell
 pip install larq-zoo
