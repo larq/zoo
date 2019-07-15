@@ -21,7 +21,7 @@ setup(
     extras_require={
         "tensorflow": ["tensorflow>=1.13.1"],
         "tensorflow_gpu": ["tensorflow-gpu>=1.13.1"],
-        "test": ["pytest>=4.3.1", "pytest-cov>=2.6.1", "Pillow==6.0.0"],
+        "test": ["pytest>=4.3.1", "pytest-cov>=2.6.1", "Pillow==6.1.0"],
     },
     entry_points="""
         [console_scripts]
