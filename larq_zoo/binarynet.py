@@ -71,7 +71,7 @@ def binary_alexnet(hparams, dataset, input_tensor=None, include_top=True):
 
 @registry.register_hparams(binary_alexnet)
 class default(HParams):
-    epochs = 100
+    epochs = 150
     inflation_ratio = 1
     batch_size = 512
     learning_rate = 0.01
