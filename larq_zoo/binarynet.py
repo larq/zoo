@@ -71,7 +71,7 @@ def binary_alexnet(hparams, dataset, input_tensor=None, include_top=True):
 
 @registry.register_hparams(binary_alexnet)
 class default(HParams):
-    epochs = 100
+    epochs = 150
     inflation_ratio = 1
     batch_size = 512
     learning_rate = 0.01
@@ -126,22 +126,23 @@ def BinaryAlexNet(
 
     # Load weights.
     if weights == "imagenet":
-        raise NotImplementedError()
-        # if include_top:
-        #     weights_path = tf.keras.utils.get_file(
-        #         "vgg16_weights_tf_dim_ordering_tf_kernels.h5",
-        #         WEIGHTS_PATH,
-        #         cache_subdir="models",
-        #         file_hash="64373286793e3c8b2b4e3219cbf3544b",
-        #     )
-        # else:
-        #     weights_path = tf.keras.utils.get_file(
-        #         "vgg16_weights_tf_dim_ordering_tf_kernels_notop.h5",
-        #         WEIGHTS_PATH_NO_TOP,
-        #         cache_subdir="models",
-        #         file_hash="6d6bbae143d832006294945121d1f1fc",
-        #     )
-        # model.load_weights(weights_path)
+        # download appropriate file
+        if include_top:
+            weights_path = utils.download_pretrained_model(
+                model="binary_alexnet",
+                version="v0.1.0",
+                file="binary_alexnet_weights.h5",
+                file_hash="4dd4ddf6af0c26a0312ae1109191c1db59707ba0c03a025e6b71035d1f7057a2",
+            )
+        else:
+            weights_path = utils.download_pretrained_model(
+                model="binary_alexnet",
+                version="v0.1.0",
+                file="binary_alexnet_weights_notop.h5",
+                file_hash="2138b34787df6fee300e584df35de3bf4aefa7dd2788211d2b0d30ae7a9284cc",
+            )
+        model.load_weights(weights_path)
     elif weights is not None:
         model.load_weights(weights)
+
     return model

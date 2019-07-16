@@ -30,13 +30,13 @@ def parametrize(func):
     )(func)
 
 
-@keras_test
-def test_prediction():
+@parametrize
+def test_prediction(app, last_feature_dim):
     file = os.path.join(os.path.dirname(__file__), "fixtures", "elephant.jpg")
     img = keras.preprocessing.image.load_img(file)
     img = keras.preprocessing.image.img_to_array(img)
     img = lqz.preprocess_input(img)
-    model = lqz.BiRealNet()
+    model = app(weights="imagenet")
     preds = model.predict(np.expand_dims(img, axis=0))
 
     # Test correct label is in top 3 (weak correctness test).
