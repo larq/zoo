@@ -129,18 +129,18 @@ def BinaryAlexNet(
         # download appropriate file
         if include_top:
             weights_path = utils.download_pretrained_model(
-                model='binary_alexnet',
-                version='v0.1.0',
+                model="binary_alexnet",
+                version="v0.1.0",
                 file="binary_alexnet_weights.h5",
-                file_hash="4dd4ddf6af0c26a0312ae1109191c1db59707ba0c03a025e6b71035d1f7057a2"
-                )
+                file_hash="4dd4ddf6af0c26a0312ae1109191c1db59707ba0c03a025e6b71035d1f7057a2",
+            )
         else:
             weights_path = utils.download_pretrained_model(
-                model='binary_alexnet',
-                version='v0.1.0',
+                model="binary_alexnet",
+                version="v0.1.0",
                 file="binary_alexnet_weights_notop.h5",
-                file_hash="2138b34787df6fee300e584df35de3bf4aefa7dd2788211d2b0d30ae7a9284cc"
-                )
+                file_hash="2138b34787df6fee300e584df35de3bf4aefa7dd2788211d2b0d30ae7a9284cc",
+            )
         model.load_weights(weights_path)
     elif weights is not None:
         model.load_weights(weights)
