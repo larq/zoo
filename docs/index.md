@@ -21,7 +21,7 @@ The following models are trained on the [ImageNet](http://image-net.org/) datase
 
 The model definitions and the train loop are available in the [Larq Zoo repository](https://github.com/larq/zoo).
 
-| Model                                 | Top-1 Accuracy | Top-5 Accuracy |
-| ------------------------------------- | -------------- | -------------- |
-| [Bi-Real Net](/models/api/#birealnet) | 55.88 %        | 78.62 %        |
-| [Binary Alexnet](/models/api/#BinaryAlexNet) | 36.28 % | 61.05 %        |
+| Model                                        | Top-1 Accuracy | Top-5 Accuracy |
+| -------------------------------------------- | -------------- | -------------- |
+| [Bi-Real Net](/models/api/#birealnet)        | 55.88 %        | 78.62 %        |
+| [Binary AlexNet](/models/api/#binaryalexnet) | 36.28 %        | 61.05 %        |
