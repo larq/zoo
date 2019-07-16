@@ -113,7 +113,7 @@ class default(HParams):
     input_quantizer = "ste_sign"
     kernel_quantizer = "xnor_weight_scale"
     kernel_constraint = "weight_clip"
-    regularization_quantity = 1e-7  # To be firmed up once run is finished
+    regularization_quantity = 5e-7
     use_bias = False
     bn_scale = False
     bn_momentum = 0.9
@@ -156,14 +156,14 @@ class default(HParams):
         return tf.keras.optimizers.Adam(self.initial_lr)
 
 
-def XNORnet(
+def XNORNet(
     include_top=True,
     weights="imagenet",
     input_tensor=None,
     input_shape=None,
     classes=1000,
 ):
-    """Instantiates the XNORnet architecture.
+    """Instantiates the XNORNet architecture.
 
     Optionally loads weights pre-trained on ImageNet.
 
