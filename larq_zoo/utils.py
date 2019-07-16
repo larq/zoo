@@ -21,15 +21,13 @@ def download_pretrained_model(model, version, file, file_hash, cache_dir=None):
     url = slash_join(root_url, model + "-" + version, file)
     cache_subdir = os.path.join("larq/models/", model)
 
-    weights_path = tf.keras.utils.get_file(
+    return tf.keras.utils.get_file(
         fname=file,
         origin=url,
         cache_dir=cache_dir,
         cache_subdir=cache_subdir,
         file_hash=file_hash,
     )
-
-    return weights_path
 
 
 def get_current_epoch(output_dir):
