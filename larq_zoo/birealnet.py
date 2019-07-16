@@ -143,24 +143,21 @@ def BiRealNet(
 
     # Load weights.
     if weights == "imagenet":
-        url = "https://github.com/plumerai/larq-zoo/releases/download/birealnet-v0.1.0/"
-        cache_dir = os.path.join(os.path.expanduser("~"), ".larq")
+        # download appropriate file
         if include_top:
-            weights_path = tf.keras.utils.get_file(
-                "birealnet_weights-v0.1.0.h5",
-                url + "birealnet_weights.h5",
-                cache_dir=cache_dir,
-                cache_subdir="models",
-                file_hash="7fafcef8c453ec528fce3562fd5c7835",
-            )
+            weights_path = utils.download_pretrained_model(
+                model='birealnet',
+                version='v0.1.0',
+                file="birealnet_weights.h5",
+                file_hash="7fafcef8c453ec528fce3562fd5c7835"
+                )
         else:
-            weights_path = tf.keras.utils.get_file(
-                "birealnet_weights_notop-v0.1.0.h5",
-                url + "birealnet_weights_notop.h5",
-                cache_dir=cache_dir,
-                cache_subdir="models",
-                file_hash="0617bab5884ca8c3179ad451448651e9",
-            )
+            weights_path = utils.download_pretrained_model(
+                model='birealnet',
+                version='v0.1.0',
+                file="birealnet_weights_notop.h5",
+                file_hash="0617bab5884ca8c3179ad451448651e9"
+                )
         model.load_weights(weights_path)
     elif weights is not None:
         model.load_weights(weights)
