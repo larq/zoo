@@ -23,5 +23,6 @@ The model definitions and the train loop are available in the [Larq Zoo reposito
 
 | Model                                        | Top-1 Accuracy | Top-5 Accuracy |
 | -------------------------------------------- | -------------- | -------------- |
-| [Bi-Real Net](/models/api/#birealnet)        | 55.88 %        | 78.62 %        |
 | [Binary AlexNet](/models/api/#binaryalexnet) | 36.28 %        | 61.05 %        |
+| [Bi-Real Net](/models/api/#birealnet)        | 55.88 %        | 78.62 %        |
+| [XNOR-Net](/models/api/#xnornet)             | 43.03 %        | 67.32 %        |

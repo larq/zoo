@@ -40,7 +40,6 @@ A Keras model instance.
 
 - [Binarized Neural Networks](https://papers.nips.cc/paper/6573-binarized-neural-networks)
 
-
 ## BiRealNet<a class="headerlink code-link" style="float:right;" href="https://github.com/larq/zoo/blob/master/larq_zoo/birealnet.py#L100" title="Source code"></a>
 
 ```python
@@ -82,6 +81,46 @@ A Keras model instance.
 - [Bi-Real Net: Enhancing the Performance of 1-bit CNNs With Improved
   Representational Capability and Advanced Training
   Algorithm](https://arxiv.org/abs/1808.00278)
+
+## XNORNet<a class="headerlink code-link" style="float:right;" href="https://github.com/larq/zoo/blob/master/larq_zoo/xnornet.py#L150" title="Source code"></a>
+
+```python
+XNORNet(include_top=True,
+        weights="imagenet",
+        input_tensor=None,
+        input_shape=None,
+        classes=1000)
+```
+
+Instantiates the XNOR-Net architecture.
+
+Optionally loads weights pre-trained on ImageNet.
+
+**Arguments**
+
+- `include_top`: whether to include the fully-connected layer at the top of the network.
+- `weights`: one of `None` (random initialization), `"imagenet"` (pre-training on
+  ImageNet), or the path to the weights file to be loaded.
+- `input_tensor`: optional Keras Tensor (i.e. output of `layers.Input()`) to use as
+  image input for the model.
+- `input_shape`: optional shape tuple, only to be specified if `include_top` is False
+  (otherwise the input shape has to be `(224, 224, 3)` (with `channels_last` data
+  format) or `(3, 224, 224)` (with `channels_first` data format).
+  It should have exactly 3 inputs channels.
+- `classes`: optional number of classes to classify images into, only to be specified
+  if `include_top` is True, and if no `weights` argument is specified.
+
+**Returns**
+
+A Keras model instance.
+
+**Raises**
+
+- **ValueError**: in case of invalid argument for `weights`, or invalid input shape.
+
+**References**
+
+- [XNOR-Net: ImageNet Classification Using Binary Convolutional Neural Networks](https://arxiv.org/abs/1603.05279)
 
 ## decode_predictions<a class="headerlink code-link" style="float:right;" href="https://github.com/keras-team/keras-applications/blob/master/keras_applications/imagenet_utils.py#L198" title="Source code"></a>
 
