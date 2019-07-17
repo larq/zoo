@@ -96,6 +96,10 @@ Instantiates the XNOR-Net architecture.
 
 Optionally loads weights pre-trained on ImageNet.
 
+```plot-altair
+/plots/xnornet.vg.json
+```
+
 **Arguments**
 
 - `include_top`: whether to include the fully-connected layer at the top of the network.
