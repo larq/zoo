@@ -48,7 +48,7 @@ def preprocess_input(image):
 
 
 @registry.register_preprocess("imagenet2012", (224, 224, 3))
-@registry.register_preprocess("oxford_iiit_pet", (224, 224, 3))
+@registry.register_preprocess("oxford_flowers102", (224, 224, 3))  # For testing
 def default(image, training):
     return preprocess_image(image, 224, 224, is_training=training)
 
