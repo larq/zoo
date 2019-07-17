@@ -99,9 +99,6 @@ def xnor_weight_scale(x):
 
 @registry.register_hparams(xnornet)
 class default(HParams):
-    filters = 128
-    kernel_size = 3
-    dense_units = 1024
     input_quantizer = "ste_sign"
     kernel_quantizer = "xnor_weight_scale"
     kernel_constraint = "weight_clip"
