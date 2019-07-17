@@ -83,6 +83,7 @@ def xnornet(hparams, dataset, input_tensor=None, include_top=True):
     return tf.keras.models.Model(inputs, x)
 
 
+@lq.utils.set_precision(1)
 @lq.utils.register_keras_custom_object
 def xnor_weight_scale(x):
     """ Clips the weights between -1 and +1 and then

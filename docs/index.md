@@ -7,15 +7,15 @@ We believe that a collection of tested implementations with pretrained weights i
 
 ## Available models
 
-The following models are trained on the [ImageNet](http://image-net.org/) dataset. The Top-1 and Top-5 accuracy refers to the model's performance on the ImageNet validation dataset.
+The following models are trained on the [ImageNet](http://image-net.org/) dataset. The Top-1 and Top-5 accuracy refers to the model's performance on the ImageNet validation dataset, memory refers to the memory after quantization of the weights.
 
 The model definitions and the train loop are available in the [Larq Zoo repository](https://github.com/larq/zoo).
 
-| Model                                        | Top-1 Accuracy | Top-5 Accuracy |
-| -------------------------------------------- | -------------- | -------------- |
-| [Binary AlexNet](/models/api/#binaryalexnet) | 36.28 %        | 61.05 %        |
-| [Bi-Real Net](/models/api/#birealnet)        | 55.88 %        | 78.62 %        |
-| [XNOR-Net](/models/api/#xnornet)             | 43.03 %        | 67.32 %        |
+| Model                                        | Top-1 Accuracy | Top-5 Accuracy | Parameters | Memory   |
+| -------------------------------------------- | -------------- | -------------- | ---------- | -------- |
+| [Binary AlexNet](/models/api/#binaryalexnet) | 36.28 %        | 61.05 %        | 61 859 192 | 7.49 MB  |
+| [Bi-Real Net](/models/api/#birealnet)        | 55.88 %        | 78.62 %        | 11 736 232 | 4.04 MB  |
+| [XNOR-Net](/models/api/#xnornet)             | 43.03 %        | 67.32 %        | 62 396 768 | 22.81 MB |
 
 ## Installation
 
