@@ -33,32 +33,31 @@ def xnornet(hparams, dataset, input_tensor=None, include_top=True):
     x = tf.keras.layers.BatchNormalization(
         momentum=hparams.bn_momentum, scale=hparams.bn_scale, epsilon=1e-4
     )(x)
-    x = lq.layers.QuantConv2D(256, (5, 5), strides=(1, 1), padding="same", **kwargs)(x)
+    x = lq.layers.QuantConv2D(256, (5, 5), padding="same", **kwargs)(x)
     x = tf.keras.layers.MaxPool2D(pool_size=(3, 3), strides=(2, 2))(x)
     x = tf.keras.layers.BatchNormalization(
         momentum=hparams.bn_momentum, scale=hparams.bn_scale, epsilon=1e-4
     )(x)
-    x = lq.layers.QuantConv2D(384, (3, 3), strides=(1, 1), padding="same", **kwargs)(x)
+    x = lq.layers.QuantConv2D(384, (3, 3), padding="same", **kwargs)(x)
     x = tf.keras.layers.BatchNormalization(
         momentum=hparams.bn_momentum, scale=hparams.bn_scale, epsilon=1e-4
     )(x)
-    x = lq.layers.QuantConv2D(384, (3, 3), strides=(1, 1), padding="same", **kwargs)(x)
+    x = lq.layers.QuantConv2D(384, (3, 3), padding="same", **kwargs)(x)
     x = tf.keras.layers.BatchNormalization(
         momentum=hparams.bn_momentum, scale=hparams.bn_scale, epsilon=1e-4
     )(x)
-    x = lq.layers.QuantConv2D(256, (3, 3), strides=(1, 1), padding="same", **kwargs)(x)
+    x = lq.layers.QuantConv2D(256, (3, 3), padding="same", **kwargs)(x)
     x = tf.keras.layers.MaxPool2D(pool_size=(3, 3), strides=(2, 2))(x)
     x = tf.keras.layers.BatchNormalization(
         momentum=hparams.bn_momentum, scale=hparams.bn_scale, epsilon=1e-4
     )(x)
-    x = lq.layers.QuantConv2D(4096, (6, 6), strides=(1, 1), padding="valid", **kwargs)(
-        x
-    )
+    x = lq.layers.QuantConv2D(4096, (6, 6), padding="valid", **kwargs)(x)
     x = tf.keras.layers.BatchNormalization(
         momentum=hparams.bn_momentum, scale=hparams.bn_scale, epsilon=1e-4
     )(x)
 
     if include_top:
+        # Equivilent to a dense layer
         x = lq.layers.QuantConv2D(
             4096, (1, 1), strides=(1, 1), padding="valid", **kwargs
         )(x)
@@ -84,13 +83,6 @@ def xnornet(hparams, dataset, input_tensor=None, include_top=True):
     return tf.keras.models.Model(inputs, x, name="xnornet")
 
 
-def clamp(x):
-    """ Clips an input between -1 and +1
-    """
-    x = tf.clip_by_value(x, -1, 1)
-    return x
-
-
 @lq.utils.register_keras_custom_object
 def xnor_weight_scale(x):
     """ Clips the weights between -1 and +1 and then
@@ -98,7 +90,7 @@ def xnor_weight_scale(x):
         https://arxiv.org/abs/1603.05279 for more details
     """
 
-    x = clamp(x)
+    x = tf.clip_by_value(x, -1, 1)
 
     alpha = tf.reduce_mean(tf.abs(x), axis=[0, 1, 2], keepdims=True)
 
@@ -130,22 +122,21 @@ class default(HParams):
         epoch_dec_6 = 76
         epoch_dec_7 = 86
         if epoch < epoch_dec_1:
-            internal_learning_rate = self.initial_lr
+            return self.initial_lr
         elif epoch < epoch_dec_2:
-            internal_learning_rate = self.initial_lr * 0.5
+            return self.initial_lr * 0.5
         elif epoch < epoch_dec_3:
-            internal_learning_rate = self.initial_lr * 0.1
+            return self.initial_lr * 0.1
         elif epoch < epoch_dec_4:
-            internal_learning_rate = self.initial_lr * 0.1 * 0.5
+            return self.initial_lr * 0.1 * 0.5
         elif epoch < epoch_dec_5:
-            internal_learning_rate = self.initial_lr * 0.01
+            return self.initial_lr * 0.01
         elif epoch < epoch_dec_6:
-            internal_learning_rate = self.initial_lr * 0.01 * 0.5
+            return self.initial_lr * 0.01 * 0.5
         elif epoch < epoch_dec_7:
-            internal_learning_rate = self.initial_lr * 0.01 * 0.1
+            return self.initial_lr * 0.01 * 0.1
         else:
-            internal_learning_rate = self.initial_lr * 0.001 * 0.1
-        return internal_learning_rate
+            return self.initial_lr * 0.001 * 0.1
 
     @property
     def kernel_regularizer(self):
