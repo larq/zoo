@@ -80,7 +80,7 @@ def xnornet(hparams, dataset, input_tensor=None, include_top=True):
     else:
         inputs = img_input
 
-    return tf.keras.models.Model(inputs, x, name="xnornet")
+    return tf.keras.models.Model(inputs, x)
 
 
 @lq.utils.register_keras_custom_object
@@ -188,7 +188,22 @@ def XNORNet(
 
     # Load weights.
     if weights == "imagenet":
-        raise NotImplementedError()
+        # download appropriate file
+        if include_top:
+            weights_path = utils.download_pretrained_model(
+                model="xnornet",
+                version="v0.1.0",
+                file="xnornet_weights.h5",
+                file_hash="031d79b139ef2c04125726698e4a90fc6e862114e738ffb9f5b06be635b4e3f0",
+            )
+        else:
+            weights_path = utils.download_pretrained_model(
+                model="xnornet",
+                version="v0.1.0",
+                file="xnornet_weights_notop.h5",
+                file_hash="7f8ba86da2770ad317b5ab685d6c644128b9ac8ce480444dddaecd2664b6a6b4",
+            )
+        model.load_weights(weights_path)
     elif weights is not None:
         model.load_weights(weights)
     return model
