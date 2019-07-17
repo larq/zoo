@@ -154,7 +154,7 @@ def XNORNet(
     input_shape=None,
     classes=1000,
 ):
-    """Instantiates the XNORNet architecture.
+    """Instantiates the XNOR-Net architecture.
 
     Optionally loads weights pre-trained on ImageNet.
 
@@ -176,6 +176,10 @@ def XNORNet(
 
     # Raises
     ValueError: in case of invalid argument for `weights`, or invalid input shape.
+
+    # References
+    - [XNOR-Net: ImageNet Classification Using Binary Convolutional Neural
+      Networks](https://arxiv.org/abs/1603.05279)
     """
     input_shape = utils.validate_input(input_shape, weights, include_top, classes)
 
