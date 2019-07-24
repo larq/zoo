@@ -16,10 +16,10 @@ jobs:
         Python37_TF114:
           python.version: "3.7"
           tensorflow.version: "1.14.0"
+          pytest.args: "--cov=larq --cov-report=html --cov-config=.coveragerc"
         Python37_TF2:
           python.version: "3.7"
           tensorflow.version: "2.0.0-beta1"
-          coverage: "true"
 
     steps:
       - task: UsePythonVersion@0
@@ -30,25 +30,8 @@ jobs:
       - script: |
           pip install tensorflow==$(tensorflow.version)
           pip install -e .[test]
+          pip install pytest-azurepipelines
         displayName: "Install dependencies"
 
-      - script: pytest . --junitxml=junit/test-results.xml
+      - script: pytest . $(pytest.args)
         displayName: "pytest"
-        condition: ne(variables['coverage'], 'true')
-
-      - script: pytest . --junitxml=junit/test-results.xml --cov=larq_zoo --cov-report=xml --cov-report=html
-        displayName: "pytest coverage"
-        condition: eq(variables['coverage'], 'true')
-
-      - task: PublishTestResults@2
-        condition: succeededOrFailed()
-        inputs:
-          testResultsFiles: "**/test-*.xml"
-          testRunTitle: "Publish test results for Python $(python.version) and TF $(tensorflow.version)"
-
-      - task: PublishCodeCoverageResults@1
-        condition: eq(variables['coverage'], 'true')
-        inputs:
-          codeCoverageTool: Cobertura
-          summaryFileLocation: "$(System.DefaultWorkingDirectory)/**/coverage.xml"
-          reportDirectory: "$(System.DefaultWorkingDirectory)/**/htmlcov"
