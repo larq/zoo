@@ -35,3 +35,21 @@ jobs:
 
       - script: pytest . $(pytest.args)
         displayName: "pytest"
+
+  - job: "Lint"
+    pool:
+      vmImage: "Ubuntu-16.04"
+    steps:
+      - task: UsePythonVersion@0
+        inputs:
+          versionSpec: "3.7"
+          architecture: "x64"
+
+      - script: pip install pyflakes==2.1.1 black==19.3b0
+        displayName: "Install linting dependencies"
+
+      - script: pyflakes .
+        displayName: "pyflakes"
+
+      - script: black . --check --target-version py36
+        displayName: "Black code style"
