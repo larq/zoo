@@ -136,3 +136,31 @@ input_tensor = tf.keras.layers.Input(shape=(224, 224, 3))
 
 model = lqz.BiRealNet(input_tensor=input_tensor, weights="imagenet")
 ```
+
+## Evaluate Bi-Real Net with TensorFlow Datasets
+
+```python
+import tensorflow_datasets as tfds
+import larq_zoo as lqz
+import tensorflow as tf
+
+
+def preprocess(data):
+    return lqz.preprocess_input(data["image"]), tf.one_hot(data["label"], 1000)
+
+dataset = (
+    tfds.load("imagenet2012", split=tfds.Split.VALIDATION)
+    .map(preprocess, num_parallel_calls=tf.data.experimental.AUTOTUNE)
+    .batch(128)
+    .prefetch(1)
+)
+
+model = lqz.BiRealNet()
+model.compile(
+    optimizer="sgd",
+    loss="categorical_crossentropy",
+    metrics=["categorical_accuracy", "top_k_categorical_accuracy"],
+)
+
+model.evaluate(dataset)
+```
