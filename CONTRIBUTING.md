@@ -7,7 +7,7 @@
 
 ## Project setup
 
-To send a Pull Request it is required to fork Larq Zoo on GitHub.
+To send a Pull Request please [fork](https://help.github.com/en/articles/fork-a-repo) Larq Zoo on GitHub.
 After that clone it to a desired directory:
 
 ```shell
