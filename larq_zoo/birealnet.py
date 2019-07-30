@@ -76,7 +76,7 @@ class default(HParams):
     filters = 64
     learning_rate = 5e-3
     decay_schedule = "linear"
-    epochs = 50
+    epochs = 300
     batch_size = 512
     input_quantizer = "approx_sign"
     kernel_quantizer = "magnitude_aware_sign"
