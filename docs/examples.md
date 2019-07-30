@@ -4,6 +4,7 @@
 
 ```python
 import tensorflow as tf
+import numpy as np
 import larq_zoo as lqz
 
 model = lqz.BiRealNet(weights="imagenet")
@@ -25,6 +26,7 @@ print("Predicted:", lqz.decode_predictions(preds, top=3)[0])
 
 ```python
 import tensorflow as tf
+import numpy as np
 import larq_zoo as lqz
 
 model = lqz.BiRealNet(weights="imagenet", include_top=False)
@@ -42,6 +44,7 @@ features = model.predict(x)
 
 ```python
 import tensorflow as tf
+import numpy as np
 import larq_zoo as lqz
 
 base_model = lqz.BiRealNet(weights="imagenet")
