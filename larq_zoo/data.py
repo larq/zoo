@@ -1,33 +1,17 @@
 """Provides utilities to preprocess images.
 
-The preprocessing steps for VGG were introduced in the following technical
-report:
-
-  Very Deep Convolutional Networks For Large-Scale Image Recognition
-  Karen Simonyan and Andrew Zisserman
-  arXiv technical report, 2015
-  PDF: http://arxiv.org/pdf/1409.1556.pdf
-  ILSVRC 2014 Slides: http://www.robots.ox.ac.uk/~karen/pdf/ILSVRC_2014.pdf
-  CC-BY-4.0
-
-More information can be obtained from the VGG website:
-www.robots.ox.ac.uk/~vgg/research/very_deep/
+The ImageNet preprocessing from https://github.com/tensorflow/tpu/blob/master/models/official/efficientnet/preprocessing.py
 """
 
 import numpy as np
 import tensorflow as tf
 from zookeeper import registry
 
-_R_MEAN = 123.68
-_G_MEAN = 116.78
-_B_MEAN = 103.94
+IMAGE_SIZE = 224
+CROP_PADDING = 32
 
-_R_STD = 0.229 * 255
-_G_STD = 0.224 * 255
-_B_STD = 0.225 * 255
-
-_RESIZE_SIDE_MIN = 256
-_RESIZE_SIDE_MAX = 512
+MEAN_RGB = [0.485 * 255, 0.456 * 255, 0.406 * 255]
+STDDEV_RGB = [0.229 * 255, 0.224 * 255, 0.225 * 255]
 
 
 def preprocess_input(image):
@@ -41,212 +25,206 @@ def preprocess_input(image):
     """
     if len(image.shape) != 3:
         raise ValueError("Input must be of size [height, width, C>0]")
-    result = preprocess_image(tf.convert_to_tensor(image), 224, 224, is_training=False)
+    result = preprocess_image_tensor(tf.convert_to_tensor(image), image_size=IMAGE_SIZE)
     if isinstance(image, np.ndarray):
         return tf.keras.backend.get_value(result)
     return result
 
 
-@registry.register_preprocess("imagenet2012", (224, 224, 3))
-@registry.register_preprocess("oxford_flowers102", (224, 224, 3))  # For testing
-def default(image, training):
-    return preprocess_image(image, 224, 224, is_training=training)
-
-
-def _get_h_w(image):
-    """Convenience for grabbing the height and width of an image.
-    """
-    shape = tf.shape(image)
-    return shape[0], shape[1]
-
-
-def _random_crop_and_flip(image, crop_height, crop_width):
-    """Crops the given image to a random part of the image, and randomly flips.
-
-    Args:
-      image: a 3-D image tensor
-      crop_height: the new height.
-      crop_width: the new width.
-
-    Returns:
-      3-D tensor with cropped image.
-
-    """
-    height, width = _get_h_w(image)
-
-    # Create a random bounding box.
-    #
-    # Use tf.random.uniform and not numpy.random.rand as doing the former would
-    # generate random numbers at graph eval time, unlike the latter which
-    # generates random numbers at graph definition time.
-    total_crop_height = height - crop_height
-    crop_top = tf.random.uniform([], maxval=total_crop_height + 1, dtype=tf.int32)
-    total_crop_width = width - crop_width
-    crop_left = tf.random.uniform([], maxval=total_crop_width + 1, dtype=tf.int32)
-
-    cropped = tf.slice(image, [crop_top, crop_left, 0], [crop_height, crop_width, -1])
-
-    cropped = tf.image.random_flip_left_right(cropped)
-    return cropped
-
-
-def _central_crop(image, crop_height, crop_width):
-    """Performs central crops of the given image list.
-
-    Args:
-      image: a 3-D image tensor
-      crop_height: the height of the image following the crop.
-      crop_width: the width of the image following the crop.
-
-    Returns:
-      3-D tensor with cropped image.
-    """
-    height, width = _get_h_w(image)
-
-    total_crop_height = height - crop_height
-    crop_top = total_crop_height // 2
-    total_crop_width = width - crop_width
-    crop_left = total_crop_width // 2
-    return tf.slice(image, [crop_top, crop_left, 0], [crop_height, crop_width, -1])
-
-
-def _mean_image_subtraction(image, means):
-    """Subtracts the given means from each image channel.
-
-    For example:
-      means = [123.68, 116.779, 103.939]
-      image = _mean_image_subtraction(image, means)
-
-    Note that the rank of `image` must be known.
-
-    Args:
-      image: a tensor of size [height, width, C].
-      means: a C-vector of values to subtract from each channel.
-
-    Returns:
-      the centered image.
-
-    Raises:
-      ValueError: If the rank of `image` is unknown, if `image` has a rank other
-        than three or if the number of channels in `image` doesn't match the
-        number of values in `means`.
-    """
-    if image.get_shape().ndims != 3:
-        raise ValueError("Input must be of size [height, width, C>0]")
-    num_channels = image.get_shape().as_list()[-1]
-    if len(means) != num_channels:
-        raise ValueError("len(means) must match the number of channels")
-
-    # We have a 1-D tensor of means; convert to 3-D.
-    means = tf.expand_dims(tf.expand_dims(means, 0), 0)
-
-    return image - means
-
-
-def _scale_normalization(image, stds):
-    # We have a 1-D tensor of means; convert to 3-D.
-    stds = tf.expand_dims(tf.expand_dims(stds, 0), 0)
-
-    return image / stds
-
-
-def _smallest_size_at_least(height, width, smallest_side):
-    """Computes new shape with the smallest side equal to `smallest_side`.
-
-    Computes new shape with the smallest side equal to `smallest_side` while
-    preserving the original aspect ratio.
-
-    Args:
-      height: an int32 scalar tensor indicating the current height.
-      width: an int32 scalar tensor indicating the current width.
-      smallest_side: A python integer or scalar `Tensor` indicating the size of
-        the smallest side after resize.
-
-    Returns:
-      new_height: an int32 scalar tensor indicating the new height.
-      new_width: and int32 scalar tensor indicating the new width.
-    """
-    smallest_side = tf.cast(smallest_side, tf.float32)
-
-    height = tf.cast(height, tf.float32)
-    width = tf.cast(width, tf.float32)
-
-    smaller_dim = tf.minimum(height, width)
-    scale_ratio = smallest_side / smaller_dim
-    new_height = tf.cast(height * scale_ratio, tf.int32)
-    new_width = tf.cast(width * scale_ratio, tf.int32)
-
-    return new_height, new_width
-
-
-def _aspect_preserving_resize(image, smallest_side):
-    """Resize images preserving the original aspect ratio.
-
-    Args:
-      image: A 3-D image `Tensor`.
-      smallest_side: A python integer or scalar `Tensor` indicating the size of
-        the smallest side after resize.
-
-    Returns:
-      resized_image: A 3-D tensor containing the resized image.
-    """
-    smallest_side = tf.convert_to_tensor(smallest_side, dtype=tf.int32)
-
-    height, width = _get_h_w(image)
-    new_height, new_width = _smallest_size_at_least(height, width, smallest_side)
-
-    resized_image = tf.compat.v1.image.resize(
-        image,
-        [new_height, new_width],
-        method=tf.image.ResizeMethod.BILINEAR,
-        align_corners=False,
+@registry.register_preprocess("imagenet2012", (IMAGE_SIZE, IMAGE_SIZE, 3))
+@registry.register_preprocess("oxford_flowers102", (IMAGE_SIZE, IMAGE_SIZE, 3))
+def default(image_bytes, training):
+    return preprocess_image_bytes(
+        image_bytes, is_training=training, image_size=IMAGE_SIZE
     )
-    return resized_image
 
 
-def preprocess_image(
-    image,
-    output_height,
-    output_width,
-    is_training=False,
-    resize_side_min=_RESIZE_SIDE_MIN,
-    resize_side_max=_RESIZE_SIDE_MAX,
+def distorted_bounding_box_crop(
+    image_bytes,
+    bbox,
+    min_object_covered=0.1,
+    aspect_ratio_range=(0.75, 1.33),
+    area_range=(0.05, 1.0),
+    max_attempts=100,
+    scope=None,
 ):
+    """Generates cropped_image using one of the bboxes randomly distorted.
+
+    See `tf.image.sample_distorted_bounding_box` for more documentation.
+
+    Args:
+      image_bytes: `Tensor` of binary image data.
+      bbox: `Tensor` of bounding boxes arranged `[1, num_boxes, coords]`
+          where each coordinate is [0, 1) and the coordinates are arranged
+          as `[ymin, xmin, ymax, xmax]`. If num_boxes is 0 then use the whole
+          image.
+      min_object_covered: An optional `float`. Defaults to `0.1`. The cropped
+          area of the image must contain at least this fraction of any bounding
+          box supplied.
+      aspect_ratio_range: An optional list of `float`s. The cropped area of the
+          image must have an aspect ratio = width / height within this range.
+      area_range: An optional list of `float`s. The cropped area of the image
+          must contain a fraction of the supplied image within in this range.
+      max_attempts: An optional `int`. Number of attempts at generating a cropped
+          region of the image of the specified constraints. After `max_attempts`
+          failures, return the entire image.
+      scope: Optional `str` for name scope.
+    Returns:
+      cropped image `Tensor`
+    """
+    with tf.name_scope(scope, "distorted_bounding_box_crop", [image_bytes, bbox]):
+        shape = tf.image.extract_jpeg_shape(image_bytes)
+        sample_distorted_bounding_box = tf.image.sample_distorted_bounding_box(
+            shape,
+            bounding_boxes=bbox,
+            min_object_covered=min_object_covered,
+            aspect_ratio_range=aspect_ratio_range,
+            area_range=area_range,
+            max_attempts=max_attempts,
+            use_image_if_no_bounding_boxes=True,
+        )
+        bbox_begin, bbox_size, _ = sample_distorted_bounding_box
+
+        # Crop the image to the specified bounding box.
+        offset_y, offset_x, _ = tf.unstack(bbox_begin)
+        target_height, target_width, _ = tf.unstack(bbox_size)
+        crop_window = tf.stack([offset_y, offset_x, target_height, target_width])
+        image = tf.image.decode_and_crop_jpeg(image_bytes, crop_window, channels=3)
+
+        return image
+
+
+def _at_least_x_are_equal(a, b, x):
+    """At least `x` of `a` and `b` `Tensors` are equal."""
+    match = tf.equal(a, b)
+    match = tf.cast(match, tf.int32)
+    return tf.greater_equal(tf.reduce_sum(match), x)
+
+
+def _decode_and_random_crop(image_bytes, image_size):
+    """Make a random crop of image_size."""
+    bbox = tf.constant([0.0, 0.0, 1.0, 1.0], dtype=tf.float32, shape=[1, 1, 4])
+    image = distorted_bounding_box_crop(
+        image_bytes,
+        bbox,
+        min_object_covered=0.1,
+        aspect_ratio_range=(3.0 / 4, 4.0 / 3.0),
+        area_range=(0.08, 1.0),
+        max_attempts=10,
+        scope=None,
+    )
+    original_shape = tf.image.extract_jpeg_shape(image_bytes)
+    bad = _at_least_x_are_equal(original_shape, tf.shape(image), 3)
+
+    image = tf.cond(
+        bad,
+        lambda: _decode_and_center_crop(image_bytes, image_size),
+        lambda: tf.compat.v1.image.resize_bicubic([image], [image_size, image_size])[0],
+    )
+
+    return image
+
+
+def _decode_and_center_crop(image_bytes, image_size):
+    """Crops to center of image with padding then scales image_size."""
+    shape = tf.image.extract_jpeg_shape(image_bytes)
+    image_height = shape[0]
+    image_width = shape[1]
+
+    padded_center_crop_size = tf.cast(
+        (
+            (image_size / (image_size + CROP_PADDING))
+            * tf.cast(tf.minimum(image_height, image_width), tf.float32)
+        ),
+        tf.int32,
+    )
+
+    offset_height = ((image_height - padded_center_crop_size) + 1) // 2
+    offset_width = ((image_width - padded_center_crop_size) + 1) // 2
+    crop_window = tf.stack(
+        [offset_height, offset_width, padded_center_crop_size, padded_center_crop_size]
+    )
+    image = tf.image.decode_and_crop_jpeg(image_bytes, crop_window, channels=3)
+    image = tf.compat.v1.image.resize_bicubic([image], [image_size, image_size])[0]
+    return image
+
+
+def _center_crop(image, image_size):
+    """Crops to center of image with padding then scales image_size."""
+    shape = tf.shape(image)
+    image_height = shape[0]
+    image_width = shape[1]
+
+    padded_center_crop_size = tf.cast(
+        (
+            (image_size / (image_size + CROP_PADDING))
+            * tf.cast(tf.minimum(image_height, image_width), tf.float32)
+        ),
+        tf.int32,
+    )
+
+    offset_height = ((image_height - padded_center_crop_size) + 1) // 2
+    offset_width = ((image_width - padded_center_crop_size) + 1) // 2
+
+    image = tf.image.crop_to_bounding_box(
+        image,
+        offset_height,
+        offset_width,
+        padded_center_crop_size,
+        padded_center_crop_size,
+    )
+    image = tf.compat.v1.image.resize_bicubic([image], [image_size, image_size])[0]
+    return image
+
+
+def _normalize(image, mean_rgb=MEAN_RGB, stddev_rgb=STDDEV_RGB):
+    """Normalizes images to variance 1 and mean 0 over the whole dataset"""
+    # TODO: Evaluate if it makes sense to use this as a first layer
+    # and do the computation on the GPU instead
+
+    image -= tf.broadcast_to(mean_rgb, tf.shape(image))
+    image /= tf.broadcast_to(stddev_rgb, tf.shape(image))
+
+    return image
+
+
+def preprocess_image_bytes(image_bytes, is_training=False, image_size=IMAGE_SIZE):
     """Preprocesses the given image.
 
     Args:
-      image: A `Tensor` representing an image of arbitrary size.
-      output_height: The height of the image after preprocessing.
-      output_width: The width of the image after preprocessing.
-      is_training: `True` if we're preprocessing the image for training and
-        `False` otherwise.
-      resize_side_min: The lower bound for the smallest side of the image for
-        aspect-preserving resizing. If `is_training` is `False`, then this value
-        is used for rescaling.
-      resize_side_max: The upper bound for the smallest side of the image for
-        aspect-preserving resizing. If `is_training` is `False`, this value is
-        ignored. Otherwise, the resize side is sampled from
-          [resize_size_min, resize_size_max].
+      image_bytes: `Tensor` representing an image binary of arbitrary size.
+      is_training: `bool` for whether the preprocessing is for training.
+      image_size: image size.
 
     Returns:
-      A preprocessed image.
+      A preprocessed and normalized image `Tensor`.
     """
     if is_training:
-        # For training, we want to randomize some of the distortions.
-        resize_side = tf.random.uniform(
-            [], minval=resize_side_min, maxval=resize_side_max + 1, dtype=tf.int32
-        )
-        crop_fn = _random_crop_and_flip
+        image = _decode_and_random_crop(image_bytes, image_size)
+        image = tf.image.random_flip_left_right(image)
     else:
-        resize_side = resize_side_min
-        crop_fn = _central_crop
+        image = _decode_and_center_crop(image_bytes, image_size)
 
-    num_channels = image.get_shape().as_list()[-1]
-    image = _aspect_preserving_resize(image, resize_side)
-    image = crop_fn(image, output_height, output_width)
+    image = tf.reshape(image, [image_size, image_size, 3])
+    image = tf.cast(image, dtype=tf.float32)
+    image = _normalize(image, mean_rgb=MEAN_RGB, stddev_rgb=STDDEV_RGB)
 
-    image.set_shape([output_height, output_width, num_channels])
+    return image
 
-    image = tf.cast(image, tf.float32)
-    image = _mean_image_subtraction(image, [_R_MEAN, _G_MEAN, _B_MEAN])
-    return _scale_normalization(image, [_R_STD, _G_STD, _B_STD])
+
+def preprocess_image_tensor(image_tensor, image_size=IMAGE_SIZE):
+    """Preprocesses the given image Tensor.
+
+    Args:
+      image_tensor: `Tensor` representing an image array arbitrary size.
+      image_size: image size.
+
+    Returns:
+      A preprocessed and normalized image `Tensor`.
+    """
+    image_tensor = _center_crop(image_tensor, image_size)
+
+    image_tensor = tf.reshape(image_tensor, [image_size, image_size, 3])
+    image_tensor = tf.cast(image_tensor, dtype=tf.float32)
+    image_tensor = _normalize(image_tensor, mean_rgb=MEAN_RGB, stddev_rgb=STDDEV_RGB)
+    return image_tensor
