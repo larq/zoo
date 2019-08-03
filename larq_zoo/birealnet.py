@@ -146,16 +146,16 @@ def BiRealNet(
         if include_top:
             weights_path = utils.download_pretrained_model(
                 model="birealnet",
-                version="v0.1.0",
+                version="v0.2.0",
                 file="birealnet_weights.h5",
-                file_hash="7fafcef8c453ec528fce3562fd5c7835",
+                file_hash="e8b29d6204663997dded5629804c0c2e309ec422512a54a17d98802fb39415ec",
             )
         else:
             weights_path = utils.download_pretrained_model(
                 model="birealnet",
-                version="v0.1.0",
+                version="v0.2.0",
                 file="birealnet_weights_notop.h5",
-                file_hash="0617bab5884ca8c3179ad451448651e9",
+                file_hash="746ff2d2d2b794226e66f0fa3fd0ff19db836df5a9ea9a0f7e59a724e1364757",
             )
         model.load_weights(weights_path)
     elif weights is not None:
