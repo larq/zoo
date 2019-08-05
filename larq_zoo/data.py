@@ -179,8 +179,6 @@ def _center_crop(image, image_size):
 
 def _normalize(image, mean_rgb=MEAN_RGB, stddev_rgb=STDDEV_RGB):
     """Normalizes images to variance 1 and mean 0 over the whole dataset"""
-    # TODO: Evaluate if it makes sense to use this as a first layer
-    # and do the computation on the GPU instead
 
     image -= tf.broadcast_to(mean_rgb, tf.shape(image))
     image /= tf.broadcast_to(stddev_rgb, tf.shape(image))
