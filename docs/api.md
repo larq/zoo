@@ -14,6 +14,10 @@ Instantiates the Binary AlexNet architecture.
 
 Optionally loads weights pre-trained on ImageNet.
 
+```plot-altair
+/plots/binary_alexnet.vg.json
+```
+
 **Arguments**
 
 - `include_top`: whether to include the fully-connected layers at the top of the network.
@@ -53,6 +57,10 @@ BiRealNet(include_top=True,
 Instantiates the Bi-Real Net architecture.
 
 Optionally loads weights pre-trained on ImageNet.
+
+```plot-altair
+/plots/birealnet.vg.json
+```
 
 **Arguments**
 

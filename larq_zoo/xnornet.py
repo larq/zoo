@@ -194,16 +194,16 @@ def XNORNet(
         if include_top:
             weights_path = utils.download_pretrained_model(
                 model="xnornet",
-                version="v0.1.0",
+                version="v0.2.0",
                 file="xnornet_weights.h5",
-                file_hash="031d79b139ef2c04125726698e4a90fc6e862114e738ffb9f5b06be635b4e3f0",
+                file_hash="e6ba24f785655260ae76a2ef1fab520e3528243d9c8fac430299cd81dbeabe10",
             )
         else:
             weights_path = utils.download_pretrained_model(
                 model="xnornet",
-                version="v0.1.0",
+                version="v0.2.0",
                 file="xnornet_weights_notop.h5",
-                file_hash="7f8ba86da2770ad317b5ab685d6c644128b9ac8ce480444dddaecd2664b6a6b4",
+                file_hash="0b8e3d0d60a7a728b5e387b8cd9f0fedc1dd72bcf9f4c693a2245d3a3c596b91",
             )
         model.load_weights(weights_path)
     elif weights is not None:
