@@ -72,7 +72,9 @@ def distorted_bounding_box_crop(
     Returns:
       cropped image `Tensor`
     """
-    with tf.name_scope(scope, "distorted_bounding_box_crop", [image_bytes, bbox]):
+    with tf.compat.v1.name_scope(
+        scope, "distorted_bounding_box_crop", [image_bytes, bbox]
+    ):
         shape = tf.image.extract_jpeg_shape(image_bytes)
         sample_distorted_bounding_box = tf.image.sample_distorted_bounding_box(
             shape,
