@@ -24,13 +24,13 @@ Larq Zoo ships with a command line interface powered by [`zookeeper`](https://gi
 E.g. to reproduce the training of [Binary AlexNet](/models/api/#binaryalexnet) run:
 
 ```shell
-lqz train binary_alexnet --dataset imagenet2012
+lqz train binary_alexnet --dataset imagenet2012 --dataset-version 5.0.0
 ```
 
 To experiment with different hyperparameters you can either edit the [`HParams` for this model](https://github.com/larq/zoo/blob/master/larq_zoo/binarynet.py#L72-L85) or overwrite them from the command line, e.g.:
 
 ```shell
-lqz train binary_alexnet --dataset imagenet2012 --hparams epochs=150,batch_size=256
+lqz train binary_alexnet --dataset imagenet2012 --dataset-version 5.0.0 --hparams epochs=150,batch_size=256
 ```
 
 To view a TensorBoard for the current training, replace the `lqz train` command with `lqz tensorboard`.
