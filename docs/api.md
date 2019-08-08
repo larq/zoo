@@ -10,7 +10,7 @@ BinaryAlexNet(include_top=True,
               classes=1000)
 ```
 
-Instantiates the Binary AlexNet architecture.
+Instantiates the Binary AlexNet architecture ([interactive architecture diagram](https://lutzroeder.github.io/netron/?url=https://cors-anywhere.herokuapp.com/https://github.com/larq/zoo/releases/download/binary_alexnet-v0.2.0/binary_alexnet.h5)).
 
 Optionally loads weights pre-trained on ImageNet.
 
@@ -54,7 +54,7 @@ BiRealNet(include_top=True,
           classes=1000)
 ```
 
-Instantiates the Bi-Real Net architecture.
+Instantiates the Bi-Real Net architecture ([interactive architecture diagram](https://lutzroeder.github.io/netron/?url=https://cors-anywhere.herokuapp.com/https://github.com/larq/zoo/releases/download/birealnet-v0.2.0/birealnet.h5)).
 
 Optionally loads weights pre-trained on ImageNet.
 
@@ -100,7 +100,7 @@ XNORNet(include_top=True,
         classes=1000)
 ```
 
-Instantiates the XNOR-Net architecture.
+Instantiates the XNOR-Net architecture ([interactive architecture diagram](https://lutzroeder.github.io/netron/?url=https://cors-anywhere.herokuapp.com/https://github.com/larq/zoo/releases/download/xnornet-v0.2.0/xnornet.h5)).
 
 Optionally loads weights pre-trained on ImageNet.
 
