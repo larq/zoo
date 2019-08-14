@@ -102,9 +102,8 @@ def BinaryAlexNet(
         ImageNet), or the path to the weights file to be loaded.
     input_tensor: optional Keras tensor (i.e. output of `layers.Input()`) to use as
         image input for the model.
-    input_shape: optional shape tuple, only to be specified if `include_top` is False
-        (otherwise the input shape has to be `(224, 224, 3)` (with `channels_last` data
-        format) or `(3, 224, 224)` (with `channels_first` data format).
+    input_shape: optional shape tuple, only to be specified if `include_top` is False,
+        otherwise the input shape has to be `(224, 224, 3)`.
         It should have exactly 3 inputs channels.
     classes: optional number of classes to classify images into, only to be specified
         if `include_top` is True, and if no `weights` argument is specified.
