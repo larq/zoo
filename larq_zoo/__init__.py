@@ -9,7 +9,7 @@ from larq_zoo.densenet import (
     BinaryDenseNet45,
 )
 from larq_zoo.data import preprocess_input
-from tensorflow.keras.applications.vgg16 import decode_predictions
+from larq_zoo.utils import decode_predictions
 
 __all__ = [
     "BinaryAlexNet",
