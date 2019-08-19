@@ -8,8 +8,6 @@ from tensorflow.python.eager.context import num_gpus
 from keras_applications.imagenet_utils import _obtain_input_shape
 from collections import namedtuple
 
-ImagenetDataset = namedtuple("ImagenetDataset", ["input_shape", "num_classes"])
-
 
 def slash_join(*args):
     return "/".join(arg.strip("/") for arg in args)
