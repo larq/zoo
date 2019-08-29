@@ -88,17 +88,17 @@ A Keras model instance.
   Representational Capability and Advanced Training
   Algorithm](https://arxiv.org/abs/1808.00278)
 
-## ResNetE18<a class="headerlink code-link" style="float:right;" href="https://github.com/larq/zoo/blob/master/larq_zoo/resnet_e.py#L120" title="Source code"></a>
+## BinaryResNetE18<a class="headerlink code-link" style="float:right;" href="https://github.com/larq/zoo/blob/master/larq_zoo/resnet_e.py#L120" title="Source code"></a>
 
 ```python
-ResNetE18(include_top=True,
-          weights="imagenet",
-          input_tensor=None,
-          input_shape=None,
-          classes=1000)
+BinaryResNetE18(include_top=True,
+                weights="imagenet",
+                input_tensor=None,
+                input_shape=None,
+                classes=1000)
 ```
 
-Instantiates the ResNetE 18 architecture.
+Instantiates the BinaryResNetE 18 architecture.
 
 Optionally loads weights pre-trained on ImageNet.
 
@@ -132,17 +132,17 @@ A Keras model instance.
 - [Back to Simplicity:
   How to Train Accurate BNNs from Scratch?](https://arxiv.org/abs/1906.08637)
 
-## DenseNet28<a class="headerlink code-link" style="float:right;" href="https://github.com/larq/zoo/blob/master/larq_zoo/densenet.py#L119" title="Source code"></a>
+## BinaryDenseNet28<a class="headerlink code-link" style="float:right;" href="https://github.com/larq/zoo/blob/master/larq_zoo/densenet.py#L119" title="Source code"></a>
 
 ```python
-DenseNet28(include_top=True,
-           weights="imagenet",
-           input_tensor=None,
-           input_shape=None,
-           classes=1000)
+BinaryDenseNet28(include_top=True,
+                 weights="imagenet",
+                 input_tensor=None,
+                 input_shape=None,
+                 classes=1000)
 ```
 
-Instantiates the Binary DenseNet 28 architecture.
+Instantiates the Binary BinaryDenseNet 28 architecture.
 
 Optionally loads weights pre-trained on ImageNet.
 
@@ -176,17 +176,17 @@ A Keras model instance.
 - [Back to Simplicity:
   How to Train Accurate BNNs from Scratch?](https://arxiv.org/abs/1906.08637)
 
-## DenseNet37<a class="headerlink code-link" style="float:right;" href="https://github.com/larq/zoo/blob/master/larq_zoo/densenet.py#L184" title="Source code"></a>
+## BinaryDenseNet37<a class="headerlink code-link" style="float:right;" href="https://github.com/larq/zoo/blob/master/larq_zoo/densenet.py#L184" title="Source code"></a>
 
 ```python
-DenseNet37(include_top=True,
-           weights="imagenet",
-           input_tensor=None,
-           input_shape=None,
-           classes=1000)
+BinaryDenseNet37(include_top=True,
+                 weights="imagenet",
+                 input_tensor=None,
+                 input_shape=None,
+                 classes=1000)
 ```
 
-Instantiates the Binary DenseNet 37 architecture.
+Instantiates the Binary BinaryDenseNet 37 architecture.
 
 Optionally loads weights pre-trained on ImageNet.
 
@@ -220,17 +220,17 @@ A Keras model instance.
 - [Back to Simplicity:
   How to Train Accurate BNNs from Scratch?](https://arxiv.org/abs/1906.08637)
 
-## DenseNet45<a class="headerlink code-link" style="float:right;" href="https://github.com/larq/zoo/blob/master/larq_zoo/densenet.py#L249" title="Source code"></a>
+## BinaryDenseNet45<a class="headerlink code-link" style="float:right;" href="https://github.com/larq/zoo/blob/master/larq_zoo/densenet.py#L249" title="Source code"></a>
 
 ```python
-DenseNet45(include_top=True,
-           weights="imagenet",
-           input_tensor=None,
-           input_shape=None,
-           classes=1000)
+BinaryDenseNet45(include_top=True,
+                 weights="imagenet",
+                 input_tensor=None,
+                 input_shape=None,
+                 classes=1000)
 ```
 
-Instantiates the Binary DenseNet 45 architecture.
+Instantiates the Binary BinaryDenseNet 45 architecture.
 
 Optionally loads weights pre-trained on ImageNet.
 

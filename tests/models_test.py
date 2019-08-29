@@ -30,10 +30,10 @@ def parametrize(func):
         [
             (lqz.BinaryAlexNet, 256),
             (lqz.BiRealNet, 512),
-            (lqz.ResNetE18, 512),
-            (lqz.DenseNet28, 576),
-            (lqz.DenseNet37, 640),
-            (lqz.DenseNet45, 800),
+            (lqz.BinaryResNetE18, 512),
+            (lqz.BinaryDenseNet28, 576),
+            (lqz.BinaryDenseNet37, 640),
+            (lqz.BinaryDenseNet45, 800),
             (lqz.XNORNet, 4096),
         ],
     )(func)

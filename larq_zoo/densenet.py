@@ -20,7 +20,9 @@ def densely_connected_block(x, args):
 
 
 @registry.register_model
-def densenet(args, input_shape, num_classes, input_tensor=None, include_top=True):
+def binary_densenet(
+    args, input_shape, num_classes, input_tensor=None, include_top=True
+):
     input = utils.get_input_layer(input_shape, input_tensor)
 
     if input_shape[0] and input_shape[0] < 50:
@@ -71,8 +73,8 @@ def densenet(args, input_shape, num_classes, input_tensor=None, include_top=True
     return keras.Model(inputs=input, outputs=x)
 
 
-@registry.register_hparams(densenet)
-class densenet28(HParams):
+@registry.register_hparams(binary_densenet)
+class binary_densenet28(HParams):
     epochs = 120
     batch_size = 256
     learning_rate = 0.004
@@ -98,16 +100,16 @@ class densenet28(HParams):
         return keras.optimizers.Adam(self.learning_rate, epsilon=1e-8)
 
 
-@registry.register_hparams(densenet)
-class densenet37(densenet28):
+@registry.register_hparams(binary_densenet)
+class binary_densenet37(binary_densenet28):
     batch_size = 192
     learning_steps = [100, 110]
     reduction = [3.3, 3.3, 4]
     layers = [6, 8, 12, 6]
 
 
-@registry.register_hparams(densenet)
-class densenet45(densenet28):
+@registry.register_hparams(binary_densenet)
+class binary_densenet45(binary_densenet28):
     epochs = 125
     batch_size = 384
     learning_rate = 0.008
@@ -116,14 +118,14 @@ class densenet45(densenet28):
     layers = [6, 12, 14, 8]
 
 
-def DenseNet28(
+def BinaryDenseNet28(
     include_top=True,
     weights="imagenet",
     input_tensor=None,
     input_shape=None,
     classes=1000,
 ):
-    """Instantiates the Binary DenseNet 28 architecture.
+    """Instantiates the Binary BinaryDenseNet 28 architecture.
 
     Optionally loads weights pre-trained on ImageNet.
 
@@ -151,8 +153,8 @@ def DenseNet28(
     """
     input_shape = utils.validate_input(input_shape, weights, include_top, classes)
 
-    model = densenet(
-        densenet28(),
+    model = binary_densenet(
+        binary_densenet28(),
         input_shape=input_shape,
         num_classes=classes,
         input_tensor=input_tensor,
@@ -164,16 +166,16 @@ def DenseNet28(
         # download appropriate file
         if include_top:
             weights_path = utils.download_pretrained_model(
-                model="densenet",
+                model="binary_densenet",
                 version="v0.1.0",
-                file="densenet_28_weights.h5",
+                file="binary_densenet_28_weights.h5",
                 file_hash="21fe3ca03eed244df9c41a2219876fcf03e73800932ec96a3e2a76af4747ac53",
             )
         else:
             weights_path = utils.download_pretrained_model(
-                model="densenet",
+                model="binary_densenet",
                 version="v0.1.0",
-                file="densenet_28_weights_notop.h5",
+                file="binary_densenet_28_weights_notop.h5",
                 file_hash="a376df1e41772c4427edd1856072b934a89bf293bf911438bf6f751a9b2a28f5",
             )
         model.load_weights(weights_path)
@@ -182,14 +184,14 @@ def DenseNet28(
     return model
 
 
-def DenseNet37(
+def BinaryDenseNet37(
     include_top=True,
     weights="imagenet",
     input_tensor=None,
     input_shape=None,
     classes=1000,
 ):
-    """Instantiates the Binary DenseNet 37 architecture.
+    """Instantiates the Binary BinaryDenseNet 37 architecture.
 
     Optionally loads weights pre-trained on ImageNet.
 
@@ -217,8 +219,8 @@ def DenseNet37(
     """
     input_shape = utils.validate_input(input_shape, weights, include_top, classes)
 
-    model = densenet(
-        densenet37(),
+    model = binary_densenet(
+        binary_densenet37(),
         input_shape=input_shape,
         num_classes=classes,
         input_tensor=input_tensor,
@@ -230,16 +232,16 @@ def DenseNet37(
         # download appropriate file
         if include_top:
             weights_path = utils.download_pretrained_model(
-                model="densenet",
+                model="binary_densenet",
                 version="v0.1.0",
-                file="densenet_37_weights.h5",
+                file="binary_densenet_37_weights.h5",
                 file_hash="8056a5d52c3ed86a934893987d09a06f59a5166aa9bddcaedb050f111d0a7d76",
             )
         else:
             weights_path = utils.download_pretrained_model(
-                model="densenet",
+                model="binary_densenet",
                 version="v0.1.0",
-                file="densenet_37_weights_notop.h5",
+                file="binary_densenet_37_weights_notop.h5",
                 file_hash="4e12bca9fd27580a5b833241c4eb35d6cc332878c406048e6ca8dbbc78d59175",
             )
         model.load_weights(weights_path)
@@ -248,14 +250,14 @@ def DenseNet37(
     return model
 
 
-def DenseNet45(
+def BinaryDenseNet45(
     include_top=True,
     weights="imagenet",
     input_tensor=None,
     input_shape=None,
     classes=1000,
 ):
-    """Instantiates the Binary DenseNet 45 architecture.
+    """Instantiates the Binary BinaryDenseNet 45 architecture.
 
     Optionally loads weights pre-trained on ImageNet.
 
@@ -283,8 +285,8 @@ def DenseNet45(
     """
     input_shape = utils.validate_input(input_shape, weights, include_top, classes)
 
-    model = densenet(
-        densenet45(),
+    model = binary_densenet(
+        binary_densenet45(),
         input_shape=input_shape,
         num_classes=classes,
         input_tensor=input_tensor,
@@ -296,16 +298,16 @@ def DenseNet45(
         # download appropriate file
         if include_top:
             weights_path = utils.download_pretrained_model(
-                model="densenet",
+                model="binary_densenet",
                 version="v0.1.0",
-                file="densenet_45_weights.h5",
+                file="binary_densenet_45_weights.h5",
                 file_hash="d00a0d26fbd2dba1bfba8c0306c770f3aeea5c370e99f963bb239bd916f72c37",
             )
         else:
             weights_path = utils.download_pretrained_model(
-                model="densenet",
+                model="binary_densenet",
                 version="v0.1.0",
-                file="densenet_45_weights_notop.h5",
+                file="binary_densenet_45_weights_notop.h5",
                 file_hash="e72d5cc6b0afe4612f8be7b1f9bb48a53ba2c8468b57bf1266d2900c99fd2adf",
             )
         model.load_weights(weights_path)

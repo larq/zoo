@@ -115,14 +115,14 @@ class default(HParams):
             raise ValueError(f"Only specs for layers {list(self.spec.keys())} defined.")
 
 
-def ResNetE18(
+def BinaryResNetE18(
     include_top=True,
     weights="imagenet",
     input_tensor=None,
     input_shape=None,
     classes=1000,
 ):
-    """Instantiates the ResNetE 18 architecture.
+    """Instantiates the BinaryResNetE 18 architecture.
 
     Optionally loads weights pre-trained on ImageNet.
 
