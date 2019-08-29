@@ -107,7 +107,7 @@ class densenet37(densenet28):
 
 
 @registry.register_hparams(densenet)
-class densenet45(densenet37):
+class densenet45(densenet28):
     epochs = 125
     batch_size = 384
     learning_rate = 0.008
