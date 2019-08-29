@@ -176,7 +176,51 @@ A Keras model instance.
 - [Back to Simplicity:
   How to Train Accurate BNNs from Scratch?](https://arxiv.org/abs/1906.08637)
 
-## DenseNet45<a class="headerlink code-link" style="float:right;" href="https://github.com/larq/zoo/blob/master/larq_zoo/densenet.py#L184" title="Source code"></a>
+## DenseNet37<a class="headerlink code-link" style="float:right;" href="https://github.com/larq/zoo/blob/master/larq_zoo/densenet.py#L184" title="Source code"></a>
+
+```python
+DenseNet37(include_top=True,
+           weights="imagenet",
+           input_tensor=None,
+           input_shape=None,
+           classes=1000)
+```
+
+Instantiates the Binary DenseNet 37 architecture.
+
+Optionally loads weights pre-trained on ImageNet.
+
+```plot-altair
+/plots/densenet_37.vg.json
+```
+
+**Arguments**
+
+- `include_top`: whether to include the fully-connected layer at the top of the network.
+- `weights`: one of `None` (random initialization), `"imagenet"` (pre-training on
+  ImageNet), or the path to the weights file to be loaded.
+- `input_tensor`: optional Keras Tensor (i.e. output of `layers.Input()`) to use as
+  image input for the model.
+- `input_shape`: optional shape tuple, only to be specified if `include_top` is False,
+  otherwise the input shape has to be `(224, 224, 3)`.
+  It should have exactly 3 inputs channels.
+- `classes`: optional number of classes to classify images into, only to be specified
+  if `include_top` is True, and if no `weights` argument is specified.
+
+**Returns**
+
+A Keras model instance.
+
+**Raises**
+
+- **ValueError**: in case of invalid argument for `weights`, or invalid input shape.
+
+**References**
+
+- [Back to Simplicity:
+  How to Train Accurate BNNs from Scratch?](https://arxiv.org/abs/1906.08637)
+
+## DenseNet45<a class="headerlink code-link" style="float:right;" href="https://github.com/larq/zoo/blob/master/larq_zoo/densenet.py#L249" title="Source code"></a>
 
 ```python
 DenseNet45(include_top=True,

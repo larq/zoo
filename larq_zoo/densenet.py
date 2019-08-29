@@ -101,7 +101,7 @@ class densenet28(HParams):
 @registry.register_hparams(densenet)
 class densenet37(densenet28):
     batch_size = 192
-    learning_steps = [80, 100]
+    learning_steps = [100, 110]
     reduction = [3.3, 3.3, 4]
     layers = [6, 8, 12, 6]
 
@@ -175,6 +175,72 @@ def DenseNet28(
                 version="v0.1.0",
                 file="densenet_28_weights_notop.h5",
                 file_hash="a376df1e41772c4427edd1856072b934a89bf293bf911438bf6f751a9b2a28f5",
+            )
+        model.load_weights(weights_path)
+    elif weights is not None:
+        model.load_weights(weights)
+    return model
+
+
+def DenseNet37(
+    include_top=True,
+    weights="imagenet",
+    input_tensor=None,
+    input_shape=None,
+    classes=1000,
+):
+    """Instantiates the Binary DenseNet 37 architecture.
+
+    Optionally loads weights pre-trained on ImageNet.
+
+    # Arguments
+    include_top: whether to include the fully-connected layer at the top of the network.
+    weights: one of `None` (random initialization), "imagenet" (pre-training on
+        ImageNet), or the path to the weights file to be loaded.
+    input_tensor: optional Keras tensor (i.e. output of `layers.Input()`) to use as
+        image input for the model.
+    input_shape: optional shape tuple, only to be specified if `include_top` is False,
+        otherwise the input shape has to be `(224, 224, 3)`.
+        It should have exactly 3 inputs channels.
+    classes: optional number of classes to classify images into, only to be specified
+        if `include_top` is True, and if no `weights` argument is specified.
+
+    # Returns
+    A Keras model instance.
+
+    # Raises
+    ValueError: in case of invalid argument for `weights`, or invalid input shape.
+
+    # References
+    - [Back to Simplicity:
+      How to Train Accurate BNNs from Scratch?](https://arxiv.org/abs/1906.08637)
+    """
+    input_shape = utils.validate_input(input_shape, weights, include_top, classes)
+
+    model = densenet(
+        densenet37(),
+        input_shape=input_shape,
+        num_classes=classes,
+        input_tensor=input_tensor,
+        include_top=include_top,
+    )
+
+    # Load weights.
+    if weights == "imagenet":
+        # download appropriate file
+        if include_top:
+            weights_path = utils.download_pretrained_model(
+                model="densenet",
+                version="v0.1.0",
+                file="densenet_37_weights.h5",
+                file_hash="8056a5d52c3ed86a934893987d09a06f59a5166aa9bddcaedb050f111d0a7d76",
+            )
+        else:
+            weights_path = utils.download_pretrained_model(
+                model="densenet",
+                version="v0.1.0",
+                file="densenet_37_weights_notop.h5",
+                file_hash="4e12bca9fd27580a5b833241c4eb35d6cc332878c406048e6ca8dbbc78d59175",
             )
         model.load_weights(weights_path)
     elif weights is not None:

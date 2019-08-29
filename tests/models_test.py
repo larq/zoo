@@ -32,6 +32,7 @@ def parametrize(func):
             (lqz.BiRealNet, 512),
             (lqz.ResNetE18, 512),
             (lqz.DenseNet28, 576),
+            (lqz.DenseNet37, 640),
             (lqz.DenseNet45, 800),
             (lqz.XNORNet, 4096),
         ],
