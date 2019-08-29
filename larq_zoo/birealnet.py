@@ -5,7 +5,7 @@ from larq_zoo import utils
 
 
 @registry.register_model
-def birealnet(args, dataset, input_tensor=None, include_top=True):
+def birealnet(args, input_shape, num_classes, input_tensor=None, include_top=True):
     def residual_block(x, double_filters=False, filters=None):
         assert not (double_filters and filters)
 
@@ -38,7 +38,7 @@ def birealnet(args, dataset, input_tensor=None, include_top=True):
         x = tf.keras.layers.BatchNormalization(momentum=0.8)(x)
         return tf.keras.layers.add([x, shortcut])
 
-    img_input = utils.get_input_layer(dataset.input_shape, input_tensor)
+    img_input = utils.get_input_layer(input_shape, input_tensor)
 
     # layer 1
     out = tf.keras.layers.Conv2D(
@@ -66,7 +66,7 @@ def birealnet(args, dataset, input_tensor=None, include_top=True):
     # layer 18
     if include_top:
         out = tf.keras.layers.GlobalAvgPool2D()(out)
-        out = tf.keras.layers.Dense(dataset.num_classes, activation="softmax")(out)
+        out = tf.keras.layers.Dense(num_classes, activation="softmax")(out)
 
     return tf.keras.Model(inputs=img_input, outputs=out)
 
@@ -134,7 +134,8 @@ def BiRealNet(
 
     model = birealnet(
         default(),
-        utils.ImagenetDataset(input_shape, classes),
+        input_shape,
+        classes,
         input_tensor=input_tensor,
         include_top=include_top,
     )

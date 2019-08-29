@@ -6,9 +6,6 @@ import json
 from tensorflow.python.keras.backend import is_keras_tensor
 from tensorflow.python.eager.context import num_gpus
 from keras_applications.imagenet_utils import _obtain_input_shape
-from collections import namedtuple
-
-ImagenetDataset = namedtuple("ImagenetDataset", ["input_shape", "num_classes"])
 
 
 def slash_join(*args):

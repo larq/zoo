@@ -5,7 +5,7 @@ from larq_zoo import utils
 
 
 @registry.register_model
-def xnornet(hparams, dataset, input_tensor=None, include_top=True):
+def xnornet(hparams, input_shape, num_classes, input_tensor=None, include_top=True):
     kwargs = dict(
         kernel_quantizer=hparams.kernel_quantizer,
         input_quantizer=hparams.input_quantizer,
@@ -13,7 +13,7 @@ def xnornet(hparams, dataset, input_tensor=None, include_top=True):
         use_bias=hparams.use_bias,
         kernel_regularizer=hparams.kernel_regularizer,
     )
-    img_input = utils.get_input_layer(dataset.input_shape, input_tensor)
+    img_input = utils.get_input_layer(input_shape, input_tensor)
 
     x = tf.keras.layers.Conv2D(
         96,
@@ -21,7 +21,7 @@ def xnornet(hparams, dataset, input_tensor=None, include_top=True):
         strides=(4, 4),
         padding="same",
         use_bias=hparams.use_bias,
-        input_shape=dataset.input_shape,
+        input_shape=input_shape,
         kernel_regularizer=hparams.kernel_regularizer,
     )(img_input)
 
@@ -67,9 +67,7 @@ def xnornet(hparams, dataset, input_tensor=None, include_top=True):
         x = tf.keras.layers.Activation("relu")(x)
         x = tf.keras.layers.Flatten()(x)
         x = tf.keras.layers.Dense(
-            dataset.num_classes,
-            use_bias=False,
-            kernel_regularizer=hparams.kernel_regularizer,
+            num_classes, use_bias=False, kernel_regularizer=hparams.kernel_regularizer
         )(x)
         x = tf.keras.layers.Activation("softmax")(x)
 
@@ -183,7 +181,8 @@ def XNORNet(
 
     model = xnornet(
         default(),
-        utils.ImagenetDataset(input_shape, classes),
+        input_shape,
+        classes,
         input_tensor=input_tensor,
         include_top=include_top,
     )

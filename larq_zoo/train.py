@@ -28,7 +28,7 @@ def train(build_model, dataset, hparams, output_dir, tensorboard):
         validation_data = dataset.validation_data(hparams.batch_size)
 
     with utils.get_distribution_scope(hparams.batch_size):
-        model = build_model(hparams, dataset)
+        model = build_model(hparams, **dataset.preprocessing.kwargs)
         model.compile(
             optimizer=hparams.optimizer,
             loss="categorical_crossentropy",
@@ -55,7 +55,9 @@ def train(build_model, dataset, hparams, output_dir, tensorboard):
     model.save_weights(path.join(output_dir, f"{model_name}_weights.h5"))
 
     # Save weights without top
-    notop_model = build_model(hparams, dataset, include_top=False)
+    notop_model = build_model(
+        hparams, **dataset.preprocessing.kwargs, include_top=False
+    )
     notop_model.set_weights(model.get_weights()[: len(notop_model.get_weights())])
     notop_model.save_weights(path.join(output_dir, f"{model_name}_weights_notop.h5"))
 

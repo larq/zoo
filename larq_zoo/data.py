@@ -5,7 +5,8 @@ The ImageNet preprocessing from https://github.com/tensorflow/tpu/blob/master/mo
 
 import numpy as np
 import tensorflow as tf
-from zookeeper import registry
+from zookeeper import registry, Preprocessing
+import tensorflow_datasets as tfds
 
 IMAGE_SIZE = 224
 CROP_PADDING = 32
@@ -31,12 +32,34 @@ def preprocess_input(image):
     return result
 
 
-@registry.register_preprocess("imagenet2012", (IMAGE_SIZE, IMAGE_SIZE, 3))
-@registry.register_preprocess("oxford_flowers102", (IMAGE_SIZE, IMAGE_SIZE, 3))
-def default(image_bytes, training):
-    return preprocess_image_bytes(
-        image_bytes, is_training=training, image_size=IMAGE_SIZE
-    )
+class ImageClassification(Preprocessing):
+    @property
+    def kwargs(self):
+        return {
+            "input_shape": self.features["image"].shape,
+            "num_classes": self.features["label"].num_classes,
+        }
+
+    def inputs(self, data, training):
+        return tf.cast(data["image"], tf.float32)
+
+    def outputs(self, data, training):
+        return tf.one_hot(data["label"], self.features["label"].num_classes)
+
+
+@registry.register_preprocess("imagenet2012")
+@registry.register_preprocess("oxford_flowers102")
+class default(ImageClassification):
+    decoders = {"image": tfds.decode.SkipDecoding()}
+
+    @property
+    def kwargs(self):
+        return {**super().kwargs, "input_shape": (IMAGE_SIZE, IMAGE_SIZE, 3)}
+
+    def inputs(self, data, training):
+        return preprocess_image_bytes(
+            data["image"], is_training=training, image_size=IMAGE_SIZE
+        )
 
 
 def distorted_bounding_box_crop(

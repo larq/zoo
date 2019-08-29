@@ -5,7 +5,9 @@ from zookeeper import registry, HParams
 
 
 @registry.register_model
-def binary_alexnet(hparams, dataset, input_tensor=None, include_top=True):
+def binary_alexnet(
+    hparams, input_shape, num_classes, input_tensor=None, include_top=True
+):
     """
     Implementation of ["Binarized Neural Networks"](https://papers.nips.cc/paper/6573-binarized-neural-networks)
     by Hubara et al., NIPS, 2016.
@@ -47,7 +49,7 @@ def binary_alexnet(hparams, dataset, input_tensor=None, include_top=True):
         return x
 
     # get input
-    img_input = utils.get_input_layer(dataset.input_shape, input_tensor)
+    img_input = utils.get_input_layer(input_shape, input_tensor)
 
     # feature extractor
     out = conv_block(
@@ -63,7 +65,7 @@ def binary_alexnet(hparams, dataset, input_tensor=None, include_top=True):
         out = tf.keras.layers.Flatten()(out)
         out = dense_block(out, units=4096)
         out = dense_block(out, units=4096)
-        out = dense_block(out, dataset.num_classes)
+        out = dense_block(out, num_classes)
         out = tf.keras.layers.Activation("softmax")(out)
 
     return tf.keras.Model(inputs=img_input, outputs=out)
@@ -118,7 +120,8 @@ def BinaryAlexNet(
 
     model = binary_alexnet(
         default(),
-        utils.ImagenetDataset(input_shape, classes),
+        input_shape,
+        classes,
         input_tensor=input_tensor,
         include_top=include_top,
     )
