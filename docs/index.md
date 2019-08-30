@@ -13,9 +13,13 @@ The model definitions and the train loop are available in the [Larq Zoo reposito
 
 | Model                                        | Top-1 Accuracy | Top-5 Accuracy | Parameters | Memory   |
 | -------------------------------------------- | -------------- | -------------- | ---------- | -------- |
-| [Binary AlexNet](/models/api/#binaryalexnet) | 36.30 %        | 61.53 %        | 61 859 192 | 7.49 MB  |
+| [BinaryDenseNet45](/models/api/#densenet45)  | 64.59 %        | 85.21 %        | 13 939 240 | 7.54 MB  |
+| [BinaryDenseNet37](/models/api/#densenet37)  | 62.89 %        | 84.19 %        | 8 734 120  | 5.25 MB  |
+| [BinaryDenseNet28](/models/api/#densenet28)  | 60.91 %        | 82.83 %        | 5 150 504  | 4.12 MB  |
+| [BinaryResNetE18](/models/api/#resnete18)    | 58.32 %        | 80.79 %        | 11 699 368 | 4.03 MB  |
 | [Bi-Real Net](/models/api/#birealnet)        | 58.01 %        | 80.27 %        | 11 736 232 | 4.04 MB  |
 | [XNOR-Net](/models/api/#xnornet)             | 44.96 %        | 69.18 %        | 62 396 768 | 22.81 MB |
+| [Binary AlexNet](/models/api/#binaryalexnet) | 36.30 %        | 61.53 %        | 61 859 192 | 7.49 MB  |
 
 ## Training Models from Scratch
 
