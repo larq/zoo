@@ -13,7 +13,7 @@ def slash_join(*args):
 
 
 def download_pretrained_model(model, version, file, file_hash, cache_dir=None):
-    root_url = "https://github.com/plumerai/larq-zoo/releases/download/"
+    root_url = "https://github.com/larq/zoo/releases/download/"
 
     url = slash_join(root_url, model + "-" + version, file)
     cache_subdir = os.path.join("larq/models/", model)
