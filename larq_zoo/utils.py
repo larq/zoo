@@ -6,6 +6,9 @@ import json
 from tensorflow.python.keras.backend import is_keras_tensor
 from tensorflow.python.eager.context import num_gpus
 from keras_applications.imagenet_utils import _obtain_input_shape
+from tensorflow.keras.applications.vgg16 import (
+    decode_predictions as keras_decode_predictions,
+)
 
 
 def slash_join(*args):
@@ -89,3 +92,21 @@ def get_input_layer(input_shape, input_tensor):
     if not is_keras_tensor(input_tensor):
         return tf.keras.layers.Input(tensor=input_tensor, shape=input_shape)
     return input_tensor
+
+
+def decode_predictions(preds, top=5, **kwargs):
+    """Decodes the prediction of an ImageNet model.
+
+    # Arguments
+    preds: Numpy tensor encoding a batch of predictions.
+    top: Integer, how many top-guesses to return.
+
+    # Returns
+    A list of lists of top class prediction tuples
+        `(class_name, class_description, score)`.
+        One list of tuples per sample in batch input.
+
+    # Raises
+    ValueError: In case of invalid shape of the `pred` array (must be 2D).
+    """
+    return keras_decode_predictions(preds, top=5, **kwargs)

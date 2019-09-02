@@ -126,6 +126,13 @@ def BinaryResNetE18(
 
     Optionally loads weights pre-trained on ImageNet.
 
+    ```netron
+    resnet_e-v0.1.0/resnet_e_18.json
+    ```
+    ```plot-altair
+    /plots/resnet_e_18.vg.json
+    ```
+
     # Arguments
     include_top: whether to include the fully-connected layer at the top of the network.
     weights: one of `None` (random initialization), "imagenet" (pre-training on

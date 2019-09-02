@@ -98,6 +98,13 @@ def BinaryAlexNet(
 
     Optionally loads weights pre-trained on ImageNet.
 
+    ```netron
+    binary_alexnet-v0.2.0/binary_alexnet.json
+    ```
+    ```plot-altair
+    /plots/binary_alexnet.vg.json
+    ```
+
     # Arguments
     include_top: whether to include the fully-connected layer at the top of the network.
     weights: one of `None` (random initialization), "imagenet" (pre-training on
