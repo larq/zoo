@@ -1,5 +1,4 @@
 from larq_zoo.binarynet import BinaryAlexNet
-from larq_zoo.birealnet import BiRealNet
 from larq_zoo.xnornet import XNORNet
 from larq_zoo.resnet_e import BinaryResNetE18
 from larq_zoo.densenet import (
@@ -13,7 +12,6 @@ from larq_zoo.utils import decode_predictions
 
 __all__ = [
     "BinaryAlexNet",
-    "BiRealNet",
     "XNORNet",
     "BinaryResNetE18",
     "BinaryDenseNet28",

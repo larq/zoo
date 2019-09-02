@@ -29,7 +29,6 @@ def parametrize(func):
         "app,last_feature_dim",
         [
             (lqz.BinaryAlexNet, 256),
-            (lqz.BiRealNet, 512),
             (lqz.BinaryResNetE18, 512),
             (lqz.BinaryDenseNet28, 576),
             (lqz.BinaryDenseNet37, 640),
