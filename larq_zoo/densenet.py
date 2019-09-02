@@ -136,9 +136,13 @@ def BinaryDenseNet28(
     input_shape=None,
     classes=1000,
 ):
-    """Instantiates the Binary BinaryDenseNet 28 architecture.
+    """Instantiates the BinaryDenseNet 28 architecture.
 
     Optionally loads weights pre-trained on ImageNet.
+
+    ```plot-altair
+    /plots/densenet_28.vg.json
+    ```
 
     # Arguments
     include_top: whether to include the fully-connected layer at the top of the network.
@@ -202,9 +206,13 @@ def BinaryDenseNet37(
     input_shape=None,
     classes=1000,
 ):
-    """Instantiates the Binary BinaryDenseNet 37 architecture.
+    """Instantiates the BinaryDenseNet 37 architecture.
 
     Optionally loads weights pre-trained on ImageNet.
+
+    ```plot-altair
+    /plots/densenet_37.vg.json
+    ```
 
     # Arguments
     include_top: whether to include the fully-connected layer at the top of the network.
@@ -272,6 +280,10 @@ def BinaryDenseNet37Dilated(
 
     Optionally loads weights pre-trained on ImageNet.
 
+    ```plot-altair
+    /plots/densenet_37_dilated.vg.json
+    ```
+
     # Arguments
     include_top: whether to include the fully-connected layer at the top of the network.
     weights: one of `None` (random initialization), "imagenet" (pre-training on
@@ -337,6 +349,10 @@ def BinaryDenseNet45(
     """Instantiates the Binary BinaryDenseNet 45 architecture.
 
     Optionally loads weights pre-trained on ImageNet.
+
+    ```plot-altair
+    /plots/densenet_45.vg.json
+    ```
 
     # Arguments
     include_top: whether to include the fully-connected layer at the top of the network.
