@@ -4,11 +4,12 @@ from larq_zoo import utils
 import larq as lq
 
 
-def densely_connected_block(x, args):
+def densely_connected_block(x, args, dilation_rate=1):
     y = keras.layers.BatchNormalization(momentum=0.9, epsilon=1e-5)(x)
     y = lq.layers.QuantConv2D(
         filters=args.growth_rate,
         kernel_size=3,
+        dilation_rate=dilation_rate,
         input_quantizer=args.quantizer,
         kernel_quantizer=args.quantizer,
         kernel_initializer="glorot_normal",
@@ -49,11 +50,12 @@ def binary_densenet(
 
     for block, layers_per_block in enumerate(args.layers):
         for _ in range(layers_per_block):
-            x = densely_connected_block(x, args)
+            x = densely_connected_block(x, args, args.dilation_rate[block])
 
         if block < len(args.layers) - 1:
             x = keras.layers.BatchNormalization(momentum=0.9, epsilon=1e-5)(x)
-            x = keras.layers.MaxPooling2D(2, strides=2)(x)
+            if args.dilation_rate[block + 1] == 1:
+                x = keras.layers.MaxPooling2D(2, strides=2)(x)
             x = keras.layers.Activation("relu")(x)
             x = keras.layers.Conv2D(
                 round(x.shape.as_list()[-1] // args.reduction[block] / 32) * 32,
@@ -83,6 +85,7 @@ class binary_densenet28(HParams):
     initial_filters = 64
     growth_rate = 64
     reduction = [2.7, 2.7, 2.2]
+    dilation_rate = [1, 1, 1, 1]
     layers = [6, 6, 6, 5]
     quantizer = lq.quantizers.SteSign(clip_value=1.3)
     constraint = lq.constraints.WeightClip(clip_value=1.3)
@@ -106,6 +109,14 @@ class binary_densenet37(binary_densenet28):
     learning_steps = [100, 110]
     reduction = [3.3, 3.3, 4]
     layers = [6, 8, 12, 6]
+
+
+@registry.register_hparams(binary_densenet)
+class binary_densenet37_dilated(binary_densenet37):
+    epochs = 80
+    batch_size = 256
+    learning_steps = [60, 70]
+    dilation_rate = [1, 1, 2, 4]
 
 
 @registry.register_hparams(binary_densenet)
@@ -243,6 +254,72 @@ def BinaryDenseNet37(
                 version="v0.1.0",
                 file="binary_densenet_37_weights_notop.h5",
                 file_hash="4e12bca9fd27580a5b833241c4eb35d6cc332878c406048e6ca8dbbc78d59175",
+            )
+        model.load_weights(weights_path)
+    elif weights is not None:
+        model.load_weights(weights)
+    return model
+
+
+def BinaryDenseNet37Dilated(
+    include_top=True,
+    weights="imagenet",
+    input_tensor=None,
+    input_shape=None,
+    classes=1000,
+):
+    """Instantiates the Dilated BinaryDenseNet 37 architecture.
+
+    Optionally loads weights pre-trained on ImageNet.
+
+    # Arguments
+    include_top: whether to include the fully-connected layer at the top of the network.
+    weights: one of `None` (random initialization), "imagenet" (pre-training on
+        ImageNet), or the path to the weights file to be loaded.
+    input_tensor: optional Keras tensor (i.e. output of `layers.Input()`) to use as
+        image input for the model.
+    input_shape: optional shape tuple, only to be specified if `include_top` is False,
+        otherwise the input shape has to be `(224, 224, 3)`.
+        It should have exactly 3 inputs channels.
+    classes: optional number of classes to classify images into, only to be specified
+        if `include_top` is True, and if no `weights` argument is specified.
+
+    # Returns
+    A Keras model instance.
+
+    # Raises
+    ValueError: in case of invalid argument for `weights`, or invalid input shape.
+
+    # References
+    - [Back to Simplicity:
+      How to Train Accurate BNNs from Scratch?](https://arxiv.org/abs/1906.08637)
+    """
+    input_shape = utils.validate_input(input_shape, weights, include_top, classes)
+
+    model = binary_densenet(
+        binary_densenet37_dilated(),
+        input_shape=input_shape,
+        num_classes=classes,
+        input_tensor=input_tensor,
+        include_top=include_top,
+    )
+
+    # Load weights.
+    if weights == "imagenet":
+        # download appropriate file
+        if include_top:
+            weights_path = utils.download_pretrained_model(
+                model="binary_densenet",
+                version="v0.1.0",
+                file="binary_densenet_37_dilated_weights.h5",
+                file_hash="15c1bcd79b8dc22971382fbf79acf364a3f51049d0e584a11533e6fdbb7363d3",
+            )
+        else:
+            weights_path = utils.download_pretrained_model(
+                model="binary_densenet",
+                version="v0.1.0",
+                file="binary_densenet_37_dilated_weights_notop.h5",
+                file_hash="eaf3eac19fc90708f56a27435fb06d0e8aef40e6e0411ff7a8eefbe479226e4f",
             )
         model.load_weights(weights_path)
     elif weights is not None:
