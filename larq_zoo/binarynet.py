@@ -98,6 +98,9 @@ def BinaryAlexNet(
 
     Optionally loads weights pre-trained on ImageNet.
 
+    ```netron
+    binary_alexnet-v0.2.0/binary_alexnet.json
+    ```
     ```plot-altair
     /plots/binary_alexnet.vg.json
     ```

@@ -126,6 +126,9 @@ def BinaryResNetE18(
 
     Optionally loads weights pre-trained on ImageNet.
 
+    ```netron
+    resnet_e-v0.1.0/resnet_e_18.json
+    ```
     ```plot-altair
     /plots/resnet_e_18.vg.json
     ```

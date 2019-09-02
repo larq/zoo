@@ -154,6 +154,9 @@ def XNORNet(
 
     Optionally loads weights pre-trained on ImageNet.
 
+    ```netron
+    xnornet-v0.2.0/xnornet.json
+    ```
     ```plot-altair
     /plots/xnornet.vg.json
     ```

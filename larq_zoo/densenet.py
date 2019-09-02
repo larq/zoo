@@ -140,6 +140,9 @@ def BinaryDenseNet28(
 
     Optionally loads weights pre-trained on ImageNet.
 
+    ```netron
+    binary_densenet-v0.1.0/binary_densenet_28.json
+    ```
     ```plot-altair
     /plots/densenet_28.vg.json
     ```
@@ -210,6 +213,9 @@ def BinaryDenseNet37(
 
     Optionally loads weights pre-trained on ImageNet.
 
+    ```netron
+    binary_densenet-v0.1.0/binary_densenet_37.json
+    ```
     ```plot-altair
     /plots/densenet_37.vg.json
     ```
@@ -280,6 +286,9 @@ def BinaryDenseNet37Dilated(
 
     Optionally loads weights pre-trained on ImageNet.
 
+    ```netron
+    binary_densenet-v0.1.0/binary_densenet_37_dilated.json
+    ```
     ```plot-altair
     /plots/densenet_37_dilated.vg.json
     ```
@@ -350,6 +359,9 @@ def BinaryDenseNet45(
 
     Optionally loads weights pre-trained on ImageNet.
 
+    ```netron
+    binary_densenet-v0.1.0/binary_densenet_45.json
+    ```
     ```plot-altair
     /plots/densenet_45.vg.json
     ```
