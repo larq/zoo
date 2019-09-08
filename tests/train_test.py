@@ -1,13 +1,7 @@
-import pytest
 from click.testing import CliRunner
 from larq_zoo import train
-import tensorflow as tf
 
 
-@pytest.mark.skipif(
-    int(tf.__version__[0]) == 2,
-    reason="This currently fails on TF 2 due to https://github.com/larq/larq/pull/195.",
-)
 def test_cli():
     runner = CliRunner()
     result = runner.invoke(
