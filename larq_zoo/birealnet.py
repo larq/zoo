@@ -110,7 +110,7 @@ def BiRealNet(
     Optionally loads weights pre-trained on ImageNet.
 
     ```netron
-    birealnet-v0.2.0/birealnet.json
+    birealnet-v0.3.0/birealnet.json
     ```
     ```plot-altair
     /plots/birealnet.vg.json
