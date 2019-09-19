@@ -109,4 +109,4 @@ def decode_predictions(preds, top=5, **kwargs):
     # Raises
     ValueError: In case of invalid shape of the `pred` array (must be 2D).
     """
-    return keras_decode_predictions(preds, top=5, **kwargs)
+    return keras_decode_predictions(preds, top=top, **kwargs)
