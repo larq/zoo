@@ -36,7 +36,7 @@ def parametrize(func):
             (lqz.BinaryDenseNet37Dilated, 640),
             (lqz.BinaryDenseNet45, 800),
             (lqz.XNORNet, 4096),
-            (lqz.DoReFaNet, 4096),
+            (lqz.DoReFaNet, 256),
         ],
     )(func)
 
