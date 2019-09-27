@@ -8,7 +8,7 @@ from zookeeper import registry, HParams
 def dorefa_net(hparams, input_shape, num_classes, input_tensor=None, include_top=True):
     def conv_block(x, filters, kernel_size, strides=1, pool=False, padding="same"):
         x = lq.layers.QuantConv2D(
-            features,
+            filters,
             kernel_size=kernel_size,
             strides=strides,
             padding="same",
