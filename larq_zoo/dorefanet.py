@@ -24,7 +24,7 @@ def dorefa_net(hparams, input_shape, num_classes, input_tensor=None, include_top
             x = tf.keras.layers.MaxPool2D(pool_size=3, strides=2, padding=padding)(x)
         return x
 
-    def dense_block(x, units):
+    def fully_connected_block(x, units):
 
         x = lq.layers.QuantDense(
             units,
@@ -53,8 +53,8 @@ def dorefa_net(hparams, input_shape, num_classes, input_tensor=None, include_top
     # classifier
     if include_top:
         out = tf.keras.layers.Flatten()(out)
-        out = dense_block(out, units=4096)
-        out = dense_block(out, units=4096)
+        out = fully_connected_block(out, units=4096)
+        out = fully_connected_block(out, units=4096)
         out = tf.keras.layers.Activation("clip_by_value_activation")(out)
         out = tf.keras.layers.Dense(num_classes, use_bias=True)(out)
         out = tf.keras.layers.Activation("softmax")(out)
@@ -65,7 +65,7 @@ def dorefa_net(hparams, input_shape, num_classes, input_tensor=None, include_top
 @lq.utils.register_keras_custom_object
 @lq.utils.set_precision(1)
 def magnitude_aware_sign_unclipped(x):
-    r"""
+    """
     Scaled sign function with identity pseudo-gradient as used for the
     weights in the DoReFa paper. The Scale factor is calculated per layer.
     """
