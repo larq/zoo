@@ -25,7 +25,6 @@ def dorefa_net(hparams, input_shape, num_classes, input_tensor=None, include_top
         return x
 
     def fully_connected_block(x, units):
-
         x = lq.layers.QuantDense(
             units,
             input_quantizer=hparams.input_quantizer,
