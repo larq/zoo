@@ -44,10 +44,10 @@ def dorefa_net(hparams, input_shape, num_classes, input_tensor=None, include_top
     out = tf.keras.layers.Conv2D(
         96, kernel_size=12, strides=4, padding="valid", use_bias=True
     )(img_input)
-    out = conv_block(out, features=256, kernel_size=5, pool=True)
-    out = conv_block(out, features=384, kernel_size=3, pool=True)
-    out = conv_block(out, features=384, kernel_size=3)
-    out = conv_block(out, features=256, kernel_size=3, padding="valid", pool=True)
+    out = conv_block(out, filters=256, kernel_size=5, pool=True)
+    out = conv_block(out, filters=384, kernel_size=3, pool=True)
+    out = conv_block(out, filters=384, kernel_size=3)
+    out = conv_block(out, filters=256, kernel_size=3, padding="valid", pool=True)
 
     # classifier
     if include_top:
