@@ -21,7 +21,9 @@ def dorefa_net(hparams, input_shape, num_classes, input_tensor=None, include_top
             x
         )
         if pool:
-            x = tf.keras.layers.MaxPool2D(pool_size=3, strides=2, padding=pool_padding)(x)
+            x = tf.keras.layers.MaxPool2D(pool_size=3, strides=2, padding=pool_padding)(
+                x
+            )
         return x
 
     def fully_connected_block(x, units):
