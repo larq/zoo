@@ -47,7 +47,7 @@ def dorefa_net(hparams, input_shape, num_classes, input_tensor=None, include_top
     out = conv_block(out, filters=256, kernel_size=5, pool=True)
     out = conv_block(out, filters=384, kernel_size=3, pool=True)
     out = conv_block(out, filters=384, kernel_size=3)
-    out = conv_block(out, filters=256, kernel_size=3, padding="valid", pool=True)
+    out = conv_block(out, filters=256, kernel_size=3, pool_padding="valid", pool=True)
 
     # classifier
     if include_top:
