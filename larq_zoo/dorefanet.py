@@ -143,10 +143,13 @@ def DoReFaNet(
         It should have exactly 3 inputs channels.
     classes: optional number of classes to classify images into, only to be specified
         if `include_top` is True, and if no `weights` argument is specified.
+
     # Returns
     A Keras model instance.
+
     # Raises
     ValueError: in case of invalid argument for `weights`, or invalid input shape.
+
     # References
     - [DoReFa-Net: Training Low Bitwidth Convolutional Neural Networks with Low
     Bitwidth Gradients](https://arxiv.org/abs/1606.06160)
