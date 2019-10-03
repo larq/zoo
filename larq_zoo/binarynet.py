@@ -78,13 +78,10 @@ class default(HParams):
     batch_size = 512
     learning_rate = 0.01
     lr_decay_stepsize = 10
+    optimizer = tf.keras.optimizers.Adam(learning_rate)
 
     def learning_rate_schedule(self, epoch):
         return self.learning_rate * 0.5 ** (epoch // self.lr_decay_stepsize)
-
-    @property
-    def optimizer(self):
-        return tf.keras.optimizers.Adam(self.learning_rate)
 
 
 def BinaryAlexNet(

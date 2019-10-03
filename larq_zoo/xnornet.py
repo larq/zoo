@@ -108,6 +108,8 @@ class default(HParams):
     epochs = 100
     batch_size = 1200
     initial_lr = 0.001
+    kernel_regularizer = tf.keras.regularizers.l2(regularization_quantity)
+    optimizer = tf.keras.optimizers.Adam(initial_lr)
 
     def learning_rate_schedule(self, epoch):
         epoch_dec_1 = 19
@@ -133,14 +135,6 @@ class default(HParams):
             return self.initial_lr * 0.01 * 0.1
         else:
             return self.initial_lr * 0.001 * 0.1
-
-    @property
-    def kernel_regularizer(self):
-        return tf.keras.regularizers.l2(self.regularization_quantity)
-
-    @property
-    def optimizer(self):
-        return tf.keras.optimizers.Adam(self.initial_lr)
 
 
 def XNORNet(

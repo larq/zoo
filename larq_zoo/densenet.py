@@ -89,6 +89,7 @@ class binary_densenet28(HParams):
     layers = [6, 6, 6, 5]
     quantizer = lq.quantizers.SteSign(clip_value=1.3)
     constraint = lq.constraints.WeightClip(clip_value=1.3)
+    optimizer = keras.optimizers.Adam(learning_rate, epsilon=1e-8)
 
     def learning_rate_schedule(self, epoch):
         lr = self.learning_rate
@@ -97,10 +98,6 @@ class binary_densenet28(HParams):
                 return lr
             lr *= self.learning_factor
         return lr
-
-    @property
-    def optimizer(self):
-        return keras.optimizers.Adam(self.learning_rate, epsilon=1e-8)
 
 
 @registry.register_hparams(binary_densenet)

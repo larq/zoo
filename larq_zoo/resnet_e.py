@@ -87,6 +87,7 @@ class default(HParams):
     initial_filters = 64
     quantizer = lq.quantizers.SteSign(clip_value=1.25)
     constraint = lq.constraints.WeightClip(clip_value=1.25)
+    optimizer = keras.optimizers.Adam(learning_rate, epsilon=1e-8)
 
     def learning_rate_schedule(self, epoch):
         lr = self.learning_rate
@@ -95,10 +96,6 @@ class default(HParams):
                 return lr
             lr *= self.learning_factor
         return lr
-
-    @property
-    def optimizer(self):
-        return keras.optimizers.Adam(self.learning_rate, epsilon=1e-8)
 
     @property
     def spec(self):
