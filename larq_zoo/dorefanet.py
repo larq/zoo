@@ -94,8 +94,11 @@ class default(HParams):
     fast_decay_start = 82
     activations_k_bit = 2
     input_quantizer = lq.quantizers.DoReFaQuantizer(k_bit=activations_k_bit)
-    kernel_quantizer = magnitude_aware_sign_unclipped
     optimizer = tf.keras.optimizers.Adam(learning_rate, epsilon=1e-5)
+
+    @property
+    def kernel_quantizer(self):
+        return magnitude_aware_sign_unclipped
 
     def learning_rate_schedule(self, epoch):
         if epoch < self.decay_start:
