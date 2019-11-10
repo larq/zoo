@@ -26,7 +26,7 @@ setup(
             "pytest-cov>=2.6.1",
             "pytest-xdist==1.30.0",
             "Pillow==6.2.1",
-            "scipy==1.3.1",
+            "scipy==1.3.2",
         ],
     },
     entry_points="""
