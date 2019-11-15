@@ -9,7 +9,7 @@ Larq Zoo contains reference implementations of popular Binarized Neural Networks
 Before installing Larq Zoo, please install:
 
 - [Python](https://python.org) version `3.6` or `3.7`
-- [Tensorflow](https://www.tensorflow.org/install) version `1.13+` or `2.0.0`
+- [Tensorflow](https://www.tensorflow.org/install) version `1.14+` or `2.0.0`
 
 ## Installation
 
