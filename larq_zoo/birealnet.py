@@ -70,7 +70,7 @@ def birealnet(args, input_shape, num_classes, input_tensor=None, include_top=Tru
         out = tf.keras.layers.GlobalAvgPool2D()(out)
         out = tf.keras.layers.Dense(num_classes, activation="softmax")(out)
 
-    return tf.keras.Model(inputs=img_input, outputs=out, name="birealnet")
+    return tf.keras.Model(inputs=img_input, outputs=out, name="birealnet18")
 
 
 @registry.register_hparams(birealnet)
