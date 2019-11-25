@@ -60,7 +60,7 @@ def dorefa_net(hparams, input_shape, num_classes, input_tensor=None, include_top
         out = tf.keras.layers.Dense(num_classes, use_bias=True)(out)
         out = tf.keras.layers.Activation("softmax")(out)
 
-    return tf.keras.Model(inputs=img_input, outputs=out)
+    return tf.keras.Model(inputs=img_input, outputs=out, name="dorefanet")
 
 
 @lq.utils.register_keras_custom_object

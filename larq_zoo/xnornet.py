@@ -78,7 +78,7 @@ def xnornet(hparams, input_shape, num_classes, input_tensor=None, include_top=Tr
     else:
         inputs = img_input
 
-    return tf.keras.models.Model(inputs, x)
+    return tf.keras.models.Model(inputs, x, name="xnornet")
 
 
 @lq.utils.set_precision(1)

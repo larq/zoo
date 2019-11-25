@@ -68,7 +68,7 @@ def binary_alexnet(
         out = dense_block(out, num_classes)
         out = tf.keras.layers.Activation("softmax")(out)
 
-    return tf.keras.Model(inputs=img_input, outputs=out)
+    return tf.keras.Model(inputs=img_input, outputs=out, name="binary_alexnet")
 
 
 @registry.register_hparams(binary_alexnet)

@@ -72,11 +72,12 @@ def binary_densenet(
         x = keras.layers.Dense(
             num_classes, activation="softmax", kernel_initializer="he_normal"
         )(x)
-    return keras.Model(inputs=input, outputs=x)
+    return keras.Model(inputs=input, outputs=x, name=args.name)
 
 
 @registry.register_hparams(binary_densenet)
 class binary_densenet28(HParams):
+    name = "binary_densenet28"
     epochs = 120
     batch_size = 256
     learning_rate = 0.004
@@ -105,6 +106,7 @@ class binary_densenet28(HParams):
 
 @registry.register_hparams(binary_densenet)
 class binary_densenet37(binary_densenet28):
+    name = "binary_densenet37"
     batch_size = 192
     learning_steps = [100, 110]
     reduction = [3.3, 3.3, 4]
@@ -113,6 +115,7 @@ class binary_densenet37(binary_densenet28):
 
 @registry.register_hparams(binary_densenet)
 class binary_densenet37_dilated(binary_densenet37):
+    name = "binary_densenet37_dilated"
     epochs = 80
     batch_size = 256
     learning_steps = [60, 70]
@@ -121,6 +124,7 @@ class binary_densenet37_dilated(binary_densenet37):
 
 @registry.register_hparams(binary_densenet)
 class binary_densenet45(binary_densenet28):
+    name = "binary_densenet45"
     epochs = 125
     batch_size = 384
     learning_rate = 0.008

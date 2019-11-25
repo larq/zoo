@@ -73,11 +73,12 @@ def resnet_e(args, input_shape, num_classes, input_tensor=None, include_top=True
         x = keras.layers.Dense(
             num_classes, activation="softmax", kernel_initializer="glorot_normal"
         )(x)
-    return keras.Model(inputs=input, outputs=x)
+    return keras.Model(inputs=input, outputs=x, name=args.name)
 
 
 @registry.register_hparams(resnet_e)
 class default(HParams):
+    name = "binary_resnet_e_18"
     epochs = 120
     batch_size = 1024
     num_layers = 18
