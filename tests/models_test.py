@@ -1,9 +1,11 @@
-import pytest
 import functools
-import larq_zoo as lqz
 import os
+
 import numpy as np
+import pytest
 from tensorflow import keras
+
+import larq_zoo as lqz
 
 
 def keras_test(func):

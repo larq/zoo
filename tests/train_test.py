@@ -1,20 +1,19 @@
 from click.testing import CliRunner
-from larq_zoo import train
+
+import larq_zoo
 
 
 def test_cli():
-    runner = CliRunner()
-    result = runner.invoke(
-        train.cli,
+    result = CliRunner().invoke(
+        larq_zoo.train.cli,
         [
-            "train",
-            "binary_alexnet",
-            "--dataset",
-            "oxford_flowers102",
-            "--hparams",
-            "epochs=1,batch_size=230",
+            "TrainBinaryAlexNet",
+            "dataset=OxfordFlowers",
+            "dataset.train_split='train'",
+            "dataset.validation_split='validation'",
+            "epochs=1",
+            "batch_size=230",
             "--no-tensorboard",
-            "--validationset",
         ],
     )
     assert result.exit_code == 0
