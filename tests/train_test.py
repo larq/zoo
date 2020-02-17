@@ -12,8 +12,9 @@ def test_cli():
             "dataset.train_split='train'",
             "dataset.validation_split='validation'",
             "epochs=1",
-            "batch_size=230",
+            "batch_size=32",
             "--no-tensorboard",
+            "--no-use_model_checkpointing",
         ],
     )
     assert result.exit_code == 0
