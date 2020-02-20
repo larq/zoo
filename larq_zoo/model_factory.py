@@ -6,7 +6,6 @@ from zookeeper.tf import Dataset
 
 from larq_zoo import utils
 
-# FIXME
 QuantizerType = Union[
     tf.keras.layers.Layer, Callable[[tf.Tensor], tf.Tensor], str, None
 ]
