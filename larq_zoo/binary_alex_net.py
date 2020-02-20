@@ -22,12 +22,6 @@ class BinaryAlexNetFactory(ModelFactory):
     kernel_quantizer = Field("ste_sign")
     kernel_constraint = Field("weight_clip")
 
-    @Field
-    def num_classes(self) -> int:
-        if self.dataset is None:
-            raise TypeError("Must override either `dataset` or `num_classes`.")
-        return self.dataset.num_classes
-
     def conv_block(
         self,
         x: tf.Tensor,
