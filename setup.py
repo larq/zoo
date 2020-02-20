@@ -20,7 +20,7 @@ setup(
     install_requires=[
         "numpy~=1.18",
         "larq~=0.8.4",
-        "zookeeper @ git+git://github.com/AdamHillier/zookeeper@factories",
+        "zookeeper @ git+git://github.com/larq/zookeeper@8824c1bcb47f8246712275aa5798e51fbade7a7b",
     ],
     extras_require={
         "tensorflow": ["tensorflow>=2.0.0"],
