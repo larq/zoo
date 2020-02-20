@@ -56,7 +56,7 @@ class TrainLarqZooModel(Experiment):
                     filepath=str(self.model_path), save_weights_only=True
                 )
             )
-        if self.learning_rate_schedule:
+        if hasattr(self, "learning_rate_schedule"):
             callbacks.append(
                 keras.callbacks.LearningRateScheduler(self.learning_rate_schedule)
             )
