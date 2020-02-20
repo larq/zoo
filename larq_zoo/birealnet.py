@@ -1,4 +1,4 @@
-from typing import Optional, Tuple, Union
+from typing import Optional, Sequence, Union
 
 import larq as lq
 import tensorflow as tf
@@ -117,9 +117,9 @@ class BiRealNetFactory(ModelFactory):
 
 def BiRealNet(
     *,  # Keyword arguments only
-    input_shape: Tuple[int, int, int] = None,
-    input_tensor: tf.Tensor = None,
-    weights: str = "imagenet",
+    input_shape: Optional[Sequence[Optional[int]]] = None,
+    input_tensor: Optional[tf.Tensor] = None,
+    weights: Optional[str] = "imagenet",
     include_top: bool = True,
     num_classes: int = 1000,
 ) -> tf.keras.models.Model:

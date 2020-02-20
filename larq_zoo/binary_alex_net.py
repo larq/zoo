@@ -112,11 +112,11 @@ class BinaryAlexNetFactory(ModelFactory):
 
 def BinaryAlexNet(
     *,  # Keyword arguments only
-    input_shape=None,
-    input_tensor=None,
-    weights="imagenet",
-    include_top=True,
-    num_classes=1000,
+    input_shape: Optional[Sequence[Optional[int]]] = None,
+    input_tensor: Optional[tf.Tensor] = None,
+    weights: Optional[str] = "imagenet",
+    include_top: bool = True,
+    num_classes: int = 1000,
 ) -> tf.keras.models.Model:
     """Instantiates the BinaryAlexNet architecture.
     Optionally loads weights pre-trained on ImageNet.

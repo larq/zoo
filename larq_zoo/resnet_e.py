@@ -1,4 +1,4 @@
-from typing import Sequence, Tuple
+from typing import Optional, Sequence
 
 import larq as lq
 import tensorflow as tf
@@ -139,9 +139,9 @@ class BinaryResNetE18Factory(ModelFactory):
 
 def BinaryResNetE18(
     *,  # Keyword arguments only
-    input_shape: Tuple[int, int, int] = None,
-    input_tensor: tf.Tensor = None,
-    weights: str = "imagenet",
+    input_shape: Optional[Sequence[Optional[int]]] = None,
+    input_tensor: Optional[tf.Tensor] = None,
+    weights: Optional[str] = "imagenet",
     include_top: bool = True,
     num_classes: int = 1000,
 ) -> tf.keras.models.Model:

@@ -1,4 +1,4 @@
-from typing import Sequence, Tuple
+from typing import Optional, Sequence
 
 import larq as lq
 import tensorflow as tf
@@ -231,9 +231,9 @@ class BinaryDenseNet45Factory(BinaryDenseNet28Factory):
 
 def BinaryDenseNet28(
     *,  # Keyword arguments only
-    input_shape: Tuple[int, int, int] = None,
-    input_tensor: tf.Tensor = None,
-    weights: str = "imagenet",
+    input_shape: Optional[Sequence[Optional[int]]] = None,
+    input_tensor: Optional[tf.Tensor] = None,
+    weights: Optional[str] = "imagenet",
     include_top: bool = True,
     num_classes: int = 1000,
 ) -> tf.keras.models.Model:
@@ -275,9 +275,9 @@ def BinaryDenseNet28(
 
 def BinaryDenseNet37(
     *,  # Keyword arguments only
-    input_shape: Tuple[int, int, int] = None,
-    input_tensor: tf.Tensor = None,
-    weights: str = "imagenet",
+    input_shape: Optional[Sequence[Optional[int]]] = None,
+    input_tensor: Optional[tf.Tensor] = None,
+    weights: Optional[str] = "imagenet",
     include_top: bool = True,
     num_classes: int = 1000,
 ) -> tf.keras.models.Model:
@@ -319,9 +319,9 @@ def BinaryDenseNet37(
 
 def BinaryDenseNet37Dilated(
     *,  # Keyword arguments only
-    input_shape: Tuple[int, int, int] = None,
-    input_tensor: tf.Tensor = None,
-    weights: str = "imagenet",
+    input_shape: Optional[Sequence[Optional[int]]] = None,
+    input_tensor: Optional[tf.Tensor] = None,
+    weights: Optional[str] = "imagenet",
     include_top: bool = True,
     num_classes: int = 1000,
 ) -> tf.keras.models.Model:
@@ -363,9 +363,9 @@ def BinaryDenseNet37Dilated(
 
 def BinaryDenseNet45(
     *,  # Keyword arguments only
-    input_shape: Tuple[int, int, int] = None,
-    input_tensor: tf.Tensor = None,
-    weights: str = "imagenet",
+    input_shape: Optional[Sequence[Optional[int]]] = None,
+    input_tensor: Optional[tf.Tensor] = None,
+    weights: Optional[str] = "imagenet",
     include_top: bool = True,
     num_classes: int = 1000,
 ) -> tf.keras.models.Model:

@@ -1,4 +1,4 @@
-from typing import Optional, Tuple
+from typing import Optional, Sequence
 
 import larq as lq
 import tensorflow as tf
@@ -125,8 +125,8 @@ class DoReFaNetFactory(ModelFactory):
 
 def DoReFaNet(
     *,  # Keyword arguments only
-    input_shape: Tuple[int, int, int] = None,
-    input_tensor: tf.Tensor = None,
+    input_shape: Optional[Sequence[Optional[int]]] = None,
+    input_tensor: Optional[tf.Tensor] = None,
     weights: Optional[str] = "imagenet",
     include_top: bool = True,
     num_classes: int = 1000,
