@@ -30,7 +30,10 @@ class ModelFactory:
     @Field
     def num_classes(self) -> int:
         if self.dataset is None:
-            raise TypeError("Must override either `dataset` or `num_classes`.")
+            raise TypeError(
+                "No `dataset` is defined so unable to infer `num_classes`. Please "
+                "provide a `dataset` or override `num_classes` directly."
+            )
         return self.dataset.num_classes
 
     include_top: bool = Field(True)

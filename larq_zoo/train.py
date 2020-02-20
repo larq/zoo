@@ -38,7 +38,7 @@ class TrainLarqZooModel(Experiment):
 
     @property
     def model_path(self):
-        return self.output_dir / "model"
+        return Path(self.output_dir) / "model"
 
     metrics: List[Union[Callable[[tf.Tensor, tf.Tensor], float], str]] = Field(
         lambda: ["sparse_categorical_accuracy", "sparse_top_k_categorical_accuracy"]
