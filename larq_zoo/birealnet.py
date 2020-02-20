@@ -60,11 +60,6 @@ class BiRealNetFactory(ModelFactory):
         return tf.keras.layers.add([x, shortcut])
 
     def build(self) -> tf.keras.models.Model:
-        input_shape = utils.validate_input(
-            self.input_shape, self.weights, self.include_top, self.num_classes
-        )
-        img_input = utils.get_input_layer(input_shape, self.input_tensor)
-
         # Layer 1
         out = tf.keras.layers.Conv2D(
             self.filters,
@@ -73,7 +68,7 @@ class BiRealNetFactory(ModelFactory):
             kernel_initializer=self.kernel_initializer,
             padding="same",
             use_bias=False,
-        )(img_input)
+        )(self.image_input)
         out = tf.keras.layers.BatchNormalization(momentum=0.8)(out)
         out = tf.keras.layers.MaxPool2D((3, 3), strides=2, padding="same")(out)
 
@@ -95,7 +90,7 @@ class BiRealNetFactory(ModelFactory):
             out = tf.keras.layers.GlobalAvgPool2D()(out)
             out = tf.keras.layers.Dense(self.num_classes, activation="softmax")(out)
 
-        model = tf.keras.Model(inputs=img_input, outputs=out, name="birealnet18")
+        model = tf.keras.Model(inputs=self.image_input, outputs=out, name="birealnet18")
 
         # Load weights.
         if self.weights == "imagenet":

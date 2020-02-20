@@ -68,16 +68,14 @@ class BinaryResNetE18Factory(ModelFactory):
         return tf.keras.layers.add([x, residual])
 
     def build(self) -> tf.keras.models.Model:
-        image_input = self.image_input
-
-        if image_input.shape[1] and image_input.shape[2] < 50:
+        if self.image_input.shape[1] and self.image_input.shape[2] < 50:
             x = tf.keras.layers.Conv2D(
                 self.initial_filters,
                 kernel_size=3,
                 padding="same",
                 kernel_initializer="he_normal",
                 use_bias=False,
-            )(image_input)
+            )(self.image_input)
         else:
             x = tf.keras.layers.Conv2D(
                 self.initial_filters,
@@ -86,7 +84,7 @@ class BinaryResNetE18Factory(ModelFactory):
                 padding="same",
                 kernel_initializer="he_normal",
                 use_bias=False,
-            )(image_input)
+            )(self.image_input)
 
             x = tf.keras.layers.BatchNormalization(momentum=0.9, epsilon=1e-5)(x)
             x = tf.keras.layers.Activation("relu")(x)
@@ -111,7 +109,9 @@ class BinaryResNetE18Factory(ModelFactory):
             )(x)
 
         model = tf.keras.Model(
-            inputs=image_input, outputs=x, name=f"binary_resnet_e_{self.num_layers}"
+            inputs=self.image_input,
+            outputs=x,
+            name=f"binary_resnet_e_{self.num_layers}",
         )
 
         # Load weights.

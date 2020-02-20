@@ -38,8 +38,6 @@ class XNORNetFactory(ModelFactory):
         return tf.keras.regularizers.l2(5e-7)
 
     def build(self) -> tf.keras.models.Model:
-        image_input = self.image_input
-
         quant_conv_kwargs = dict(
             kernel_quantizer=self.kernel_quantizer,
             input_quantizer=self.input_quantizer,
@@ -55,7 +53,7 @@ class XNORNetFactory(ModelFactory):
             padding="same",
             use_bias=False,
             kernel_regularizer=self.kernel_regularizer,
-        )(image_input)
+        )(self.image_input)
 
         x = tf.keras.layers.BatchNormalization(momentum=0.9, scale=False, epsilon=1e-5)(
             x
@@ -105,7 +103,9 @@ class XNORNetFactory(ModelFactory):
             )(x)
             x = tf.keras.layers.Activation("softmax")(x)
 
-        model = tf.keras.models.Model(inputs=image_input, outputs=x, name="xnornet")
+        model = tf.keras.models.Model(
+            inputs=self.image_input, outputs=x, name="xnornet"
+        )
 
         # Load weights.
         if self.weights == "imagenet":

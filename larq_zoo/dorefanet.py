@@ -80,11 +80,9 @@ class DoReFaNetFactory(ModelFactory):
         )(x)
 
     def build(self) -> tf.keras.models.Model:
-        image_input = self.image_input
-
         out = tf.keras.layers.Conv2D(
             96, kernel_size=12, strides=4, padding="valid", use_bias=True
-        )(image_input)
+        )(self.image_input)
         out = self.conv_block(out, filters=256, kernel_size=5, pool=True)
         out = self.conv_block(out, filters=384, kernel_size=3, pool=True)
         out = self.conv_block(out, filters=384, kernel_size=3)
@@ -100,7 +98,7 @@ class DoReFaNetFactory(ModelFactory):
             out = tf.keras.layers.Dense(self.num_classes, use_bias=True)(out)
             out = tf.keras.layers.Activation("softmax")(out)
 
-        model = tf.keras.Model(inputs=image_input, outputs=out, name="dorefanet")
+        model = tf.keras.Model(inputs=self.image_input, outputs=out, name="dorefanet")
 
         # Load weights.
         if self.weights == "imagenet":

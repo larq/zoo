@@ -58,11 +58,9 @@ class BinaryAlexNetFactory(ModelFactory):
         return tf.keras.layers.BatchNormalization(scale=False, momentum=0.9)(x)
 
     def build(self) -> tf.keras.models.Model:
-        image_input = self.image_input
-
         # Feature extractor
         out = self.conv_block(
-            image_input,
+            self.image_input,
             features=64,
             kernel_size=11,
             strides=4,
@@ -85,7 +83,7 @@ class BinaryAlexNetFactory(ModelFactory):
             out = tf.keras.layers.Activation("softmax")(out)
 
         model = tf.keras.models.Model(
-            inputs=image_input, outputs=out, name="binary_alexnet"
+            inputs=self.image_input, outputs=out, name="binary_alexnet"
         )
 
         # Load weights.

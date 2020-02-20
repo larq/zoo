@@ -54,16 +54,14 @@ class BinaryDenseNetFactory(ModelFactory):
         return tf.keras.layers.concatenate([x, y])
 
     def build(self) -> BinaryDenseNet:
-        image_input = self.image_input
-
-        if image_input.shape[1] and image_input.shape[2] < 50:
+        if self.image_input.shape[1] and self.image_input.shape[2] < 50:
             x = tf.keras.layers.Conv2D(
                 self.initial_filters,
                 kernel_size=3,
                 padding="same",
                 kernel_initializer="he_normal",
                 use_bias=False,
-            )(image_input)
+            )(self.image_input)
         else:
             x = tf.keras.layers.Conv2D(
                 self.initial_filters,
@@ -72,7 +70,7 @@ class BinaryDenseNetFactory(ModelFactory):
                 padding="same",
                 kernel_initializer="he_normal",
                 use_bias=False,
-            )(image_input)
+            )(self.image_input)
 
             x = tf.keras.layers.BatchNormalization(momentum=0.9, epsilon=1e-5)(x)
             x = tf.keras.layers.Activation("relu")(x)
@@ -103,7 +101,7 @@ class BinaryDenseNetFactory(ModelFactory):
                 self.num_classes, activation="softmax", kernel_initializer="he_normal",
             )(x)
 
-        model = BinaryDenseNet(inputs=image_input, outputs=x, name=self.name)
+        model = BinaryDenseNet(inputs=self.image_input, outputs=x, name=self.name)
 
         if self.weights == "imagenet":
             if self.include_top:
