@@ -111,22 +111,29 @@ class TrainLarqZooModel(Experiment):
 
         click.secho(str(self))
 
-        self.model.fit(
-            train_data,
-            epochs=self.epochs,
-            steps_per_epoch=math.ceil(num_train_examples / self.batch_size),
-            validation_data=validation_data,
+        self.model.evaluate(
+            validation_data,
             validation_steps=math.ceil(num_validation_examples / self.batch_size),
             verbose=1 if self.use_progress_bar else 2,
-            initial_epoch=initial_epoch,
             callbacks=self.callbacks,
         )
 
+        # self.model.fit(
+        #     train_data,
+        #     epochs=self.epochs,
+        #     steps_per_epoch=math.ceil(num_train_examples / self.batch_size),
+        #     validation_data=validation_data,
+        #     validation_steps=math.ceil(num_validation_examples / self.batch_size),
+        #     verbose=1 if self.use_progress_bar else 2,
+        #     initial_epoch=initial_epoch,
+        #     callbacks=self.callbacks,
+        # )
+
         # Save model, weights, and config JSON.
-        self.model.save(str(self.output_dir / f"{self.model.name}.h5"))
-        self.model.save_weights(str(self.output_dir / f"{self.model.name}_weights.h5"))
-        with open(self.output_dir / f"{self.model.name}.json", "w") as json_file:
-            json_file.write(self.model.to_json())
+        # self.model.save(str(self.output_dir / f"{self.model.name}.h5"))
+        # self.model.save_weights(str(self.output_dir / f"{self.model.name}_weights.h5"))
+        # with open(self.output_dir / f"{self.model.name}.json", "w") as json_file:
+        #     json_file.write(self.model.to_json())
 
 
 if __name__ == "__main__":
