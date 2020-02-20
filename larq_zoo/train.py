@@ -68,7 +68,7 @@ class TrainLarqZooModel(Experiment):
         return callbacks
 
     def run(self):
-        os.makedirs(self.output_dir, exist_ok=True)
+        self.output_dir.mkdir(parents=True, exist_ok=True)
 
         initial_epoch = utils.get_current_epoch(self.output_dir)
 
