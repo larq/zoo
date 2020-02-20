@@ -104,6 +104,14 @@ class TrainLarqZooModel(Experiment):
             callbacks=self.callbacks,
         )
 
+        # Evaluate loss metrics
+        metric_dict = {}
+        for metric, name in zip(self.model.metrics, self.model.metrics_names[1:]):
+            value = metric.result().numpy()
+            metric_dict[f"val_{name}"] = value
+            tf.summary.scalar(f"epoch_{name}", value, step=0)
+        print(" - ".join(f"{name}: {value}" for name, value in metric_dict.items()))
+
 
 if __name__ == "__main__":
     import importlib
