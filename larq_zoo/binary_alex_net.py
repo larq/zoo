@@ -1,4 +1,4 @@
-from typing import Tuple
+from typing import Optional, Sequence, Tuple
 
 import larq as lq
 import tensorflow as tf
