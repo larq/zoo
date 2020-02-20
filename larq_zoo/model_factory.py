@@ -9,7 +9,7 @@ from larq_zoo import utils
 QuantizerType = Union[
     tf.keras.layers.Layer, Callable[[tf.Tensor], tf.Tensor], str, None
 ]
-ContraintType = Union[tf.keras.constraints.Constraint, str, None]
+ConstraintType = Union[tf.keras.constraints.Constraint, str, None]
 DimType = Optional[int]
 
 
@@ -19,7 +19,7 @@ class ModelFactory:
     # Don't set any defaults here.
     input_quantizer: QuantizerType = Field()
     kernel_quantizer: QuantizerType = Field()
-    kernel_constraint: ContraintType = Field()
+    kernel_constraint: ConstraintType = Field()
 
     # This field is included for automatic inference of `num_clases`, if no
     # value is otherwise provided. We set `allow_missing` because we don't want
