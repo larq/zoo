@@ -3,7 +3,7 @@ import math
 import os
 from datetime import datetime
 from pathlib import Path
-from typing import Callable, List, Union
+from typing import Callable, List, Optional, Union
 
 import click
 import larq as lq
@@ -39,6 +39,8 @@ class TrainLarqZooModel(Experiment):
     @property
     def model_path(self):
         return self.output_dir / "model"
+
+    learning_rate_schedule: Optional[Callable] = None
 
     metrics: List[Union[Callable[[tf.Tensor, tf.Tensor], float], str]] = Field(
         lambda: ["sparse_categorical_accuracy", "sparse_top_k_categorical_accuracy"]
