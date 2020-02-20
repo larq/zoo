@@ -68,7 +68,7 @@ class BinaryResNetE18Factory(ModelFactory):
         return tf.keras.layers.add([x, residual])
 
     def build(self) -> tf.keras.models.Model:
-        if self.image_input.shape[1] and self.image_input.shape[2] < 50:
+        if self.image_input.shape[1] and self.image_input.shape[1] < 50:
             x = tf.keras.layers.Conv2D(
                 self.initial_filters,
                 kernel_size=3,
