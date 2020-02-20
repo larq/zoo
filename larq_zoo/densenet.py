@@ -54,7 +54,7 @@ class BinaryDenseNetFactory(ModelFactory):
         return tf.keras.layers.concatenate([x, y])
 
     def build(self) -> BinaryDenseNet:
-        if self.image_input.shape[1] and self.image_input.shape[2] < 50:
+        if self.image_input.shape[1] and self.image_input.shape[1] < 50:
             x = tf.keras.layers.Conv2D(
                 self.initial_filters,
                 kernel_size=3,
