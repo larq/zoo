@@ -113,7 +113,7 @@ class TrainLarqZooModel(Experiment):
 
         self.model.evaluate(
             validation_data,
-            validation_steps=math.ceil(num_validation_examples / self.batch_size),
+            steps=math.ceil(num_validation_examples / self.batch_size),
             verbose=1 if self.use_progress_bar else 2,
             callbacks=self.callbacks,
         )
