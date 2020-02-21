@@ -98,8 +98,9 @@ class BinaryResNetE18Factory(ModelFactory):
                 strides = 1 if block == 0 or layer != 0 else 2
                 x = self.residual_block(x, filters, strides=strides)
 
+        x = tf.keras.layers.Activation("relu")(x)
+
         if self.include_top:
-            x = tf.keras.layers.Activation("relu")(x)
             x = tf.keras.layers.GlobalAvgPool2D()(x)
             x = tf.keras.layers.Dense(
                 self.num_classes,

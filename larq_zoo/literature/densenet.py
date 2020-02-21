@@ -92,12 +92,12 @@ class BinaryDenseNetFactory(ModelFactory):
                 )(x)
 
         x = tf.keras.layers.BatchNormalization(momentum=0.9, epsilon=1e-5)(x)
+        x = tf.keras.layers.Activation("relu")(x)
 
         if self.include_top:
-            x = tf.keras.layers.Activation("relu")(x)
             x = tf.keras.layers.GlobalAvgPool2D()(x)
             x = tf.keras.layers.Dense(
-                self.num_classes, activation="softmax", kernel_initializer="he_normal",
+                self.num_classes, activation="softmax", kernel_initializer="he_normal"
             )(x)
 
         model = BinaryDenseNet(inputs=self.image_input, outputs=x, name=self.name)
