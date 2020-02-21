@@ -23,7 +23,7 @@ jobs:
       - name: Run flake8
         run: flake8
       - name: Black code style
-        run: black --check --target-version py36 .
+        run: black . --check --target-version py36 --exclude 'build/|buck-out/|dzzist/|_build/|\.git/|\.hg/|\.mypy_cache/|\.tox/|\.venv/|larq/snapshots/'
       - name: Check import order with isort
         run: isort --check-only --diff
       - name: Type check with PyType
