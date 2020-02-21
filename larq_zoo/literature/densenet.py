@@ -33,7 +33,7 @@ class BinaryDenseNetFactory(ModelFactory):
     name: str
     reduction: Sequence[float]
     dilation_rate: Sequence[int]
-    layers: Sequence[float]
+    layers: Sequence[int]
     imagenet_weights_path: str
     imagenet_no_top_weights_path: str
 
