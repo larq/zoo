@@ -3,6 +3,7 @@ import os
 import subprocess
 import sys
 
+import larq as lq
 import numpy as np
 import pytest
 from tensorflow import keras
@@ -93,26 +94,22 @@ def test_no_top_variable_shape_4(app, last_feature_dim):
     assert model.output_shape == (None, None, None, last_feature_dim)
 
 
-@pytest.mark.parametrize("command_name", cli.commands.keys())
-def test_compare_model_summary(command_name: str, snapshot):
-    # FIXME: ideally, we'd directly call the relevant command here rather than
-    # calling its command_name through `subprocess.run`. However, this currently results
-    # in incorrect behaviour due to a zookeeper bug (object detection issue #196)
-    try:
-        print(f"Compiling {command_name}...")
-        captured = subprocess.run(
-            [
-                "lqz",
-                command_name,
-                "dataset=OxfordFlowers",
-                "batch_size=8",
-                "testing=True",
-            ],
-            check=True,
-            capture_output=True,
-        )
-        snapshot.assert_match(captured.stdout)
+@parametrize
+def test_model_summary(app, last_feature_dim, capsys, snapshot):
+    input_tensor = keras.layers.Input(shape=(224, 224, 3))
+    model = app(weights=None, input_tensor=input_tensor)
+    lq.models.summary(model)
+    out, err = capsys.readouterr()
+    snapshot.assert_match(out)
 
-    except subprocess.CalledProcessError as e:
-        print(e.stderr.decode("UTF-8"), file=sys.stderr)
-        raise
+
+@pytest.mark.parametrize("command_name", cli.commands.keys())
+def test_experiments(command_name: str, snapshot, capsys):
+    try:
+        cli.commands[command_name](
+            ["dataset=OxfordFlowers", "batch_size=8", "testing=True"]
+        )
+    # Catch successful SystemExit to prevent exception
+    except SystemExit as e:
+        if e.code != 0:
+            raise

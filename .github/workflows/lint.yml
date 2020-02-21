@@ -21,4 +21,4 @@ jobs:
       - name: Run PyFlakes
         run: pyflakes .
       - name: Black code style
-        run: black . --check --target-version py36 --exclude 'build/|buck-out/|dzzist/|_build/|\.git/|\.hg/|\.mypy_cache/|\.tox/|\.venv/|larq/snapshots/'
+        run: black . --check --target-version py36 --exclude 'build/|buck-out/|dzzist/|_build/|\.git/|\.hg/|\.mypy_cache/|\.tox/|\.venv/|tests/snapshots/'
