@@ -6,6 +6,7 @@ from typing import Optional
 
 import tensorflow as tf
 from keras_applications.imagenet_utils import _obtain_input_shape
+from tensorflow import keras
 from tensorflow.keras.applications.vgg16 import (
     decode_predictions as keras_decode_predictions,
 )
@@ -29,7 +30,7 @@ def download_pretrained_model(
     url = slash_join(root_url, model + "-" + version, file)
     cache_subdir = os.path.join("larq/models/", model)
 
-    return tf.keras.utils.get_file(
+    return keras.utils.get_file(
         fname=file,
         origin=url,
         cache_dir=cache_dir,
@@ -46,7 +47,7 @@ def get_current_epoch(output_dir):
         return 0
 
 
-class ModelCheckpoint(tf.keras.callbacks.ModelCheckpoint):
+class ModelCheckpoint(keras.callbacks.ModelCheckpoint):
     def on_epoch_end(self, epoch, logs=None):
         super().on_epoch_end(epoch, logs=logs)
         with open(os.path.join(os.path.dirname(self.filepath), "stats.json"), "w") as f:
@@ -88,7 +89,7 @@ def validate_input(input_shape, weights, include_top, classes):
         input_shape,
         default_size=224,
         min_size=64,
-        data_format=tf.keras.backend.image_data_format(),
+        data_format=keras.backend.image_data_format(),
         require_flatten=include_top,
         weights=weights,
     )
@@ -96,9 +97,9 @@ def validate_input(input_shape, weights, include_top, classes):
 
 def get_input_layer(input_shape, input_tensor):
     if input_tensor is None:
-        return tf.keras.layers.Input(shape=input_shape)
+        return keras.layers.Input(shape=input_shape)
     if not is_keras_tensor(input_tensor):
-        return tf.keras.layers.Input(tensor=input_tensor, shape=input_shape)
+        return keras.layers.Input(tensor=input_tensor, shape=input_shape)
     return input_tensor
 
 
