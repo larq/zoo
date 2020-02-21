@@ -101,8 +101,8 @@ class QuickNetLargeFactory(ModelFactory):
             strides=strides,
             padding="Same",
             input_quantizer=self.input_quantizer,
-            kernel_quantizer=self.kernal_quantizer,
-            kernel_constraint=self.constraint,
+            kernel_quantizer=self.kernel_quantizer,
+            kernel_constraint=self.kernel_constraint,
             kernel_initializer="glorot_normal",
             use_bias=False,
             activation="relu",
@@ -141,14 +141,14 @@ class QuickNetLargeFactory(ModelFactory):
                     model="quicknet_large",
                     version="v0.1.0",
                     file="quicknet_large_weights.h5",
-                    file_hash="",
+                    file_hash="1cd7ff411710023f902ec0152b860b4c3dea82e4bfe373b9310ca3598b3de640",
                 )
             else:
                 weights_path = utils.download_pretrained_model(
                     model="quicknet_large",
                     version="v0.1.0",
                     file="quicknet_large_weights_notop.h5",
-                    file_hash="",
+                    file_hash="628bde2a21cf9338e90da9b0179432d1dfa5f25a7d2aa6e51fc91d1630675c10",
                 )
             model.load_weights(weights_path)
         elif self.weights is not None:
@@ -167,7 +167,7 @@ def QuickNetLarge(
     """Instantiates the QuickNetLarge architecture.
     Optionally loads weights pre-trained on ImageNet.
     ```netron
-    quicknet-v0.1.0/quicknet.json
+    quicknet_large-v0.1.0/quicknet_large.json
     ```
     # Arguments
     include_top: whether to include the fully-connected layer at the top of the network.
