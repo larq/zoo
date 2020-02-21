@@ -6,7 +6,6 @@ from zookeeper import Field, factory
 
 from larq_zoo import utils
 from larq_zoo.model_factory import ModelFactory
-
 from larq_zoo.sota.quicknet import LCEFirstLayer
 
 
