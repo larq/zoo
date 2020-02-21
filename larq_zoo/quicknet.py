@@ -114,14 +114,14 @@ class QuickNetFactory(ModelFactory):
                     model="quicknet",
                     version="v0.1.0",
                     file="quicknet_weights.h5",
-                    file_hash="bde4a64d42c164a7b10a28debbe1ad5b287c499bc0247ecb00449e6e89f3bf5b",
+                    file_hash="",
                 )
             else:
                 weights_path = utils.download_pretrained_model(
                     model="quicknet",
                     version="v0.1.0",
                     file="quicknet_weights_notop.h5",
-                    file_hash="14cb037e47d223827a8d09db88ec73d60e4153a4464dca847e5ae1a155e7f525",
+                    file_hash="",
                 )
             model.load_weights(weights_path)
         elif self.weights is not None:
