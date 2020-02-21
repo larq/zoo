@@ -1,4 +1,4 @@
-from typing import Optional, Sequence
+from typing import Optional, Sequence, Tuple
 
 import larq as lq
 import tensorflow as tf
@@ -19,8 +19,8 @@ class QuickNetFactory(ModelFactory):
     kernel_quantizer = Field(lambda: lq.quantizers.SteSign(clip_value=1.25))
     kernel_constraint = Field(lambda: lq.constraints.WeightClip(clip_value=1.25))
 
-    @property
-    def spec(self):
+    @Field
+    def spec(self) -> Tuple[Sequence[int], Sequence[int]]:
         spec = {
             15: ([2, 3, 4, 4], [64, 128, 256, 512]),
         }
@@ -79,7 +79,7 @@ class QuickNetFactory(ModelFactory):
             metrics=[],
         )(x)
         x = tf.keras.layers.BatchNormalization(momentum=0.9, epsilon=1e-5)(x)
-        if filters != infilters:
+        if downsample:
             return tf.keras.layers.concatenate(
                 [residual, tf.keras.layers.add([x, residual])]
             )
