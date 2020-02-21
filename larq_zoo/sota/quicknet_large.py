@@ -8,13 +8,14 @@ from larq_zoo import utils
 from larq_zoo.model_factory import ModelFactory
 
 
-def squeeze_and_excite(inp, strides: int = 1, r: int = 16):
+def squeeze_and_excite(inp: tf.Tensor, strides: int = 1, r: int = 16):
+    """Squeeze and Excite as per [Squeeze-and-Excitation Networks](https://arxiv.org/abs/1709.01507)"""
     C = inp.get_shape().as_list()[-1]
 
     out = tf.keras.layers.GlobalAvgPool2D()(inp)
     out = tf.keras.layers.Flatten()(out)
     out = tf.keras.layers.Dense(
-        C / r,
+        C // r,
         activation="relu",
         kernel_initializer="he_normal",
         use_bias=False,
@@ -28,8 +29,7 @@ def squeeze_and_excite(inp, strides: int = 1, r: int = 16):
         use_bias=False,
         kernel_regularizer=tf.keras.regularizers.l2(1e-5),
     )(out)
-    out = tf.reshape(out, [-1, 1, 1, int(C * outmult)])
-    return out
+    return tf.reshape(out, [-1, 1, 1, C * outmult])
 
 
 @factory
