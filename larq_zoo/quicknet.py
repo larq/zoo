@@ -30,7 +30,7 @@ class QuickNetFactory(ModelFactory):
 
     def LCEFirstLayer(self, x: tf.Tensor) -> tf.Tensor:
         x = tf.keras.layers.Conv2D(
-            int(self.initial_filters / 8),
+            self.initial_filters // 8,
             (3, 3),
             strides=2,
             kernel_initializer="he_normal",
@@ -51,7 +51,7 @@ class QuickNetFactory(ModelFactory):
         return x
 
     # LCE Optimised Fast Block
-    def residualfast_block(
+    def residual_fast_block(
         self, x: tf.Tensor, filters: int, strides: int = 1
     ) -> tf.Tensor:
         infilters = x.get_shape().as_list()[-1]
@@ -87,7 +87,6 @@ class QuickNetFactory(ModelFactory):
             return tf.keras.layers.add([x, residual])
 
     def build(self) -> tf.keras.models.Model:
-
         x = self.LCEFirstLayer(self.img_input)
 
         for block, (layers, filters) in enumerate(zip(*self.spec)):
