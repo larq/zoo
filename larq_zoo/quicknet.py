@@ -104,7 +104,7 @@ class QuickNetFactory(ModelFactory):
                 kernel_initializer="glorot_normal",
             )(x)
 
-        model = tf.keras.Model(inputs=self.image_input, outputs=x, name="quicknet",)
+        model = tf.keras.Model(inputs=self.image_input, outputs=x, name="quicknet")
 
         # Load weights.
         if self.weights == "imagenet":
@@ -137,13 +137,13 @@ def QuickNet(
     include_top: bool = True,
     num_classes: int = 1000,
 ) -> tf.keras.models.Model:
-    """Instantiates the BinaryResNetE18 architecture.
+    """Instantiates the QuickNet architecture.
     Optionally loads weights pre-trained on ImageNet.
     ```netron
-    resnet_e-v0.1.0/resnet_e_15.json
+    resnet_e-v0.1.0/quicknet.json
     ```
     ```plot-altair
-    /plots/resnet_e_18.vg.json
+    /plots/quicknet.vg.json
     ```
     # Arguments
     include_top: whether to include the fully-connected layer at the top of the network.
