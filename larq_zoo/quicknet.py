@@ -70,8 +70,8 @@ class QuickNetFactory(ModelFactory):
             strides=strides,
             padding="Same",
             input_quantizer=self.input_quantizer,
-            kernel_quantizer=self.kernal_quantizer,
-            kernel_constraint=self.constraint,
+            kernel_quantizer=self.kernel_quantizer,
+            kernel_constraint=self.kernel_constraint,
             kernel_initializer="glorot_normal",
             use_bias=False,
             activation="relu",
@@ -86,7 +86,7 @@ class QuickNetFactory(ModelFactory):
             return tf.keras.layers.add([x, residual])
 
     def build(self) -> tf.keras.models.Model:
-        x = self.LCEFirstLayer(self.img_input)
+        x = self.LCEFirstLayer(self.image_input)
 
         for block, (layers, filters) in enumerate(zip(*self.spec)):
             for layer in range(layers):
@@ -112,14 +112,14 @@ class QuickNetFactory(ModelFactory):
                     model="quicknet",
                     version="v0.1.0",
                     file="quicknet_weights.h5",
-                    file_hash="",
+                    file_hash="f52abb0ce984015889f8a8842944eed1bfad06897d745c7b58eb663b3457cd3c",
                 )
             else:
                 weights_path = utils.download_pretrained_model(
                     model="quicknet",
                     version="v0.1.0",
                     file="quicknet_weights_notop.h5",
-                    file_hash="",
+                    file_hash="057391ea350ce0af33194db300d3d9d690c8fb5b11427bbaf37504af257e9dc5",
                 )
             model.load_weights(weights_path)
         elif self.weights is not None:
@@ -139,9 +139,6 @@ def QuickNet(
     Optionally loads weights pre-trained on ImageNet.
     ```netron
     quicknet-v0.1.0/quicknet.json
-    ```
-    ```plot-altair
-    /plots/quicknet.vg.json
     ```
     # Arguments
     include_top: whether to include the fully-connected layer at the top of the network.
