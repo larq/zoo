@@ -9,7 +9,7 @@ import click
 import larq as lq
 import tensorflow as tf
 from tensorflow import keras
-from zookeeper import Field, cli
+from zookeeper import Field
 from zookeeper.tf import Experiment
 
 from larq_zoo import utils
@@ -129,12 +129,3 @@ class TrainLarqZooModel(Experiment):
         )
         with open(Path(self.output_dir) / f"{self.model.name}.json", "w") as json_file:
             json_file.write(self.model.to_json())
-
-
-if __name__ == "__main__":
-    import importlib
-
-    # Running it without the CLI requires us to first import larq_zoo
-    # in order to register the models and datasets
-    importlib.import_module("larq_zoo")
-    cli()

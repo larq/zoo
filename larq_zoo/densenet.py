@@ -2,11 +2,10 @@ from typing import Optional, Sequence
 
 import larq as lq
 import tensorflow as tf
-from zookeeper import ComponentField, Field, factory, task
+from zookeeper import Field, factory
 
 from larq_zoo import utils
 from larq_zoo.model_factory import ModelFactory
-from larq_zoo.train import TrainLarqZooModel
 
 
 # A type alias only for type-checking.
@@ -403,55 +402,3 @@ def BinaryDenseNet45(
         include_top=include_top,
         num_classes=num_classes,
     ).build()
-
-
-##################
-# Training loops #
-##################
-
-
-@task
-class TrainBinaryDenseNet28(TrainLarqZooModel):
-    model: BinaryDenseNet = ComponentField(BinaryDenseNet28Factory)
-
-    epochs = Field(120)
-    batch_size = Field(256)
-
-    learning_rate: float = Field(4e-3)
-    learning_factor: float = Field(0.1)
-    learning_steps: Sequence[int] = Field((100, 110))
-
-    def learning_rate_schedule(self, epoch):
-        lr = self.learning_rate
-        for step in self.learning_steps:
-            if epoch < step:
-                return lr
-            lr *= self.learning_factor
-        return lr
-
-    optimizer = Field(
-        lambda self: tf.keras.optimizers.Adam(self.learning_rate, epsilon=1e-8)
-    )
-
-
-@task
-class TrainBinaryDenseNet37(TrainBinaryDenseNet28):
-    model = ComponentField(BinaryDenseNet37Factory)
-    batch_size = Field(192)
-
-
-@task
-class TrainBinaryDenseNet37Dilated(TrainBinaryDenseNet37):
-    model = ComponentField(BinaryDenseNet37DilatedFactory)
-    epochs = Field(80)
-    batch_size = Field(256)
-    learning_steps = Field((60, 70))
-
-
-@task
-class TrainBinaryDenseNet45(TrainBinaryDenseNet28):
-    model = ComponentField(BinaryDenseNet45Factory)
-    epochs = Field(125)
-    batch_size = Field(384)
-    learning_rate = Field(0.008)
-    learning_steps = Field((80, 100))

@@ -1,11 +1,11 @@
 from click.testing import CliRunner
 
-import larq_zoo
+from larq_zoo import experiments
 
 
 def test_cli():
     result = CliRunner().invoke(
-        larq_zoo.train.cli,
+        experiments.cli,
         [
             "TrainBinaryAlexNet",
             "dataset=OxfordFlowers",
