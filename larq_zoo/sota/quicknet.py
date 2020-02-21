@@ -21,9 +21,7 @@ class QuickNetFactory(ModelFactory):
 
     @Field
     def spec(self) -> Tuple[Sequence[int], Sequence[int]]:
-        spec = {
-            15: ([2, 3, 4, 4], [64, 128, 256, 512]),
-        }
+        spec = {15: ([2, 3, 4, 4], [64, 128, 256, 512])}
         try:
             return spec[self.num_layers]
         except Exception:
@@ -94,8 +92,9 @@ class QuickNetFactory(ModelFactory):
                 strides = 1 if block == 0 or layer != 0 else 2
                 x = self.residual_fast_block(x, filters, strides=strides)
 
+        x = tf.keras.layers.Activation("relu")(x)
+
         if self.include_top:
-            x = tf.keras.layers.Activation("relu")(x)
             x = tf.keras.layers.GlobalAvgPool2D()(x)
             x = tf.keras.layers.Dense(
                 self.num_classes,
