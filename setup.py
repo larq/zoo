@@ -22,17 +22,15 @@ setup(
         "tensorflow": ["tensorflow>=1.14.0"],
         "tensorflow_gpu": ["tensorflow-gpu>=1.14.0"],
         "test": [
+            "black==19.10b0",
+            "flake8~=3.7.9",
+            "isort~=4.3.21",
+            "pytype>=2019.10.17,<2020.3.0",
             "pytest>=4.3.1",
             "pytest-cov>=2.6.1",
             "pytest-xdist==1.31.0",
             "Pillow==7.0.0",
             "scipy==1.4.1",
-        ],
-        "lint": [
-            "black==19.10b0",
-            "flake8~=3.7.9",
-            "isort~=4.3.21",
-            "pytype>=2019.10.17,<2020.3.0",
         ],
     },
     entry_points="""
