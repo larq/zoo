@@ -47,8 +47,7 @@ class QuickNetFactory(ModelFactory):
             activation="relu",
         )(x)
 
-        x = tf.keras.layers.BatchNormalization(momentum=0.9, epsilon=1e-5)(x)
-        return x
+        return tf.keras.layers.BatchNormalization(momentum=0.9, epsilon=1e-5)(x)
 
     # LCE Optimised Fast Block
     def residual_fast_block(
@@ -92,7 +91,7 @@ class QuickNetFactory(ModelFactory):
         for block, (layers, filters) in enumerate(zip(*self.spec)):
             for layer in range(layers):
                 strides = 1 if block == 0 or layer != 0 else 2
-                x = self.residualfast_block(x, filters, strides=strides)
+                x = self.residual_fast_block(x, filters, strides=strides)
 
         if self.include_top:
             x = tf.keras.layers.Activation("relu")(x)
