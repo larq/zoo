@@ -1,21 +1,29 @@
-import os
-import sys
-import tensorflow as tf
 import contextlib
 import json
-from tensorflow.python.keras.backend import is_keras_tensor
-from tensorflow.python.eager.context import num_gpus
+import os
+import sys
+from typing import Optional
+
+import tensorflow as tf
 from keras_applications.imagenet_utils import _obtain_input_shape
 from tensorflow.keras.applications.vgg16 import (
     decode_predictions as keras_decode_predictions,
 )
+from tensorflow.python.eager.context import num_gpus
+from tensorflow.python.keras.backend import is_keras_tensor
 
 
 def slash_join(*args):
     return "/".join(arg.strip("/") for arg in args)
 
 
-def download_pretrained_model(model, version, file, file_hash, cache_dir=None):
+def download_pretrained_model(
+    model: str,
+    version: str,
+    file: str,
+    file_hash: str,
+    cache_dir: Optional[str] = None,
+) -> str:
     root_url = "https://github.com/larq/zoo/releases/download/"
 
     url = slash_join(root_url, model + "-" + version, file)
@@ -34,7 +42,7 @@ def get_current_epoch(output_dir):
     try:
         with open(os.path.join(output_dir, "stats.json"), "r") as f:
             return json.load(f)["epoch"]
-    except:
+    except Exception:
         return 0
 
 

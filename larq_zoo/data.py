@@ -1,12 +1,14 @@
-"""Provides utilities to preprocess images.
+"""
+Provides utilities to preprocess images.
 
 The ImageNet preprocessing from https://github.com/tensorflow/tpu/blob/master/models/official/efficientnet/preprocessing.py
 """
 
 import numpy as np
 import tensorflow as tf
-from zookeeper import registry, Preprocessing
 import tensorflow_datasets as tfds
+from zookeeper import Field, component
+from zookeeper.tf import Preprocessing
 
 IMAGE_SIZE = 224
 CROP_PADDING = 32
@@ -33,30 +35,20 @@ def preprocess_input(image):
 
 
 class ImageClassification(Preprocessing):
-    @property
-    def kwargs(self):
-        return {
-            "input_shape": self.features["image"].shape,
-            "num_classes": self.features["label"].num_classes,
-        }
-
-    def inputs(self, data, training):
+    def input(self, data, training):
         return tf.cast(data["image"], tf.float32)
 
-    def outputs(self, data, training):
-        return tf.one_hot(data["label"], self.features["label"].num_classes)
+    def output(self, data, training):
+        return data["label"]
 
 
-@registry.register_preprocess("imagenet2012")
-@registry.register_preprocess("oxford_flowers102")
-class default(ImageClassification):
-    decoders = {"image": tfds.decode.SkipDecoding()}
+@component
+class Default(ImageClassification):
+    decoders = Field(lambda: {"image": tfds.decode.SkipDecoding()})
 
-    @property
-    def kwargs(self):
-        return {**super().kwargs, "input_shape": (IMAGE_SIZE, IMAGE_SIZE, 3)}
+    input_shape = Field((IMAGE_SIZE, IMAGE_SIZE, 3))
 
-    def inputs(self, data, training):
+    def input(self, data, training):
         return preprocess_image_bytes(
             data["image"], is_training=training, image_size=IMAGE_SIZE
         )

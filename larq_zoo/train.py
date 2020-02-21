@@ -1,65 +1,134 @@
-from zookeeper import cli, build_train
-from os import path
+import functools
+import math
+import os
+from datetime import datetime
+from pathlib import Path
+from typing import Callable, List, Union
+
 import click
+import larq as lq
+import tensorflow as tf
+from tensorflow import keras
+from zookeeper import Field, cli
+from zookeeper.tf import Experiment
+
+from larq_zoo import utils
 
 
-@cli.command()
-@click.option("--tensorboard/--no-tensorboard", default=True)
-@build_train()
-def train(build_model, dataset, hparams, output_dir, tensorboard):
-    import larq as lq
-    from larq_zoo import utils
-    import tensorflow as tf
+class TrainLarqZooModel(Experiment):
+    # Save model checkpoints.
+    use_model_checkpointing: bool = Field(True)
 
-    initial_epoch = utils.get_current_epoch(output_dir)
-    model_path = path.join(output_dir, "model")
-    callbacks = [utils.ModelCheckpoint(filepath=model_path, save_weights_only=True)]
-    if hasattr(hparams, "learning_rate_schedule"):
-        callbacks.append(
-            tf.keras.callbacks.LearningRateScheduler(hparams.learning_rate_schedule)
+    # Log metrics to Tensorboard.
+    use_tensorboard: bool = Field(True)
+
+    # Use a per-batch progress bar (as opposed to per-epoch).
+    use_progress_bar: bool = Field(False)
+
+    # Where to store output.
+    @Field
+    def output_dir(self) -> Union[str, os.PathLike]:
+        return (
+            Path.home()
+            / "zookeeper-logs"
+            / self.dataset.__class__.__name__
+            / self.__class__.__name__
+            / datetime.now().strftime("%Y%m%d_%H%M")
         )
-    if tensorboard:
-        callbacks.append(
-            tf.keras.callbacks.TensorBoard(log_dir=output_dir, write_graph=False)
-        )
 
-    with tf.device("/cpu:0"):
-        train_data = dataset.train_data(hparams.batch_size)
-        validation_data = dataset.validation_data(hparams.batch_size)
+    @property
+    def model_path(self):
+        return Path(self.output_dir) / "model"
 
-    with utils.get_distribution_scope(hparams.batch_size):
-        model = build_model(hparams, **dataset.preprocessing.kwargs)
-        model.compile(
-            optimizer=hparams.optimizer,
-            loss="categorical_crossentropy",
-            metrics=["categorical_accuracy", "top_k_categorical_accuracy"],
-        )
-        lq.models.summary(model)
-
-        if initial_epoch > 0:
-            model.load_weights(model_path)
-            click.echo(f"Loaded model from epoch {initial_epoch}")
-
-    model.fit(
-        train_data,
-        epochs=hparams.epochs,
-        steps_per_epoch=dataset.train_examples // hparams.batch_size,
-        validation_data=validation_data,
-        validation_steps=dataset.validation_examples // hparams.batch_size,
-        verbose=2 if tensorboard else 1,
-        initial_epoch=initial_epoch,
-        callbacks=callbacks,
+    metrics: List[Union[Callable[[tf.Tensor, tf.Tensor], float], str]] = Field(
+        lambda: ["sparse_categorical_accuracy", "sparse_top_k_categorical_accuracy"]
     )
 
-    model_name = build_model.__name__
-    model.save_weights(path.join(output_dir, f"{model_name}_weights.h5"))
+    loss = Field("sparse_categorical_crossentropy")
 
-    # Save weights without top
-    notop_model = build_model(
-        hparams, **dataset.preprocessing.kwargs, include_top=False
-    )
-    notop_model.set_weights(model.get_weights()[: len(notop_model.get_weights())])
-    notop_model.save_weights(path.join(output_dir, f"{model_name}_weights_notop.h5"))
+    @Field
+    def callbacks(self) -> List[tf.keras.callbacks.Callback]:
+        callbacks = []
+        if self.use_model_checkpointing:
+            callbacks.append(
+                utils.ModelCheckpoint(
+                    filepath=str(self.model_path), save_weights_only=True
+                )
+            )
+        if hasattr(self, "learning_rate_schedule"):
+            callbacks.append(
+                keras.callbacks.LearningRateScheduler(self.learning_rate_schedule)
+            )
+        if self.use_tensorboard:
+            callbacks.append(
+                keras.callbacks.TensorBoard(
+                    log_dir=self.output_dir, write_graph=False, profile_batch=0
+                )
+            )
+        return callbacks
+
+    def run(self):
+        self.output_dir.mkdir(parents=True, exist_ok=True)
+
+        initial_epoch = utils.get_current_epoch(self.output_dir)
+
+        train_data, num_train_examples = self.dataset.train(
+            decoders=self.preprocessing.decoders
+        )
+        train_data = (
+            train_data.cache()
+            .shuffle(10 * self.batch_size)
+            .repeat()
+            .map(
+                functools.partial(self.preprocessing, training=True),
+                num_parallel_calls=tf.data.experimental.AUTOTUNE,
+            )
+            .batch(self.batch_size)
+            .prefetch(1)
+        )
+
+        validation_data, num_validation_examples = self.dataset.validation(
+            decoders=self.preprocessing.decoders
+        )
+        validation_data = (
+            validation_data.cache()
+            .repeat()
+            .map(self.preprocessing, num_parallel_calls=tf.data.experimental.AUTOTUNE)
+            .batch(self.batch_size)
+            .prefetch(1)
+        )
+
+        with utils.get_distribution_scope(self.batch_size):
+            self.model.compile(
+                optimizer=self.optimizer, loss=self.loss, metrics=self.metrics,
+            )
+
+            lq.models.summary(self.model)
+
+            if initial_epoch > 0:
+                self.model.load_weights(self.model_path)
+                print(f"Loaded model from epoch {initial_epoch}.")
+
+        click.secho(str(self))
+
+        self.model.fit(
+            train_data,
+            epochs=self.epochs,
+            steps_per_epoch=math.ceil(num_train_examples / self.batch_size),
+            validation_data=validation_data,
+            validation_steps=math.ceil(num_validation_examples / self.batch_size),
+            verbose=1 if self.use_progress_bar else 2,
+            initial_epoch=initial_epoch,
+            callbacks=self.callbacks,
+        )
+
+        # Save model, weights, and config JSON.
+        self.model.save(str(Path(self.output_dir) / f"{self.model.name}.h5"))
+        self.model.save_weights(
+            str(Path(self.output_dir) / f"{self.model.name}_weights.h5")
+        )
+        with open(Path(self.output_dir) / f"{self.model.name}.json", "w") as json_file:
+            json_file.write(self.model.to_json())
 
 
 if __name__ == "__main__":
