@@ -10,6 +10,7 @@ from larq_zoo.model_factory import ModelFactory
 
 @factory
 class QuickNetFactory(ModelFactory):
+    """Quicknet - A model designed for fast inference using [Larq Compute Engine](https://github.com/larq/compute-engine)"""
 
     num_layers: int = Field(15)
     initial_filters: int = Field(64)
@@ -49,10 +50,10 @@ class QuickNetFactory(ModelFactory):
 
         return tf.keras.layers.BatchNormalization(momentum=0.9, epsilon=1e-5)(x)
 
-    # LCE Optimised Fast Block
     def residual_fast_block(
         self, x: tf.Tensor, filters: int, strides: int = 1
     ) -> tf.Tensor:
+        """LCE Optimised residual block"""
         infilters = x.get_shape().as_list()[-1]
         downsample = infilters != filters
 
