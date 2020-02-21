@@ -140,7 +140,7 @@ def QuickNet(
     """Instantiates the QuickNet architecture.
     Optionally loads weights pre-trained on ImageNet.
     ```netron
-    resnet_e-v0.1.0/quicknet.json
+    quicknet-v0.1.0/quicknet.json
     ```
     ```plot-altair
     /plots/quicknet.vg.json
