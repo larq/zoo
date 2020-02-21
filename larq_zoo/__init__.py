@@ -9,6 +9,7 @@ from larq_zoo.densenet import (
     BinaryDenseNet45,
 )
 from larq_zoo.dorefanet import DoReFaNet
+from larq_zoo.quicknet import QuickNet
 from larq_zoo.resnet_e import BinaryResNetE18
 from larq_zoo.utils import decode_predictions
 from larq_zoo.xnornet import XNORNet
@@ -23,6 +24,7 @@ __all__ = [
     "BinaryDenseNet45",
     "DoReFaNet",
     "XNORNet",
+    "QuickNet",
     "datasets",
     "decode_predictions",
     "preprocess_input",
