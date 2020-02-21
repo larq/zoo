@@ -35,7 +35,7 @@ def squeeze_and_excite(inp: tf.Tensor, strides: int = 1, r: int = 16):
 @factory
 class QuickNetLargeFactory(ModelFactory):
     """QuickNetLarge - A model designed for fast inference using [Larq Compute Engine](https://github.com/larq/compute-engine)
-    and high accuracy"""
+    and high accuracy. This utilises Squeeze and Excite blocks as per [Training binary neural networks with real-to-binary convolutions](https://openreview.net/forum?id=BJg4NgBKvH)."""
 
     num_layers: int = Field(18)
     initial_filters: int = Field(64)
