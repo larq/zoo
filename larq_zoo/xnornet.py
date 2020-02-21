@@ -2,11 +2,10 @@ from typing import Optional, Sequence
 
 import larq as lq
 import tensorflow as tf
-from zookeeper import ComponentField, Field, factory, task
+from zookeeper import Field, factory
 
 from larq_zoo import utils
 from larq_zoo.model_factory import ModelFactory
-from larq_zoo.train import TrainLarqZooModel
 
 
 @lq.utils.set_precision(1)
@@ -173,40 +172,3 @@ def XNORNet(
         include_top=include_top,
         num_classes=num_classes,
     ).build()
-
-
-@task
-class TrainXNORNet(TrainLarqZooModel):
-    model = ComponentField(XNORNetFactory)
-
-    epochs = Field(100)
-    batch_size = Field(1200)
-
-    initial_lr: float = Field(0.001)
-
-    def learning_rate_schedule(self, epoch):
-        epoch_dec_1 = 19
-        epoch_dec_2 = 30
-        epoch_dec_3 = 44
-        epoch_dec_4 = 53
-        epoch_dec_5 = 66
-        epoch_dec_6 = 76
-        epoch_dec_7 = 86
-        if epoch < epoch_dec_1:
-            return self.initial_lr
-        elif epoch < epoch_dec_2:
-            return self.initial_lr * 0.5
-        elif epoch < epoch_dec_3:
-            return self.initial_lr * 0.1
-        elif epoch < epoch_dec_4:
-            return self.initial_lr * 0.1 * 0.5
-        elif epoch < epoch_dec_5:
-            return self.initial_lr * 0.01
-        elif epoch < epoch_dec_6:
-            return self.initial_lr * 0.01 * 0.5
-        elif epoch < epoch_dec_7:
-            return self.initial_lr * 0.01 * 0.1
-        else:
-            return self.initial_lr * 0.001 * 0.1
-
-    optimizer = Field(lambda self: tf.keras.optimizers.Adam(self.initial_lr))

@@ -2,11 +2,10 @@ from typing import Optional, Sequence, Tuple
 
 import larq as lq
 import tensorflow as tf
-from zookeeper import ComponentField, Field, factory, task
+from zookeeper import Field, factory
 
 from larq_zoo import utils
 from larq_zoo.model_factory import ModelFactory
-from larq_zoo.train import TrainLarqZooModel
 
 
 @factory
@@ -149,18 +148,3 @@ def BinaryAlexNet(
         include_top=include_top,
         num_classes=num_classes,
     ).build()
-
-
-@task
-class TrainBinaryAlexNet(TrainLarqZooModel):
-    model = ComponentField(BinaryAlexNetFactory)
-
-    batch_size: int = Field(512)
-    epochs: int = Field(150)
-
-    def learning_rate_schedule(self, epoch):
-        return 1e-2 * 0.5 ** (epoch // 10)
-
-    optimizer = Field(
-        lambda self: tf.keras.optimizers.Adam(self.learning_rate_schedule(0))
-    )

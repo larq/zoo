@@ -2,11 +2,10 @@ from typing import Optional, Sequence
 
 import larq as lq
 import tensorflow as tf
-from zookeeper import ComponentField, Field, factory, task
+from zookeeper import Field, factory
 
 from larq_zoo import utils
 from larq_zoo.model_factory import ModelFactory
-from larq_zoo.train import TrainLarqZooModel
 
 
 @factory
@@ -179,27 +178,3 @@ def BinaryResNetE18(
         include_top=include_top,
         num_classes=num_classes,
     ).build()
-
-
-@task
-class TrainBinaryResNetE18(TrainLarqZooModel):
-    model = ComponentField(BinaryResNetE18Factory)
-
-    epochs = Field(120)
-    batch_size = Field(1024)
-
-    learning_rate: float = Field(0.004)
-    learning_factor: float = Field(0.3)
-    learning_steps: Sequence[int] = Field((70, 90, 110))
-
-    def learning_rate_schedule(self, epoch):
-        lr = self.learning_rate
-        for step in self.learning_steps:
-            if epoch < step:
-                return lr
-            lr *= self.learning_factor
-        return lr
-
-    optimizer = Field(
-        lambda self: tf.keras.optimizers.Adam(self.learning_rate, epsilon=1e-8)
-    )

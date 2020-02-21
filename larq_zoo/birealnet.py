@@ -2,11 +2,10 @@ from typing import Optional, Sequence, Union
 
 import larq as lq
 import tensorflow as tf
-from zookeeper import ComponentField, Field, factory, task
+from zookeeper import Field, factory
 
 from larq_zoo import utils
 from larq_zoo.model_factory import ModelFactory
-from larq_zoo.train import TrainLarqZooModel
 
 
 @factory
@@ -158,26 +157,3 @@ def BiRealNet(
         input_shape=input_shape,
         num_classes=num_classes,
     ).build()
-
-
-@task
-class TrainBiRealNet(TrainLarqZooModel):
-    model = ComponentField(BiRealNetFactory)
-
-    epochs = Field(300)
-    batch_size = Field(512)
-
-    learning_rate: float = Field(5e-3)
-    decay_schedule: str = Field("linear")
-
-    @Field
-    def optimizer(self):
-        if self.decay_schedule == "linear_cosine":
-            lr = tf.keras.experimental.LinearCosineDecay(self.learning_rate, 750684)
-        elif self.decay_schedule == "linear":
-            lr = tf.keras.optimizers.schedules.PolynomialDecay(
-                self.learning_rate, 750684, end_learning_rate=0, power=1.0
-            )
-        else:
-            lr = self.learning_rate
-        return tf.keras.optimizers.Adam(lr)
