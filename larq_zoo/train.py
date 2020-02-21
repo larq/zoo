@@ -25,6 +25,9 @@ class TrainLarqZooModel(Experiment):
     # Use a per-batch progress bar (as opposed to per-epoch).
     use_progress_bar: bool = Field(False)
 
+    # Whether this experiment is compilation-only (i.e. no training)
+    testing: bool = Field(False)
+
     # Where to store output.
     @Field
     def output_dir(self) -> Union[str, os.PathLike]:
@@ -108,6 +111,10 @@ class TrainLarqZooModel(Experiment):
             if initial_epoch > 0:
                 self.model.load_weights(self.model_path)
                 print(f"Loaded model from epoch {initial_epoch}.")
+
+        if self.testing:
+            click.secho("Dry run: Not starting training!", fg="green")
+            return
 
         click.secho(str(self))
 
