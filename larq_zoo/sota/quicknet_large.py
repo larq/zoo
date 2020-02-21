@@ -7,6 +7,8 @@ from zookeeper import Field, factory
 from larq_zoo import utils
 from larq_zoo.model_factory import ModelFactory
 
+from larq_zoo.sota.quicknet import LCEFirstLayer
+
 
 def squeeze_and_excite(inp: tf.Tensor, strides: int = 1, r: int = 16):
     """Squeeze and Excite as per [Squeeze-and-Excitation Networks](https://arxiv.org/abs/1709.01507)"""
@@ -54,27 +56,6 @@ class QuickNetLargeFactory(ModelFactory):
         except Exception:
             raise ValueError(f"Only specs for layers {list(self.spec.keys())} defined.")
 
-    def LCEFirstLayer(self, x: tf.Tensor) -> tf.Tensor:
-        x = tf.keras.layers.Conv2D(
-            self.initial_filters // 8,
-            (3, 3),
-            strides=2,
-            kernel_initializer="he_normal",
-            padding="same",
-            use_bias=False,
-        )(x)
-        x = tf.keras.layers.DepthwiseConv2D(
-            (3, 3),
-            depth_multiplier=8,
-            strides=2,
-            kernel_initializer="he_normal",
-            padding="same",
-            use_bias=False,
-            activation="relu",
-        )(x)
-
-        return tf.keras.layers.BatchNormalization(momentum=0.9, epsilon=1e-5)(x)
-
     def residual_block_SE(
         self, x: tf.Tensor, filters: int, strides: int = 1
     ) -> tf.Tensor:
@@ -115,15 +96,15 @@ class QuickNetLargeFactory(ModelFactory):
         return tf.keras.layers.add([x, residual])
 
     def build(self) -> tf.keras.models.Model:
-        x = self.LCEFirstLayer(self.image_input)
+        x = LCEFirstLayer(self.initial_filters, self.image_input)
 
         for block, (layers, filters) in enumerate(zip(*self.spec)):
             for layer in range(layers):
                 strides = 1 if block == 0 or layer != 0 else 2
                 x = self.residual_block_SE(x, filters, strides=strides)
 
+        x = tf.keras.layers.Activation("relu")(x)
         if self.include_top:
-            x = tf.keras.layers.Activation("relu")(x)
             x = tf.keras.layers.GlobalAvgPool2D()(x)
             x = tf.keras.layers.Dense(
                 self.num_classes,

@@ -8,6 +8,28 @@ from larq_zoo import utils
 from larq_zoo.model_factory import ModelFactory
 
 
+def LCEFirstLayer(filters: int, x: tf.Tensor) -> tf.Tensor:
+    x = tf.keras.layers.Conv2D(
+        filters // 8,
+        (3, 3),
+        strides=2,
+        kernel_initializer="he_normal",
+        padding="same",
+        use_bias=False,
+    )(x)
+    x = tf.keras.layers.DepthwiseConv2D(
+        (3, 3),
+        depth_multiplier=8,
+        strides=2,
+        kernel_initializer="he_normal",
+        padding="same",
+        use_bias=False,
+        activation="relu",
+    )(x)
+
+    return tf.keras.layers.BatchNormalization(momentum=0.9, epsilon=1e-5)(x)
+
+
 @factory
 class QuickNetFactory(ModelFactory):
     """Quicknet - A model designed for fast inference using [Larq Compute Engine](https://github.com/larq/compute-engine)"""
@@ -28,27 +50,6 @@ class QuickNetFactory(ModelFactory):
             return spec[self.num_layers]
         except Exception:
             raise ValueError(f"Only specs for layers {list(self.spec.keys())} defined.")
-
-    def LCEFirstLayer(self, x: tf.Tensor) -> tf.Tensor:
-        x = tf.keras.layers.Conv2D(
-            self.initial_filters // 8,
-            (3, 3),
-            strides=2,
-            kernel_initializer="he_normal",
-            padding="same",
-            use_bias=False,
-        )(x)
-        x = tf.keras.layers.DepthwiseConv2D(
-            (3, 3),
-            depth_multiplier=8,
-            strides=2,
-            kernel_initializer="he_normal",
-            padding="same",
-            use_bias=False,
-            activation="relu",
-        )(x)
-
-        return tf.keras.layers.BatchNormalization(momentum=0.9, epsilon=1e-5)(x)
 
     def residual_fast_block(
         self, x: tf.Tensor, filters: int, strides: int = 1
@@ -87,7 +88,7 @@ class QuickNetFactory(ModelFactory):
             return tf.keras.layers.add([x, residual])
 
     def build(self) -> tf.keras.models.Model:
-        x = self.LCEFirstLayer(self.image_input)
+        x = LCEFirstLayer(self.initial_filters, self.image_input)
 
         for block, (layers, filters) in enumerate(zip(*self.spec)):
             for layer in range(layers):
