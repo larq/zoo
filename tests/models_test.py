@@ -2,10 +2,10 @@ import functools
 import os
 
 import numpy as np
+import pytest
 from tensorflow import keras
 
 import larq_zoo as lqz
-import pytest
 
 
 def keras_test(func):
