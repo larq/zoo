@@ -1,7 +1,5 @@
 import functools
 import os
-import subprocess
-import sys
 
 import larq as lq
 import numpy as np
