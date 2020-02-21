@@ -8,33 +8,21 @@ from larq_zoo import utils
 from larq_zoo.model_factory import ModelFactory
 
 
-def squeeze_and_excite(inp, strides=1, r=16):
+def squeeze_and_excite(inp, strides: int = 1, r: int = 16):
     C = inp.get_shape().as_list()[-1]
 
-    if C == 64:
-        pool_amount = 56
-    elif C == 128:
-        pool_amount = 28
-    elif C == 256:
-        pool_amount = 14
-    else:
-        pool_amount = 7
-
-    out = tf.keras.layers.AveragePooling2D(pool_amount, strides=1, padding="Valid")(inp)
+    out = tf.keras.layers.GlobalAvgPool2D()(inp)
     out = tf.keras.layers.Flatten()(out)
     out = tf.keras.layers.Dense(
-        int(C / r),
+        C / r,
         activation="relu",
         kernel_initializer="he_normal",
         use_bias=False,
         kernel_regularizer=tf.keras.regularizers.l2(1e-5),
     )(out)
-    if strides == 2:
-        outmult = 2
-    else:
-        outmult = 1
+    outmult = 2 if strides == 2 else 1
     out = tf.keras.layers.Dense(
-        int(C * outmult),
+        C * outmult,
         activation="sigmoid",
         kernel_initializer="he_normal",
         use_bias=False,
