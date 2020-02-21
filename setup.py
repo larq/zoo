@@ -28,6 +28,12 @@ setup(
             "Pillow==7.0.0",
             "scipy==1.4.1",
         ],
+        "lint": [
+            "black==19.10b0",
+            "flake8~=3.7.9",
+            "isort~=4.3.21",
+            "pytype>=2019.10.17,<2020.3.0",
+        ],
     },
     entry_points="""
         [console_scripts]
