@@ -145,10 +145,13 @@ def QuickNetLarge(
     num_classes: int = 1000,
 ) -> tf.keras.models.Model:
     """Instantiates the QuickNetLarge architecture.
+
     Optionally loads weights pre-trained on ImageNet.
+
     ```netron
     quicknet_large-v0.1.0/quicknet_large.json
     ```
+
     # Arguments
     include_top: whether to include the fully-connected layer at the top of the network.
     weights: one of `None` (random initialization), "imagenet" (pre-training on
@@ -160,8 +163,10 @@ def QuickNetLarge(
         It should have exactly 3 inputs channels.
     classes: optional number of classes to classify images into, only to be specified
         if `include_top` is True, and if no `weights` argument is specified.
+
     # Returns
     A Keras model instance.
+
     # Raises
     ValueError: in case of invalid argument for `weights`, or invalid input shape.
     """

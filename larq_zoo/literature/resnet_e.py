@@ -146,13 +146,16 @@ def BinaryResNetE18(
     num_classes: int = 1000,
 ) -> tf.keras.models.Model:
     """Instantiates the BinaryResNetE 18 architecture.
+
     Optionally loads weights pre-trained on ImageNet.
+
     ```netron
     resnet_e-v0.1.0/resnet_e_18.json
     ```
     ```plot-altair
     /plots/resnet_e_18.vg.json
     ```
+
     # Arguments
     include_top: whether to include the fully-connected layer at the top of the network.
     weights: one of `None` (random initialization), "imagenet" (pre-training on
@@ -164,10 +167,13 @@ def BinaryResNetE18(
         It should have exactly 3 inputs channels.
     classes: optional number of classes to classify images into, only to be specified
         if `include_top` is True, and if no `weights` argument is specified.
+
     # Returns
     A Keras model instance.
+
     # Raises
     ValueError: in case of invalid argument for `weights`, or invalid input shape.
+
     # References
     - [Back to Simplicity:
       How to Train Accurate BNNs from Scratch?](https://arxiv.org/abs/1906.08637)

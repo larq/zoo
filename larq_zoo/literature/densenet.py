@@ -237,13 +237,16 @@ def BinaryDenseNet28(
     num_classes: int = 1000,
 ) -> tf.keras.models.Model:
     """Instantiates the BinaryDenseNet 28 architecture.
+
     Optionally loads weights pre-trained on ImageNet.
+
     ```netron
     binary_densenet-v0.1.0/binary_densenet_28.json
     ```
     ```plot-altair
     /plots/densenet_28.vg.json
     ```
+
     # Arguments
     input_shape: optional shape tuple, only to be specified if `include_top` is False,
         otherwise the input shape has to be `(224, 224, 3)`.
@@ -255,10 +258,13 @@ def BinaryDenseNet28(
     include_top: whether to include the fully-connected layer at the top of the network.
     num_classes: optional number of classes to classify images into, only to be specified
         if `include_top` is True, and if no `weights` argument is specified.
+
     # Returns
     A Keras model instance.
+
     # Raises
     ValueError: in case of invalid argument for `weights`, or invalid input shape.
+
     # References
     - [Back to Simplicity:
       How to Train Accurate BNNs from Scratch?](https://arxiv.org/abs/1906.08637)
@@ -281,13 +287,16 @@ def BinaryDenseNet37(
     num_classes: int = 1000,
 ) -> tf.keras.models.Model:
     """Instantiates the BinaryDenseNet 37 architecture.
+
     Optionally loads weights pre-trained on ImageNet.
+
     ```netron
     binary_densenet-v0.1.0/binary_densenet_37.json
     ```
     ```plot-altair
     /plots/densenet_37.vg.json
     ```
+
     # Arguments
     input_shape: optional shape tuple, only to be specified if `include_top` is False,
         otherwise the input shape has to be `(224, 224, 3)`.
@@ -299,10 +308,13 @@ def BinaryDenseNet37(
     include_top: whether to include the fully-connected layer at the top of the network.
     num_classes: optional number of classes to classify images into, only to be specified
         if `include_top` is True, and if no `weights` argument is specified.
+
     # Returns
     A Keras model instance.
+
     # Raises
     ValueError: in case of invalid argument for `weights`, or invalid input shape.
+
     # References
     - [Back to Simplicity:
       How to Train Accurate BNNs from Scratch?](https://arxiv.org/abs/1906.08637)
@@ -325,13 +337,16 @@ def BinaryDenseNet37Dilated(
     num_classes: int = 1000,
 ) -> tf.keras.models.Model:
     """Instantiates the BinaryDenseNet 37Dilated architecture.
+
     Optionally loads weights pre-trained on ImageNet.
+
     ```netron
     binary_densenet-v0.1.0/binary_densenet_37_dilated.json
     ```
     ```plot-altair
     /plots/densenet_37_dilated.vg.json
     ```
+
     # Arguments
     input_shape: optional shape tuple, only to be specified if `include_top` is False,
         otherwise the input shape has to be `(224, 224, 3)`.
@@ -343,10 +358,13 @@ def BinaryDenseNet37Dilated(
     include_top: whether to include the fully-connected layer at the top of the network.
     num_classes: optional number of classes to classify images into, only to be specified
         if `include_top` is True, and if no `weights` argument is specified.
+
     # Returns
     A Keras model instance.
+
     # Raises
     ValueError: in case of invalid argument for `weights`, or invalid input shape.
+
     # References
     - [Back to Simplicity:
       How to Train Accurate BNNs from Scratch?](https://arxiv.org/abs/1906.08637)
@@ -369,13 +387,16 @@ def BinaryDenseNet45(
     num_classes: int = 1000,
 ) -> tf.keras.models.Model:
     """Instantiates the BinaryDenseNet 45 architecture.
+
     Optionally loads weights pre-trained on ImageNet.
+
     ```netron
     binary_densenet-v0.1.0/binary_densenet_45.json
     ```
     ```plot-altair
     /plots/densenet_45.vg.json
     ```
+
     # Arguments
     input_shape: optional shape tuple, only to be specified if `include_top` is False,
         otherwise the input shape has to be `(224, 224, 3)`.
@@ -387,10 +408,13 @@ def BinaryDenseNet45(
     include_top: whether to include the fully-connected layer at the top of the network.
     num_classes: optional number of classes to classify images into, only to be specified
         if `include_top` is True, and if no `weights` argument is specified.
+
     # Returns
     A Keras model instance.
+
     # Raises
     ValueError: in case of invalid argument for `weights`, or invalid input shape.
+
     # References
     - [Back to Simplicity:
       How to Train Accurate BNNs from Scratch?](https://arxiv.org/abs/1906.08637)

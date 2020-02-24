@@ -131,13 +131,16 @@ def DoReFaNet(
     num_classes: int = 1000,
 ) -> tf.keras.models.Model:
     """Instantiates the DoReFa-net architecture.
+
     Optionally loads weights pre-trained on ImageNet.
+
     ```netron
     dorefanet-v0.1.0/dorefanet.json
     ```
     ```plot-altair
     /plots/dorefanet.vg.json
     ```
+
     # Arguments
     input_shape: optional shape tuple, only to be specified if `include_top` is False,
         otherwise the input shape has to be `(224, 224, 3)`.
@@ -149,10 +152,13 @@ def DoReFaNet(
     include_top: whether to include the fully-connected layer at the top of the network.
     num_classes: optional number of classes to classify images into, only to be
         specified if `include_top` is True, and if no `weights` argument is specified.
+
     # Returns
     A Keras model instance.
+
     # Raises
     ValueError: in case of invalid argument for `weights`, or invalid input shape.
+
     # References
     - [DoReFa-Net: Training Low Bitwidth Convolutional Neural Networks with Low
     Bitwidth Gradients](https://arxiv.org/abs/1606.06160)
