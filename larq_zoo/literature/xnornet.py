@@ -149,10 +149,8 @@ def XNORNet(
     ```
 
     # Arguments
-    input_shape: optional shape tuple, only to be specified if `include_top` is False
-        (otherwise the input shape has to be `(224, 224, 3)` (with `channels_last` data
-        format) or `(3, 224, 224)` (with `channels_first` data format).
-        It should have exactly 3 inputs channels.
+    input_shape: optional shape tuple, otherwise the input shape has to be
+        `(224, 224, 3)`. It should have exactly 3 inputs channels.
     input_tensor: optional Keras tensor (i.e. output of `layers.Input()`) to use as
         image input for the model.
     weights: one of `None` (random initialization), "imagenet" (pre-training on
