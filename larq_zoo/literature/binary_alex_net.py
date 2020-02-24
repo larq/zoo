@@ -118,13 +118,16 @@ def BinaryAlexNet(
     num_classes: int = 1000,
 ) -> tf.keras.models.Model:
     """Instantiates the BinaryAlexNet architecture.
+
     Optionally loads weights pre-trained on ImageNet.
+
     ```netron
     binary_alexnet-v0.2.0/binary_alexnet.json
     ```
     ```plot-altair
     /plots/binary_alexnet.vg.json
     ```
+
     # Arguments
     input_shape: optional shape tuple, only to be specified if `include_top` is False,
         otherwise the input shape has to be `(224, 224, 3)`.
@@ -136,8 +139,10 @@ def BinaryAlexNet(
     include_top: whether to include the fully-connected layer at the top of the network.
     num_classes: optional number of classes to classify images into, only to be
         specified if `include_top` is True, and if no `weights` argument is specified.
+
     # Returns
     A Keras model instance.
+
     # Raises
     ValueError: in case of invalid argument for `weights`, or invalid input shape.
     """
