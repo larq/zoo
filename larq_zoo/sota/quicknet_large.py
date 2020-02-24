@@ -47,9 +47,7 @@ class QuickNetLargeFactory(ModelFactory):
 
     @Field
     def spec(self) -> Tuple[Sequence[int], Sequence[int]]:
-        spec = {
-            18: ([4, 4, 4, 4], [64, 128, 256, 512]),
-        }
+        spec = {18: ([4, 4, 4, 4], [64, 128, 256, 512])}
         try:
             return spec[self.num_layers]
         except Exception:
@@ -153,15 +151,15 @@ def QuickNetLarge(
     ```
 
     # Arguments
-    include_top: whether to include the fully-connected layer at the top of the network.
-    weights: one of `None` (random initialization), "imagenet" (pre-training on
-        ImageNet), or the path to the weights file to be loaded.
-    input_tensor: optional Keras tensor (i.e. output of `layers.Input()`) to use as
-        image input for the model.
     input_shape: optional shape tuple, only to be specified if `include_top` is False,
         otherwise the input shape has to be `(224, 224, 3)`.
         It should have exactly 3 inputs channels.
-    classes: optional number of classes to classify images into, only to be specified
+    input_tensor: optional Keras tensor (i.e. output of `layers.Input()`) to use as
+        image input for the model.
+    weights: one of `None` (random initialization), "imagenet" (pre-training on
+        ImageNet), or the path to the weights file to be loaded.
+    include_top: whether to include the fully-connected layer at the top of the network.
+    num_classes: optional number of classes to classify images into, only to be specified
         if `include_top` is True, and if no `weights` argument is specified.
 
     # Returns
