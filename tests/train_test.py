@@ -12,7 +12,7 @@ def test_cli(command):
         [
             command,
             "dataset=DummyOxfordFlowers",
-            "epochs=5",
+            "epochs=10",
             "batch_size=2",
             "validation_frequency=5",
             "--no-use_tensorboard",
