@@ -1,20 +1,23 @@
+import pytest
 from click.testing import CliRunner
 
 from larq_zoo import experiments
+from tests import dummy_datasets  # noqa -- Needed to register the dummy dataset.
 
 
-def test_cli():
+@pytest.mark.parametrize("command", list(experiments.cli.commands.keys()))
+def test_cli(command):
     result = CliRunner().invoke(
         experiments.cli,
         [
-            "TrainBinaryAlexNet",
-            "dataset=OxfordFlowers",
-            "dataset.train_split='train'",
-            "dataset.validation_split='validation'",
+            command,
+            "dataset=DummyOxfordFlowers",
             "epochs=1",
-            "batch_size=32",
+            "batch_size=2",
+            "validation_frequency=5",
             "--no-use_tensorboard",
             "--no-use_model_checkpointing",
+            "--no-save_weights",
         ],
     )
     assert result.exit_code == 0
