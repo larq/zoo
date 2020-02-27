@@ -8,7 +8,7 @@ def readme():
 
 setup(
     name="larq-zoo",
-    version="0.5.0",
+    version="1.0.b2",
     author="Plumerai",
     author_email="lukas@plumerai.co.uk",
     description="Reference implementations of popular Binarized Neural Networks",
@@ -22,6 +22,10 @@ setup(
         "tensorflow": ["tensorflow>=1.14.0"],
         "tensorflow_gpu": ["tensorflow-gpu>=1.14.0"],
         "test": [
+            "black==19.10b0",
+            "flake8~=3.7.9",
+            "isort~=4.3.21",
+            "pytype>=2019.10.17,<2020.3.0",
             "pytest>=4.3.1",
             "pytest-cov>=2.6.1",
             "pytest-xdist==1.31.0",
@@ -31,7 +35,7 @@ setup(
     },
     entry_points="""
         [console_scripts]
-        lqz=larq_zoo.train:cli
+        lqz=larq_zoo.experiments:cli
     """,
     classifiers=[
         "Development Status :: 2 - Pre-Alpha",

@@ -2,11 +2,10 @@ from typing import Optional, Sequence
 
 import larq as lq
 import tensorflow as tf
-from zookeeper import ComponentField, Field, factory, task
+from zookeeper import Field, factory
 
 from larq_zoo import utils
 from larq_zoo.model_factory import ModelFactory
-from larq_zoo.train import TrainLarqZooModel
 
 
 @lq.utils.register_keras_custom_object
@@ -132,16 +131,19 @@ def DoReFaNet(
     num_classes: int = 1000,
 ) -> tf.keras.models.Model:
     """Instantiates the DoReFa-net architecture.
+
     Optionally loads weights pre-trained on ImageNet.
+
     ```netron
     dorefanet-v0.1.0/dorefanet.json
     ```
     ```plot-altair
     /plots/dorefanet.vg.json
     ```
+
     # Arguments
-    input_shape: optional shape tuple, only to be specified if `include_top` is False,
-        otherwise the input shape has to be `(224, 224, 3)`.
+    input_shape: Optional shape tuple, to be specified if you would like to use a model
+        with an input image resolution that is not (224, 224, 3).
         It should have exactly 3 inputs channels.
     input_tensor: optional Keras tensor (i.e. output of `layers.Input()`) to use as
         image input for the model.
@@ -150,10 +152,13 @@ def DoReFaNet(
     include_top: whether to include the fully-connected layer at the top of the network.
     num_classes: optional number of classes to classify images into, only to be
         specified if `include_top` is True, and if no `weights` argument is specified.
+
     # Returns
     A Keras model instance.
+
     # Raises
     ValueError: in case of invalid argument for `weights`, or invalid input shape.
+
     # References
     - [DoReFa-Net: Training Low Bitwidth Convolutional Neural Networks with Low
     Bitwidth Gradients](https://arxiv.org/abs/1606.06160)
@@ -165,35 +170,3 @@ def DoReFaNet(
         include_top=include_top,
         num_classes=num_classes,
     ).build()
-
-
-@task
-class TrainDoReFaNet(TrainLarqZooModel):
-    model = ComponentField(DoReFaNetFactory)
-
-    epochs = Field(90)
-    batch_size = Field(256)
-
-    learning_rate: float = Field(2e-4)
-    decay_start: int = Field(60)
-    decay_step_2: int = Field(75)
-    fast_decay_start: int = Field(82)
-
-    def learning_rate_schedule(self, epoch):
-        if epoch < self.decay_start:
-            return self.learning_rate
-        elif epoch < self.decay_step_2:
-            return self.learning_rate * 0.2
-        elif epoch < self.fast_decay_start:
-            return self.learning_rate * 0.2 * 0.2
-        else:
-            return (
-                self.learning_rate
-                * 0.2
-                * 0.2
-                * 0.1 ** ((epoch - self.fast_decay_start) // 2 + 1)
-            )
-
-    optimizer = Field(
-        lambda self: tf.keras.optimizers.Adam(self.learning_rate, epsilon=1e-5)
-    )

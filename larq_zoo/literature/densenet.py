@@ -2,11 +2,10 @@ from typing import Optional, Sequence
 
 import larq as lq
 import tensorflow as tf
-from zookeeper import ComponentField, Field, factory, task
+from zookeeper import Field, factory
 
 from larq_zoo import utils
 from larq_zoo.model_factory import ModelFactory
-from larq_zoo.train import TrainLarqZooModel
 
 
 # A type alias only for type-checking.
@@ -34,7 +33,7 @@ class BinaryDenseNetFactory(ModelFactory):
     name: str
     reduction: Sequence[float]
     dilation_rate: Sequence[int]
-    layers: Sequence[float]
+    layers: Sequence[int]
     imagenet_weights_path: str
     imagenet_no_top_weights_path: str
 
@@ -93,12 +92,12 @@ class BinaryDenseNetFactory(ModelFactory):
                 )(x)
 
         x = tf.keras.layers.BatchNormalization(momentum=0.9, epsilon=1e-5)(x)
+        x = tf.keras.layers.Activation("relu")(x)
 
         if self.include_top:
-            x = tf.keras.layers.Activation("relu")(x)
             x = tf.keras.layers.GlobalAvgPool2D()(x)
             x = tf.keras.layers.Dense(
-                self.num_classes, activation="softmax", kernel_initializer="he_normal",
+                self.num_classes, activation="softmax", kernel_initializer="he_normal"
             )(x)
 
         model = BinaryDenseNet(inputs=self.image_input, outputs=x, name=self.name)
@@ -238,16 +237,19 @@ def BinaryDenseNet28(
     num_classes: int = 1000,
 ) -> tf.keras.models.Model:
     """Instantiates the BinaryDenseNet 28 architecture.
+
     Optionally loads weights pre-trained on ImageNet.
+
     ```netron
     binary_densenet-v0.1.0/binary_densenet_28.json
     ```
     ```plot-altair
     /plots/densenet_28.vg.json
     ```
+
     # Arguments
-    input_shape: optional shape tuple, only to be specified if `include_top` is False,
-        otherwise the input shape has to be `(224, 224, 3)`.
+    input_shape: Optional shape tuple, to be specified if you would like to use a model
+        with an input image resolution that is not (224, 224, 3).
         It should have exactly 3 inputs channels.
     input_tensor: optional Keras tensor (i.e. output of `layers.Input()`) to use as
         image input for the model.
@@ -256,10 +258,13 @@ def BinaryDenseNet28(
     include_top: whether to include the fully-connected layer at the top of the network.
     num_classes: optional number of classes to classify images into, only to be specified
         if `include_top` is True, and if no `weights` argument is specified.
+
     # Returns
     A Keras model instance.
+
     # Raises
     ValueError: in case of invalid argument for `weights`, or invalid input shape.
+
     # References
     - [Back to Simplicity:
       How to Train Accurate BNNs from Scratch?](https://arxiv.org/abs/1906.08637)
@@ -282,16 +287,19 @@ def BinaryDenseNet37(
     num_classes: int = 1000,
 ) -> tf.keras.models.Model:
     """Instantiates the BinaryDenseNet 37 architecture.
+
     Optionally loads weights pre-trained on ImageNet.
+
     ```netron
     binary_densenet-v0.1.0/binary_densenet_37.json
     ```
     ```plot-altair
     /plots/densenet_37.vg.json
     ```
+
     # Arguments
-    input_shape: optional shape tuple, only to be specified if `include_top` is False,
-        otherwise the input shape has to be `(224, 224, 3)`.
+    input_shape: Optional shape tuple, to be specified if you would like to use a model
+        with an input image resolution that is not (224, 224, 3).
         It should have exactly 3 inputs channels.
     input_tensor: optional Keras tensor (i.e. output of `layers.Input()`) to use as
         image input for the model.
@@ -300,10 +308,13 @@ def BinaryDenseNet37(
     include_top: whether to include the fully-connected layer at the top of the network.
     num_classes: optional number of classes to classify images into, only to be specified
         if `include_top` is True, and if no `weights` argument is specified.
+
     # Returns
     A Keras model instance.
+
     # Raises
     ValueError: in case of invalid argument for `weights`, or invalid input shape.
+
     # References
     - [Back to Simplicity:
       How to Train Accurate BNNs from Scratch?](https://arxiv.org/abs/1906.08637)
@@ -326,16 +337,19 @@ def BinaryDenseNet37Dilated(
     num_classes: int = 1000,
 ) -> tf.keras.models.Model:
     """Instantiates the BinaryDenseNet 37Dilated architecture.
+
     Optionally loads weights pre-trained on ImageNet.
+
     ```netron
     binary_densenet-v0.1.0/binary_densenet_37_dilated.json
     ```
     ```plot-altair
     /plots/densenet_37_dilated.vg.json
     ```
+
     # Arguments
-    input_shape: optional shape tuple, only to be specified if `include_top` is False,
-        otherwise the input shape has to be `(224, 224, 3)`.
+    input_shape: Optional shape tuple, to be specified if you would like to use a model
+        with an input image resolution that is not (224, 224, 3).
         It should have exactly 3 inputs channels.
     input_tensor: optional Keras tensor (i.e. output of `layers.Input()`) to use as
         image input for the model.
@@ -344,10 +358,13 @@ def BinaryDenseNet37Dilated(
     include_top: whether to include the fully-connected layer at the top of the network.
     num_classes: optional number of classes to classify images into, only to be specified
         if `include_top` is True, and if no `weights` argument is specified.
+
     # Returns
     A Keras model instance.
+
     # Raises
     ValueError: in case of invalid argument for `weights`, or invalid input shape.
+
     # References
     - [Back to Simplicity:
       How to Train Accurate BNNs from Scratch?](https://arxiv.org/abs/1906.08637)
@@ -370,16 +387,19 @@ def BinaryDenseNet45(
     num_classes: int = 1000,
 ) -> tf.keras.models.Model:
     """Instantiates the BinaryDenseNet 45 architecture.
+
     Optionally loads weights pre-trained on ImageNet.
+
     ```netron
     binary_densenet-v0.1.0/binary_densenet_45.json
     ```
     ```plot-altair
     /plots/densenet_45.vg.json
     ```
+
     # Arguments
-    input_shape: optional shape tuple, only to be specified if `include_top` is False,
-        otherwise the input shape has to be `(224, 224, 3)`.
+    input_shape: Optional shape tuple, to be specified if you would like to use a model
+        with an input image resolution that is not (224, 224, 3).
         It should have exactly 3 inputs channels.
     input_tensor: optional Keras tensor (i.e. output of `layers.Input()`) to use as
         image input for the model.
@@ -388,10 +408,13 @@ def BinaryDenseNet45(
     include_top: whether to include the fully-connected layer at the top of the network.
     num_classes: optional number of classes to classify images into, only to be specified
         if `include_top` is True, and if no `weights` argument is specified.
+
     # Returns
     A Keras model instance.
+
     # Raises
     ValueError: in case of invalid argument for `weights`, or invalid input shape.
+
     # References
     - [Back to Simplicity:
       How to Train Accurate BNNs from Scratch?](https://arxiv.org/abs/1906.08637)
@@ -403,55 +426,3 @@ def BinaryDenseNet45(
         include_top=include_top,
         num_classes=num_classes,
     ).build()
-
-
-##################
-# Training loops #
-##################
-
-
-@task
-class TrainBinaryDenseNet28(TrainLarqZooModel):
-    model: BinaryDenseNet = ComponentField(BinaryDenseNet28Factory)
-
-    epochs = Field(120)
-    batch_size = Field(256)
-
-    learning_rate: float = Field(4e-3)
-    learning_factor: float = Field(0.1)
-    learning_steps: Sequence[int] = Field((100, 110))
-
-    def learning_rate_schedule(self, epoch):
-        lr = self.learning_rate
-        for step in self.learning_steps:
-            if epoch < step:
-                return lr
-            lr *= self.learning_factor
-        return lr
-
-    optimizer = Field(
-        lambda self: tf.keras.optimizers.Adam(self.learning_rate, epsilon=1e-8)
-    )
-
-
-@task
-class TrainBinaryDenseNet37(TrainBinaryDenseNet28):
-    model = ComponentField(BinaryDenseNet37Factory)
-    batch_size = Field(192)
-
-
-@task
-class TrainBinaryDenseNet37Dilated(TrainBinaryDenseNet37):
-    model = ComponentField(BinaryDenseNet37DilatedFactory)
-    epochs = Field(80)
-    batch_size = Field(256)
-    learning_steps = Field((60, 70))
-
-
-@task
-class TrainBinaryDenseNet45(TrainBinaryDenseNet28):
-    model = ComponentField(BinaryDenseNet45Factory)
-    epochs = Field(125)
-    batch_size = Field(384)
-    learning_rate = Field(0.008)
-    learning_steps = Field((80, 100))

@@ -8,11 +8,10 @@ from typing import Callable, List, Union
 import click
 import larq as lq
 import tensorflow as tf
-from tensorflow import keras
-from zookeeper import Field, cli
-from zookeeper.tf import Experiment
-
 from larq_zoo import utils
+from tensorflow import keras
+from zookeeper import Field
+from zookeeper.tf import Experiment
 
 
 class TrainLarqZooModel(Experiment):
@@ -27,6 +26,12 @@ class TrainLarqZooModel(Experiment):
 
     # Whether this experiment is compilation-only (i.e. no training)
     testing: bool = Field(False)
+
+    # How often to run validation.
+    validation_frequency: int = Field(1)
+
+    # Whether or not to save models at the end.
+    save_weights: bool = Field(True)
 
     # Where to store output.
     @Field
@@ -124,24 +129,19 @@ class TrainLarqZooModel(Experiment):
             steps_per_epoch=math.ceil(num_train_examples / self.batch_size),
             validation_data=validation_data,
             validation_steps=math.ceil(num_validation_examples / self.batch_size),
+            validation_freq=self.validation_frequency,
             verbose=1 if self.use_progress_bar else 2,
             initial_epoch=initial_epoch,
             callbacks=self.callbacks,
         )
 
         # Save model, weights, and config JSON.
-        self.model.save(str(Path(self.output_dir) / f"{self.model.name}.h5"))
-        self.model.save_weights(
-            str(Path(self.output_dir) / f"{self.model.name}_weights.h5")
-        )
-        with open(Path(self.output_dir) / f"{self.model.name}.json", "w") as json_file:
-            json_file.write(self.model.to_json())
-
-
-if __name__ == "__main__":
-    import importlib
-
-    # Running it without the CLI requires us to first import larq_zoo
-    # in order to register the models and datasets
-    importlib.import_module("larq_zoo")
-    cli()
+        if self.save_weights:
+            self.model.save(str(Path(self.output_dir) / f"{self.model.name}.h5"))
+            self.model.save_weights(
+                str(Path(self.output_dir) / f"{self.model.name}_weights.h5")
+            )
+            with open(
+                Path(self.output_dir) / f"{self.model.name}.json", "w"
+            ) as json_file:
+                json_file.write(self.model.to_json())

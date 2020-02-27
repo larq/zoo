@@ -32,15 +32,17 @@ def parametrize(func):
     return pytest.mark.parametrize(
         "app,last_feature_dim",
         [
-            (lqz.BinaryAlexNet, 256),
-            (lqz.BiRealNet, 512),
-            (lqz.BinaryResNetE18, 512),
-            (lqz.BinaryDenseNet28, 576),
-            (lqz.BinaryDenseNet37, 640),
-            (lqz.BinaryDenseNet37Dilated, 640),
-            (lqz.BinaryDenseNet45, 800),
-            (lqz.XNORNet, 4096),
-            (lqz.DoReFaNet, 256),
+            (lqz.literature.BinaryAlexNet, 256),
+            (lqz.literature.BiRealNet, 512),
+            (lqz.literature.BinaryResNetE18, 512),
+            (lqz.literature.BinaryDenseNet28, 576),
+            (lqz.literature.BinaryDenseNet37, 640),
+            (lqz.literature.BinaryDenseNet37Dilated, 640),
+            (lqz.literature.BinaryDenseNet45, 800),
+            (lqz.literature.XNORNet, 4096),
+            (lqz.literature.DoReFaNet, 256),
+            (lqz.sota.QuickNet, 512),
+            (lqz.sota.QuickNetLarge, 512),
         ],
     )(func)
 

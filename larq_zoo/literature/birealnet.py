@@ -2,11 +2,10 @@ from typing import Optional, Sequence, Union
 
 import larq as lq
 import tensorflow as tf
-from zookeeper import ComponentField, Field, factory, task
+from zookeeper import Field, factory
 
 from larq_zoo import utils
 from larq_zoo.model_factory import ModelFactory
-from larq_zoo.train import TrainLarqZooModel
 
 
 @factory
@@ -124,16 +123,19 @@ def BiRealNet(
     num_classes: int = 1000,
 ) -> tf.keras.models.Model:
     """Instantiates the Bi-Real Net architecture.
+
     Optionally loads weights pre-trained on ImageNet.
+
     ```netron
     birealnet-v0.3.0/birealnet.json
     ```
     ```plot-altair
     /plots/birealnet.vg.json
     ```
+
     # Arguments
-    input_shape: optional shape tuple, only to be specified if `include_top` is False,
-        otherwise the input shape has to be `(224, 224, 3)`.
+    input_shape: Optional shape tuple, to be specified if you would like to use a model
+        with an input image resolution that is not (224, 224, 3).
         It should have exactly 3 inputs channels.
     input_tensor: optional Keras tensor (i.e. output of `layers.Input()`) to use as
         image input for the model.
@@ -142,10 +144,13 @@ def BiRealNet(
     include_top: whether to include the fully-connected layer at the top of the network.
     num_classes: optional number of classes to classify images into, only to be
         specified if `include_top` is True, and if no `weights` argument is specified.
+
     # Returns
     A Keras model instance.
+
     # Raises
     ValueError: in case of invalid argument for `weights`, or invalid input shape.
+
     # References
     - [Bi-Real Net: Enhancing the Performance of 1-bit CNNs With Improved
       Representational Capability and Advanced Training
@@ -158,26 +163,3 @@ def BiRealNet(
         input_shape=input_shape,
         num_classes=num_classes,
     ).build()
-
-
-@task
-class TrainBiRealNet(TrainLarqZooModel):
-    model = ComponentField(BiRealNetFactory)
-
-    epochs = Field(300)
-    batch_size = Field(512)
-
-    learning_rate: float = Field(5e-3)
-    decay_schedule: str = Field("linear")
-
-    @Field
-    def optimizer(self):
-        if self.decay_schedule == "linear_cosine":
-            lr = tf.keras.experimental.LinearCosineDecay(self.learning_rate, 750684)
-        elif self.decay_schedule == "linear":
-            lr = tf.keras.optimizers.schedules.PolynomialDecay(
-                self.learning_rate, 750684, end_learning_rate=0, power=1.0
-            )
-        else:
-            lr = self.learning_rate
-        return tf.keras.optimizers.Adam(lr)

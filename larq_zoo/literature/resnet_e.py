@@ -2,11 +2,10 @@ from typing import Optional, Sequence
 
 import larq as lq
 import tensorflow as tf
-from zookeeper import ComponentField, Field, factory, task
+from zookeeper import Field, factory
 
 from larq_zoo import utils
 from larq_zoo.model_factory import ModelFactory
-from larq_zoo.train import TrainLarqZooModel
 
 
 @factory
@@ -99,8 +98,9 @@ class BinaryResNetE18Factory(ModelFactory):
                 strides = 1 if block == 0 or layer != 0 else 2
                 x = self.residual_block(x, filters, strides=strides)
 
+        x = tf.keras.layers.Activation("relu")(x)
+
         if self.include_top:
-            x = tf.keras.layers.Activation("relu")(x)
             x = tf.keras.layers.GlobalAvgPool2D()(x)
             x = tf.keras.layers.Dense(
                 self.num_classes,
@@ -146,28 +146,34 @@ def BinaryResNetE18(
     num_classes: int = 1000,
 ) -> tf.keras.models.Model:
     """Instantiates the BinaryResNetE 18 architecture.
+
     Optionally loads weights pre-trained on ImageNet.
+
     ```netron
     resnet_e-v0.1.0/resnet_e_18.json
     ```
     ```plot-altair
     /plots/resnet_e_18.vg.json
     ```
+
     # Arguments
-    include_top: whether to include the fully-connected layer at the top of the network.
-    weights: one of `None` (random initialization), "imagenet" (pre-training on
-        ImageNet), or the path to the weights file to be loaded.
+    input_shape: Optional shape tuple, to be specified if you would like to use a model
+        with an input image resolution that is not (224, 224, 3).
+        It should have exactly 3 inputs channels.
     input_tensor: optional Keras tensor (i.e. output of `layers.Input()`) to use as
         image input for the model.
-    input_shape: optional shape tuple, only to be specified if `include_top` is False,
-        otherwise the input shape has to be `(224, 224, 3)`.
-        It should have exactly 3 inputs channels.
-    classes: optional number of classes to classify images into, only to be specified
+    weights: one of `None` (random initialization), "imagenet" (pre-training on
+        ImageNet), or the path to the weights file to be loaded.
+    include_top: whether to include the fully-connected layer at the top of the network.
+    num_classes: optional number of classes to classify images into, only to be specified
         if `include_top` is True, and if no `weights` argument is specified.
+
     # Returns
     A Keras model instance.
+
     # Raises
     ValueError: in case of invalid argument for `weights`, or invalid input shape.
+
     # References
     - [Back to Simplicity:
       How to Train Accurate BNNs from Scratch?](https://arxiv.org/abs/1906.08637)
@@ -179,27 +185,3 @@ def BinaryResNetE18(
         include_top=include_top,
         num_classes=num_classes,
     ).build()
-
-
-@task
-class TrainBinaryResNetE18(TrainLarqZooModel):
-    model = ComponentField(BinaryResNetE18Factory)
-
-    epochs = Field(120)
-    batch_size = Field(1024)
-
-    learning_rate: float = Field(0.004)
-    learning_factor: float = Field(0.3)
-    learning_steps: Sequence[int] = Field((70, 90, 110))
-
-    def learning_rate_schedule(self, epoch):
-        lr = self.learning_rate
-        for step in self.learning_steps:
-            if epoch < step:
-                return lr
-            lr *= self.learning_factor
-        return lr
-
-    optimizer = Field(
-        lambda self: tf.keras.optimizers.Adam(self.learning_rate, epsilon=1e-8)
-    )

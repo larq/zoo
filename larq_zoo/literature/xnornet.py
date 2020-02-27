@@ -2,11 +2,10 @@ from typing import Optional, Sequence
 
 import larq as lq
 import tensorflow as tf
-from zookeeper import ComponentField, Field, factory, task
+from zookeeper import Field, factory
 
 from larq_zoo import utils
 from larq_zoo.model_factory import ModelFactory
-from larq_zoo.train import TrainLarqZooModel
 
 
 @lq.utils.set_precision(1)
@@ -139,29 +138,34 @@ def XNORNet(
     num_classes: int = 1000,
 ):
     """Instantiates the XNOR-Net architecture.
+
     Optionally loads weights pre-trained on ImageNet.
+
     ```netron
     xnornet-v0.2.0/xnornet.json
     ```
     ```plot-altair
     /plots/xnornet.vg.json
     ```
+
     # Arguments
-    include_top: whether to include the fully-connected layer at the top of the network.
-    weights: one of `None` (random initialization), "imagenet" (pre-training on
-        ImageNet), or the path to the weights file to be loaded.
+    input_shape: Optional shape tuple, to be specified if you would like to use a model
+        with an input image resolution that is not (224, 224, 3).
+        It should have exactly 3 inputs channels.
     input_tensor: optional Keras tensor (i.e. output of `layers.Input()`) to use as
         image input for the model.
-    input_shape: optional shape tuple, only to be specified if `include_top` is False
-        (otherwise the input shape has to be `(224, 224, 3)` (with `channels_last` data
-        format) or `(3, 224, 224)` (with `channels_first` data format).
-        It should have exactly 3 inputs channels.
-    classes: optional number of classes to classify images into, only to be specified
+    weights: one of `None` (random initialization), "imagenet" (pre-training on
+        ImageNet), or the path to the weights file to be loaded.
+    include_top: whether to include the fully-connected layer at the top of the network.
+    num_classes: optional number of classes to classify images into, only to be specified
         if `include_top` is True, and if no `weights` argument is specified.
+
     # Returns
     A Keras model instance.
+
     # Raises
     ValueError: in case of invalid argument for `weights`, or invalid input shape.
+
     # References
     - [XNOR-Net: ImageNet Classification Using Binary Convolutional Neural
       Networks](https://arxiv.org/abs/1603.05279)
@@ -173,40 +177,3 @@ def XNORNet(
         include_top=include_top,
         num_classes=num_classes,
     ).build()
-
-
-@task
-class TrainXNORNet(TrainLarqZooModel):
-    model = ComponentField(XNORNetFactory)
-
-    epochs = Field(100)
-    batch_size = Field(1200)
-
-    initial_lr: float = Field(0.001)
-
-    def learning_rate_schedule(self, epoch):
-        epoch_dec_1 = 19
-        epoch_dec_2 = 30
-        epoch_dec_3 = 44
-        epoch_dec_4 = 53
-        epoch_dec_5 = 66
-        epoch_dec_6 = 76
-        epoch_dec_7 = 86
-        if epoch < epoch_dec_1:
-            return self.initial_lr
-        elif epoch < epoch_dec_2:
-            return self.initial_lr * 0.5
-        elif epoch < epoch_dec_3:
-            return self.initial_lr * 0.1
-        elif epoch < epoch_dec_4:
-            return self.initial_lr * 0.1 * 0.5
-        elif epoch < epoch_dec_5:
-            return self.initial_lr * 0.01
-        elif epoch < epoch_dec_6:
-            return self.initial_lr * 0.01 * 0.5
-        elif epoch < epoch_dec_7:
-            return self.initial_lr * 0.01 * 0.1
-        else:
-            return self.initial_lr * 0.001 * 0.1
-
-    optimizer = Field(lambda self: tf.keras.optimizers.Adam(self.initial_lr))

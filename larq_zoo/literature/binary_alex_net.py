@@ -2,11 +2,10 @@ from typing import Optional, Sequence, Tuple
 
 import larq as lq
 import tensorflow as tf
-from zookeeper import ComponentField, Field, factory, task
+from zookeeper import Field, factory
 
 from larq_zoo import utils
 from larq_zoo.model_factory import ModelFactory
-from larq_zoo.train import TrainLarqZooModel
 
 
 @factory
@@ -119,16 +118,19 @@ def BinaryAlexNet(
     num_classes: int = 1000,
 ) -> tf.keras.models.Model:
     """Instantiates the BinaryAlexNet architecture.
+
     Optionally loads weights pre-trained on ImageNet.
+
     ```netron
     binary_alexnet-v0.2.0/binary_alexnet.json
     ```
     ```plot-altair
     /plots/binary_alexnet.vg.json
     ```
+
     # Arguments
-    input_shape: optional shape tuple, only to be specified if `include_top` is False,
-        otherwise the input shape has to be `(224, 224, 3)`.
+    input_shape: Optional shape tuple, to be specified if you would like to use a model
+        with an input image resolution that is not (224, 224, 3).
         It should have exactly 3 inputs channels.
     input_tensor: optional Keras tensor (i.e. output of `layers.Input()`) to use as
         image input for the model.
@@ -137,8 +139,10 @@ def BinaryAlexNet(
     include_top: whether to include the fully-connected layer at the top of the network.
     num_classes: optional number of classes to classify images into, only to be
         specified if `include_top` is True, and if no `weights` argument is specified.
+
     # Returns
     A Keras model instance.
+
     # Raises
     ValueError: in case of invalid argument for `weights`, or invalid input shape.
     """
@@ -149,18 +153,3 @@ def BinaryAlexNet(
         include_top=include_top,
         num_classes=num_classes,
     ).build()
-
-
-@task
-class TrainBinaryAlexNet(TrainLarqZooModel):
-    model = ComponentField(BinaryAlexNetFactory)
-
-    batch_size: int = Field(512)
-    epochs: int = Field(150)
-
-    def learning_rate_schedule(self, epoch):
-        return 1e-2 * 0.5 ** (epoch // 10)
-
-    optimizer = Field(
-        lambda self: tf.keras.optimizers.Adam(self.learning_rate_schedule(0))
-    )
