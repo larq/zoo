@@ -2,12 +2,11 @@ import functools
 import os
 
 import larq as lq
+import larq_zoo as lqz
 import numpy as np
 import pytest
 from tensorflow import keras
 from zookeeper import cli
-
-import larq_zoo as lqz
 
 
 def keras_test(func):
@@ -107,7 +106,7 @@ def test_model_summary(app, last_feature_dim, capsys, snapshot):
 def test_experiments(command_name: str, snapshot, capsys):
     try:
         cli.commands[command_name](
-            ["dataset=OxfordFlowers", "batch_size=8", "testing=True"]
+            ["dataset=DummyOxfordFlowers", "batch_size=8", "testing=True"]
         )
     # Catch successful SystemExit to prevent exception
     except SystemExit as e:
