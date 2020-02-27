@@ -1,10 +1,10 @@
 from typing import Callable, Optional, Tuple, Union
 
 import tensorflow as tf
-from zookeeper import ComponentField, Field
-from zookeeper.tf import Dataset
 
 from larq_zoo import utils
+from zookeeper import ComponentField, Field
+from zookeeper.tf import Dataset
 
 QuantizerType = Union[
     tf.keras.layers.Layer, Callable[[tf.Tensor], tf.Tensor], str, None

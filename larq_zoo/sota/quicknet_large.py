@@ -2,11 +2,11 @@ from typing import Optional, Sequence, Tuple
 
 import larq as lq
 import tensorflow as tf
-from zookeeper import Field, factory
 
 from larq_zoo import utils
 from larq_zoo.model_factory import ModelFactory
 from larq_zoo.sota.quicknet import LCEFirstLayer
+from zookeeper import Field, factory
 
 
 def squeeze_and_excite(inp: tf.Tensor, strides: int = 1, r: int = 16):

@@ -1,11 +1,13 @@
 import functools
 import os
+from pathlib import Path
 
 import larq as lq
-import larq_zoo as lqz
 import numpy as np
 import pytest
 from tensorflow import keras
+
+import larq_zoo as lqz
 from zookeeper import cli
 
 
@@ -99,7 +101,21 @@ def test_model_summary(app, last_feature_dim, capsys, snapshot):
     model = app(weights=None, input_tensor=input_tensor)
     lq.models.summary(model)
     out, err = capsys.readouterr()
-    snapshot.assert_match(out)
+
+    summary_file = (
+        Path(__file__).parent
+        / "snapshots"
+        / "model_summaries"
+        / f"{app.__name__}_{last_feature_dim}.txt"
+    )
+
+    if summary_file.exists():
+        with open(summary_file, "r") as file:
+            content = file.read()
+        assert content == out
+    else:
+        with open(summary_file, "w") as file:
+            file.write(out)
 
 
 @pytest.mark.parametrize("command_name", cli.commands.keys())
