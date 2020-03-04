@@ -23,4 +23,4 @@ pip install larq-zoo
 
 ## About
 
-Larq is being developed by a team of deep learning researchers and engineers at Plumerai to help accelerate both our own research and the general adoption of Binarized Neural Networks.
+Larq Zoo is being developed by a team of deep learning researchers and engineers at Plumerai to help accelerate both our own research and the general adoption of Binarized Neural Networks.
