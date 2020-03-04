@@ -4,6 +4,8 @@
 
 For more information, see [larq.dev/zoo](https://docs.larq.dev/zoo/).
 
+*Larq Zoo is part of a family of libraries for BNN development; you can also check out [Larq](https://github.com/larq/larq) for building and training BNNs and [Larq Compute Engine](https://github.com/larq/compute-engine) for deployment on mobile and edge devices.*
+
 ## Requirements
 
 Before installing Larq Zoo, please install:
@@ -18,3 +20,7 @@ You can install Larq Zoo with Python's [pip](https://pip.pypa.io/en/stable/) pac
 ```shell
 pip install larq-zoo
 ```
+
+## About
+
+Larq is being developed by a team of deep learning researchers and engineers at Plumerai to help accelerate both our own research and the general adoption of Binarized Neural Networks.
