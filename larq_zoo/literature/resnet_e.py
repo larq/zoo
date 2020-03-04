@@ -60,7 +60,6 @@ class BinaryResNetE18Factory(ModelFactory):
             kernel_constraint=self.kernel_constraint,
             kernel_initializer="glorot_normal",
             use_bias=False,
-            metrics=[],
         )(x)
         x = tf.keras.layers.BatchNormalization(momentum=0.9, epsilon=1e-5)(x)
 

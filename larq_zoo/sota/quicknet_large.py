@@ -84,7 +84,6 @@ class QuickNetLargeFactory(ModelFactory):
             kernel_initializer="glorot_normal",
             use_bias=False,
             activation="relu",
-            metrics=[],
         )(x)
 
         x = tf.keras.layers.BatchNormalization(momentum=0.9, epsilon=1e-5)(x)
