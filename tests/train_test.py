@@ -3,6 +3,8 @@ from click.testing import CliRunner
 
 from larq_zoo.training import basic_experiments
 
+from tests import dummy_datasets  # noqa
+
 
 @pytest.mark.parametrize("command", list(basic_experiments.cli.commands.keys()))
 def test_cli(command):
