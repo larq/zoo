@@ -4,7 +4,7 @@ import tensorflow as tf
 from zookeeper import ComponentField, Field
 from zookeeper.tf import Dataset
 
-from larq_zoo import utils
+from larq_zoo.core import utils
 
 QuantizerType = Union[
     tf.keras.layers.Layer, Callable[[tf.Tensor], tf.Tensor], str, None
