@@ -108,7 +108,7 @@ class QuickNetLargeFactory(ModelFactory):
                 kernel_initializer="glorot_normal",
             )(x)
 
-        model = tf.keras.Model(inputs=self.image_input, outputs=x, name="quicknet")
+        model = tf.keras.Model(inputs=self.image_input, outputs=x, name="quicknet_large")
 
         # Load weights.
         if self.weights == "imagenet":
