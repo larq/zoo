@@ -134,7 +134,7 @@ def global_pool(
     input_shape = x.get_shape().as_list()
     pool_size = input_shape[1:3] if data_format == "channels_last" else input_shape[2:4]
 
-    if not (pool_size[0] is None) or (pool_size[1] is None):
+    if not (pool_size[0] is None or pool_size[1] is None):
 
         def fun(x_):
             x_ = tf.keras.layers.AveragePooling2D(
