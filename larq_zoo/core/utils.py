@@ -103,11 +103,13 @@ def get_input_layer(input_shape, input_tensor):
     return input_tensor
 
 
-def global_pool(x: tf.Tensor, data_format: str = "channels_last") -> tf.Tensor:
+def global_pool(
+    x: tf.Tensor, data_format: str = "channels_last", name: str = None
+) -> tf.Tensor:
     """Global average 2D pooling and flattening.
 
-    Alternative to existing keras implementation of GlobalPooling2D.
-    AveragePooling2D is much faster than GlobalPooling2D on Larq Compute Engine.
+    Alternative to existing keras implementation of GlobalAveragePooling2D.
+    AveragePooling2D is much faster than GlobalAveragePooling2D on Larq Compute Engine.
 
     # Arguments
     x: 4D TensorFlow tensor.
@@ -116,6 +118,7 @@ def global_pool(x: tf.Tensor, data_format: str = "channels_last") -> tf.Tensor:
         corresponds to inputs with shape (batch, height, width, channels) while
         channels_first corresponds to inputs with shape (batch, channels, height,
         width). It defaults to "channels_last".
+    name: String name of the layer
 
     # Returns
     2D TensorFlow tensor.
@@ -131,11 +134,23 @@ def global_pool(x: tf.Tensor, data_format: str = "channels_last") -> tf.Tensor:
     input_shape = x.get_shape().as_list()
     pool_size = input_shape[1:3] if data_format == "channels_last" else input_shape[2:4]
 
-    x = tf.keras.layers.AveragePooling2D(pool_size=pool_size, data_format=data_format)(
-        x
-    )
+    if not (pool_size[0] is None) or (pool_size[1] is None):
 
-    return tf.keras.layers.Flatten()(x)
+        def fun(x_):
+            x_ = tf.keras.layers.AveragePooling2D(
+                pool_size=pool_size, data_format=data_format
+            )(x_)
+            return tf.keras.layers.Flatten()(x_)
+
+        # wrap average pool and flattening into a lambda layer to ensure layer count
+        # remains the same as when using GlobalAveragePooling2D
+        x = tf.keras.layers.Lambda(fun, name=name)(x)
+    else:
+        x = tf.keras.layers.GlobalAveragePooling2D(data_format=data_format, name=name)(
+            x
+        )
+
+    return x
 
 
 def decode_predictions(preds, top=5, **kwargs):
