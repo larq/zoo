@@ -5,13 +5,14 @@ import sys
 from typing import Optional
 
 import tensorflow as tf
-from keras_applications.imagenet_utils import _obtain_input_shape
 from tensorflow import keras
 from tensorflow.keras.applications.vgg16 import (
     decode_predictions as keras_decode_predictions,
 )
 from tensorflow.python.eager.context import num_gpus
 from tensorflow.python.keras.backend import is_keras_tensor
+
+from keras_applications.imagenet_utils import _obtain_input_shape
 
 
 def slash_join(*args):
@@ -110,6 +111,8 @@ def global_pool(
 
     Alternative to existing keras implementation of GlobalAveragePooling2D.
     AveragePooling2D is much faster than GlobalAveragePooling2D on Larq Compute Engine.
+    If the width or height of the input is dynamic, the function falls back to
+    GlobalAveragePooling2D.
 
     # Arguments
     x: 4D TensorFlow tensor.
@@ -131,21 +134,16 @@ def global_pool(
     if data_format not in ["channels_last", "channels_first"]:
         raise ValueError("data_format not recognized.")
 
-    input_shape = x.get_shape().as_list()
-    pool_size = input_shape[1:3] if data_format == "channels_last" else input_shape[2:4]
-
-    if not (pool_size[0] is None or pool_size[1] is None):
-
-        def fun(x_):
-            x_ = tf.keras.layers.AveragePooling2D(
-                pool_size=pool_size, data_format=data_format
-            )(x_)
-            return tf.keras.layers.Flatten()(x_)
-
-        # wrap average pool and flattening into a lambda layer to ensure layer count
-        # remains the same as when using GlobalAveragePooling2D
-        x = tf.keras.layers.Lambda(fun, name=name)(x)
-    else:
+    try:
+        input_shape = x.get_shape().as_list()
+        pool_size = (
+            input_shape[1:3] if data_format == "channels_last" else input_shape[2:4]
+        )
+        x = tf.keras.layers.AveragePooling2D(
+            pool_size=pool_size, data_format=data_format
+        )(x)
+        x = tf.keras.layers.Flatten()(x)
+    except ValueError:
         x = tf.keras.layers.GlobalAveragePooling2D(data_format=data_format, name=name)(
             x
         )
