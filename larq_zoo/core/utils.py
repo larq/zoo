@@ -5,14 +5,13 @@ import sys
 from typing import Optional
 
 import tensorflow as tf
+from keras_applications.imagenet_utils import _obtain_input_shape
 from tensorflow import keras
 from tensorflow.keras.applications.vgg16 import (
     decode_predictions as keras_decode_predictions,
 )
 from tensorflow.python.eager.context import num_gpus
 from tensorflow.python.keras.backend import is_keras_tensor
-
-from keras_applications.imagenet_utils import _obtain_input_shape
 
 
 def slash_join(*args):
