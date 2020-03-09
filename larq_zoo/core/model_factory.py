@@ -41,7 +41,7 @@ class ModelFactory:
 
     input_shape: Optional[Tuple[DimType, DimType, DimType]] = Field(None)
     input_tensor: Optional[tf.Tensor] = Field(None)
-    min_size: Optional[int] = Field(64)
+    min_input_resolution: Optional[int] = Field(64)
 
     @property
     def image_input(self) -> tf.Tensor:
@@ -51,7 +51,7 @@ class ModelFactory:
                 self.weights,
                 self.include_top,
                 self.num_classes,
-                self.min_size,
+                self.min_input_resolution,
             )
             self._image_input = utils.get_input_layer(input_shape, self.input_tensor)
         return self._image_input

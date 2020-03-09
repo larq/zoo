@@ -70,7 +70,7 @@ def get_distribution_scope(batch_size):
     return distribution_scope()
 
 
-def validate_input(input_shape, weights, include_top, classes, min_size):
+def validate_input(input_shape, weights, include_top, classes, min_input_resolution):
     if not (weights in {"imagenet", None} or os.path.exists(weights)):
         raise ValueError(
             "The `weights` argument should be either `None` (random initialization), "
@@ -88,7 +88,7 @@ def validate_input(input_shape, weights, include_top, classes, min_size):
     return _obtain_input_shape(
         input_shape,
         default_size=224,
-        min_size=min_size,
+        min_size=min_input_resolution,
         data_format=keras.backend.image_data_format(),
         require_flatten=include_top,
         weights=weights,
