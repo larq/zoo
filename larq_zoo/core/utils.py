@@ -108,14 +108,14 @@ def global_pool(
 ) -> tf.Tensor:
     """Global average 2D pooling and flattening.
 
-    Alternative to existing keras implementation of GlobalAveragePooling2D.
+    Alternative to existing Keras implementation of GlobalAveragePooling2D.
     AveragePooling2D is much faster than GlobalAveragePooling2D on Larq Compute Engine.
     If the width or height of the input is dynamic, the function falls back to
     GlobalAveragePooling2D.
 
     # Arguments
     x: 4D TensorFlow tensor.
-    data_format: data_format: A string, one of channels_last (default) or
+    data_format: A string, one of channels_last (default) or
         channels_first. The ordering of the dimensions in the inputs. channels_last
         corresponds to inputs with shape (batch, height, width, channels) while
         channels_first corresponds to inputs with shape (batch, channels, height,
