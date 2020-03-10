@@ -88,7 +88,7 @@ def validate_input(input_shape, weights, include_top, classes):
     return _obtain_input_shape(
         input_shape,
         default_size=224,
-        min_size=64,
+        min_size=0,
         data_format=keras.backend.image_data_format(),
         require_flatten=include_top,
         weights=weights,
