@@ -41,17 +41,12 @@ class ModelFactory:
 
     input_shape: Optional[Tuple[DimType, DimType, DimType]] = Field(None)
     input_tensor: Optional[tf.Tensor] = Field(None)
-    min_input_resolution: Optional[int] = Field(64)
 
     @property
     def image_input(self) -> tf.Tensor:
         if not hasattr(self, "_image_input"):
             input_shape = utils.validate_input(
-                self.input_shape,
-                self.weights,
-                self.include_top,
-                self.num_classes,
-                self.min_input_resolution,
+                self.input_shape, self.weights, self.include_top, self.num_classes,
             )
             self._image_input = utils.get_input_layer(input_shape, self.input_tensor)
         return self._image_input

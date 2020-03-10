@@ -19,8 +19,6 @@ class BinaryResNetE18Factory(ModelFactory):
     kernel_quantizer = Field(lambda: lq.quantizers.SteSign(clip_value=1.25))
     kernel_constraint = Field(lambda: lq.constraints.WeightClip(clip_value=1.25))
 
-    min_input_resolution: int = Field(32)
-
     @property
     def spec(self):
         spec = {
