@@ -13,8 +13,7 @@ def squeeze_and_excite(inp: tf.Tensor, strides: int = 1, r: int = 16):
     """Squeeze and Excite as per [Squeeze-and-Excitation Networks](https://arxiv.org/abs/1709.01507)"""
     C = inp.get_shape().as_list()[-1]
 
-    out = tf.keras.layers.GlobalAvgPool2D()(inp)
-    out = tf.keras.layers.Flatten()(out)
+    out = utils.global_pool(inp)
     out = tf.keras.layers.Dense(
         C // r,
         activation="relu",
@@ -101,7 +100,7 @@ class QuickNetLargeFactory(ModelFactory):
 
         x = tf.keras.layers.Activation("relu")(x)
         if self.include_top:
-            x = tf.keras.layers.GlobalAvgPool2D()(x)
+            x = utils.global_pool(x)
             x = tf.keras.layers.Dense(
                 self.num_classes,
                 activation="softmax",

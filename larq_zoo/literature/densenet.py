@@ -95,7 +95,7 @@ class BinaryDenseNetFactory(ModelFactory):
         x = tf.keras.layers.Activation("relu")(x)
 
         if self.include_top:
-            x = tf.keras.layers.GlobalAvgPool2D()(x)
+            x = utils.global_pool(x)
             x = tf.keras.layers.Dense(
                 self.num_classes, activation="softmax", kernel_initializer="he_normal"
             )(x)

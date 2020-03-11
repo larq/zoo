@@ -86,7 +86,7 @@ class BiRealNetFactory(ModelFactory):
 
         # Layer 18
         if self.include_top:
-            out = tf.keras.layers.GlobalAvgPool2D()(out)
+            out = utils.global_pool(out)
             out = tf.keras.layers.Dense(self.num_classes, activation="softmax")(out)
 
         model = tf.keras.Model(inputs=self.image_input, outputs=out, name="birealnet18")
