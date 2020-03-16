@@ -5,7 +5,14 @@ import sys
 from typing import Optional
 
 import tensorflow as tf
-from keras_applications.imagenet_utils import _obtain_input_shape
+
+try:
+    from tensorflow.python.keras.applications.imagenet_utils import obtain_input_shape
+except ImportError:
+    from keras_applications.imagenet_utils import (
+        _obtain_input_shape as obtain_input_shape,
+    )
+
 from tensorflow import keras
 from tensorflow.keras.applications.vgg16 import (
     decode_predictions as keras_decode_predictions,
@@ -85,7 +92,7 @@ def validate_input(input_shape, weights, include_top, classes):
         )
 
     # Determine proper input shape
-    return _obtain_input_shape(
+    return obtain_input_shape(
         input_shape,
         default_size=224,
         min_size=0,
