@@ -100,7 +100,7 @@ class XNORNetFactory(ModelFactory):
                 use_bias=False,
                 kernel_regularizer=self.kernel_regularizer,
             )(x)
-            x = tf.keras.layers.Activation("softmax")(x)
+            x = tf.keras.layers.Activation("softmax", dtype="float32")(x)
 
         model = tf.keras.models.Model(
             inputs=self.image_input, outputs=x, name="xnornet"

@@ -79,7 +79,7 @@ class BinaryAlexNetFactory(ModelFactory):
             out = self.dense_block(out, units=4096)
             out = self.dense_block(out, units=4096)
             out = self.dense_block(out, self.num_classes)
-            out = tf.keras.layers.Activation("softmax")(out)
+            out = tf.keras.layers.Activation("softmax", dtype="float32")(out)
 
         model = tf.keras.models.Model(
             inputs=self.image_input, outputs=out, name="binary_alexnet"
