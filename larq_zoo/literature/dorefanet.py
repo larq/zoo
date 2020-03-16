@@ -95,7 +95,7 @@ class DoReFaNetFactory(ModelFactory):
             out = self.fully_connected_block(out, units=4096)
             out = tf.keras.layers.Activation("clip_by_value_activation")(out)
             out = tf.keras.layers.Dense(self.num_classes, use_bias=True)(out)
-            out = tf.keras.layers.Activation("softmax")(out)
+            out = tf.keras.layers.Activation("softmax", dtype="float32")(out)
 
         model = tf.keras.Model(inputs=self.image_input, outputs=out, name="dorefanet")
 

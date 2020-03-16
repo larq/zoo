@@ -96,9 +96,10 @@ class BinaryDenseNetFactory(ModelFactory):
 
         if self.include_top:
             x = utils.global_pool(x)
-            x = tf.keras.layers.Dense(
-                self.num_classes, activation="softmax", kernel_initializer="he_normal"
-            )(x)
+            x = tf.keras.layers.Dense(self.num_classes, kernel_initializer="he_normal")(
+                x
+            )
+            x = tf.keras.layers.Activation("softmax", dtype="float32")(x)
 
         model = BinaryDenseNet(inputs=self.image_input, outputs=x, name=self.name)
 

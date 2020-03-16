@@ -97,10 +97,9 @@ class QuickNetFactory(ModelFactory):
         if self.include_top:
             x = utils.global_pool(x)
             x = tf.keras.layers.Dense(
-                self.num_classes,
-                activation="softmax",
-                kernel_initializer="glorot_normal",
+                self.num_classes, kernel_initializer="glorot_normal",
             )(x)
+            x = tf.keras.layers.Activation("softmax", dtype="float32")(x)
 
         model = tf.keras.Model(inputs=self.image_input, outputs=x, name="quicknet")
 
