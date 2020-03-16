@@ -144,14 +144,12 @@ def global_pool(
         pool_size = (
             input_shape[1:3] if data_format == "channels_last" else input_shape[2:4]
         )
-        x = tf.keras.layers.AveragePooling2D(
-            pool_size=pool_size, data_format=data_format
-        )(x)
-        x = tf.keras.layers.Flatten()(x)
-    except ValueError:
-        x = tf.keras.layers.GlobalAveragePooling2D(data_format=data_format, name=name)(
+        x = keras.layers.AveragePooling2D(pool_size=pool_size, data_format=data_format)(
             x
         )
+        x = keras.layers.Flatten()(x)
+    except ValueError:
+        x = keras.layers.GlobalAveragePooling2D(data_format=data_format, name=name)(x)
 
     return x
 
