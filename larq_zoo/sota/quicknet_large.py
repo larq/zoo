@@ -71,12 +71,15 @@ class QuickNetLargeFactory(ModelFactory):
         else:
             residual = x
 
-        y = squeeze_and_excite(x, strides=strides)
+        use_se = filters not in [64, 128]
+        if use_se:
+            y = squeeze_and_excite(x, strides=strides)
         x = lq.layers.QuantConv2D(
             filters,
             kernel_size=3,
             strides=strides,
             padding="Same",
+            pad_values=1.0,
             input_quantizer=self.input_quantizer,
             kernel_quantizer=self.kernel_quantizer,
             kernel_constraint=self.kernel_constraint,
@@ -86,7 +89,9 @@ class QuickNetLargeFactory(ModelFactory):
         )(x)
 
         x = tf.keras.layers.BatchNormalization(momentum=0.9, epsilon=1e-5)(x)
-        x = tf.multiply(x, y)
+
+        if use_se:
+            x = tf.multiply(x, y)
 
         return tf.keras.layers.add([x, residual])
 
@@ -102,7 +107,7 @@ class QuickNetLargeFactory(ModelFactory):
         if self.include_top:
             x = utils.global_pool(x)
             x = tf.keras.layers.Dense(
-                self.num_classes, kernel_initializer="glorot_normal",
+                self.num_classes, kernel_initializer="glorot_normal"
             )(x)
             x = tf.keras.layers.Activation("softmax", dtype="float32")(x)
 
@@ -116,16 +121,16 @@ class QuickNetLargeFactory(ModelFactory):
             if self.include_top:
                 weights_path = utils.download_pretrained_model(
                     model="quicknet_large",
-                    version="v0.1.0",
+                    version="v0.2.0",
                     file="quicknet_large_weights.h5",
-                    file_hash="1cd7ff411710023f902ec0152b860b4c3dea82e4bfe373b9310ca3598b3de640",
+                    file_hash="2d9ebbf8ba0500552e4dd243c3e52fd8291f965ef6a0e1dbba13cc72bf6eee8b",
                 )
             else:
                 weights_path = utils.download_pretrained_model(
                     model="quicknet_large",
-                    version="v0.1.0",
+                    version="v0.2.0",
                     file="quicknet_large_weights_notop.h5",
-                    file_hash="628bde2a21cf9338e90da9b0179432d1dfa5f25a7d2aa6e51fc91d1630675c10",
+                    file_hash="067655ef8a1a1e99ef1c71fa775c09aca44bdfad0b9b71538b4ec500c3beee4f",
                 )
             model.load_weights(weights_path)
         elif self.weights is not None:

@@ -69,6 +69,7 @@ class QuickNetFactory(ModelFactory):
             kernel_size=3,
             strides=strides,
             padding="Same",
+            pad_values=1.0,
             input_quantizer=self.input_quantizer,
             kernel_quantizer=self.kernel_quantizer,
             kernel_constraint=self.kernel_constraint,
@@ -97,7 +98,7 @@ class QuickNetFactory(ModelFactory):
         if self.include_top:
             x = utils.global_pool(x)
             x = tf.keras.layers.Dense(
-                self.num_classes, kernel_initializer="glorot_normal",
+                self.num_classes, kernel_initializer="glorot_normal"
             )(x)
             x = tf.keras.layers.Activation("softmax", dtype="float32")(x)
 
@@ -109,16 +110,16 @@ class QuickNetFactory(ModelFactory):
             if self.include_top:
                 weights_path = utils.download_pretrained_model(
                     model="quicknet",
-                    version="v0.1.0",
+                    version="v0.2.0",
                     file="quicknet_weights.h5",
-                    file_hash="f52abb0ce984015889f8a8842944eed1bfad06897d745c7b58eb663b3457cd3c",
+                    file_hash="6a765f120ba7b62a7740e842c4f462eb7ba3dd65eb46b4694c5bc8169618fae7",
                 )
             else:
                 weights_path = utils.download_pretrained_model(
                     model="quicknet",
-                    version="v0.1.0",
+                    version="v0.2.0",
                     file="quicknet_weights_notop.h5",
-                    file_hash="057391ea350ce0af33194db300d3d9d690c8fb5b11427bbaf37504af257e9dc5",
+                    file_hash="5bf2fc450fb8cc322b33a16410bf88fed09d05c221550c2d5805a04985383ac2",
                 )
             model.load_weights(weights_path)
         elif self.weights is not None:
