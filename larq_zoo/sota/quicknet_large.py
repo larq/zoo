@@ -71,8 +71,8 @@ class QuickNetLargeFactory(ModelFactory):
         else:
             residual = x
 
-        use_se = filters not in [64, 128]
-        if use_se:
+        use_squeeze_and_excite = filters not in (64, 128)
+        if use_squeeze_and_excite:
             y = squeeze_and_excite(x, strides=strides)
         x = lq.layers.QuantConv2D(
             filters,
@@ -90,8 +90,8 @@ class QuickNetLargeFactory(ModelFactory):
 
         x = tf.keras.layers.BatchNormalization(momentum=0.9, epsilon=1e-5)(x)
 
-        if use_se:
-            x = tf.multiply(x, y)
+        if use_squeeze_and_excite:
+            x *= y
 
         return tf.keras.layers.add([x, residual])
 
