@@ -140,7 +140,7 @@ def QuickNet(
     Optionally loads weights pre-trained on ImageNet.
 
     ```netron
-    quicknet-v0.1.0/quicknet.json
+    quicknet-v0.2.0/quicknet.json
     ```
 
     # Arguments

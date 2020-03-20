@@ -151,7 +151,7 @@ def QuickNetLarge(
     Optionally loads weights pre-trained on ImageNet.
 
     ```netron
-    quicknet_large-v0.1.0/quicknet_large.json
+    quicknet_large-v0.2.0/quicknet_large.json
     ```
 
     # Arguments
