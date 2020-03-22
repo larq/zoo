@@ -3,9 +3,10 @@ from typing import Optional, Sequence, Tuple
 
 import larq as lq
 import tensorflow as tf
+from zookeeper import Field, factory
+
 from larq_zoo.core import utils
 from larq_zoo.core.model_factory import ModelFactory
-from zookeeper import Field, factory
 
 
 def LCEFirstLayer(filters: int, x: tf.Tensor) -> tf.Tensor:
