@@ -110,8 +110,6 @@ class QuickNetBaseFactory(ModelFactory):
         """Concat transition block.
 
         Doubles number of filters by concatenating shortcut with x + shortcut.
-        This module is loosely inspired by
-        [MeliusNet](https://arxiv.org/abs/2001.05936).
         """
         infilters = x.get_shape().as_list()[-1]
         assert filters == 2 * infilters
@@ -125,7 +123,7 @@ class QuickNetBaseFactory(ModelFactory):
 
         return tf.keras.layers.concatenate([residual, x])
 
-    def pointwise_transition_block(
+    def fp_pointwise_transition_block(
         self, x: tf.Tensor, filters: int, strides: int, use_squeeze_and_excite: bool
     ) -> tf.Tensor:
         """Pointwise transition block.
@@ -215,7 +213,7 @@ class QuickNetLargeFactory(QuickNetBaseFactory):
     spec = Field(
         lambda: ([4, 4, 4, 4], [64, 128, 256, 512], [False, False, True, True])
     )
-    transition_block = Field(lambda self: self.pointwise_transition_block)
+    transition_block = Field(lambda self: self.fp_pointwise_transition_block)
 
     def build(self) -> tf.keras.models.Model:
         model = super().build()
