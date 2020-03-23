@@ -38,11 +38,9 @@ def squeeze_and_excite(inp: tf.Tensor, filters: int, r: int = 16):
     Use of S&E in BNNs was pioneered in [Training binary neural networks with
     real-to-binary convolutions](https://openreview.net/forum?id=BJg4NgBKvH).
     """
-    C = inp.get_shape().as_list()[-1]
-
     out = utils.global_pool(inp)
     out = tf.keras.layers.Dense(
-        C // r,
+        inp.shape[-1] // r,
         activation="relu",
         kernel_initializer="he_normal",
         use_bias=False,
@@ -99,7 +97,7 @@ class QuickNetBaseFactory(ModelFactory):
 
     def residual_block(self, x: tf.Tensor, use_squeeze_and_excite: bool) -> tf.Tensor:
         """Standard residual block, without strides or filter changes."""
-        infilters = x.get_shape().as_list()[-1]
+        infilters = x.shape[-1]
         residual = x
         x = self.conv_block(x, infilters, use_squeeze_and_excite)
         return tf.keras.layers.add([x, residual])
@@ -111,7 +109,7 @@ class QuickNetBaseFactory(ModelFactory):
 
         Doubles number of filters by concatenating shortcut with x + shortcut.
         """
-        infilters = x.get_shape().as_list()[-1]
+        infilters = x.shape[-1]
         assert filters == 2 * infilters
 
         residual = tf.keras.layers.MaxPool2D(pool_size=strides, strides=strides)(x)
@@ -148,7 +146,7 @@ class QuickNetBaseFactory(ModelFactory):
             zip(*self.spec)
         ):
             for layer in range(layers):
-                if filters == x.get_shape().as_list()[-1]:
+                if filters == x.shape[-1]:
                     x = self.residual_block(x, use_squeeze_and_excite)
                 else:
                     strides = 1 if (block == 0 or layer != 0) else 2
