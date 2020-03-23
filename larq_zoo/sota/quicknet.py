@@ -1,5 +1,5 @@
 from types import MethodType
-from typing import Optional, Sequence, Tuple
+from typing import Optional, Sequence
 
 import larq as lq
 import tensorflow as tf
