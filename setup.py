@@ -8,7 +8,7 @@ def readme():
 
 setup(
     name="larq-zoo",
-    version="1.0.b3",
+    version="1.0.b4",
     author="Plumerai",
     author_email="lukas@plumerai.co.uk",
     description="Reference implementations of popular Binarized Neural Networks",
