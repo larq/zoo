@@ -97,7 +97,7 @@ class QuickNetBaseFactory(ModelFactory):
 
     def residual_block(self, x: tf.Tensor, use_squeeze_and_excite: bool) -> tf.Tensor:
         """Standard residual block, without strides or filter changes."""
-        infilters = x.shape[-1]
+        infilters = int(x.shape[-1])
         residual = x
         x = self.conv_block(x, infilters, use_squeeze_and_excite)
         return tf.keras.layers.add([x, residual])
@@ -109,7 +109,7 @@ class QuickNetBaseFactory(ModelFactory):
 
         Doubles number of filters by concatenating shortcut with x + shortcut.
         """
-        infilters = x.shape[-1]
+        infilters = int(x.shape[-1])
         assert filters == 2 * infilters
 
         residual = tf.keras.layers.MaxPool2D(pool_size=strides, strides=strides)(x)
