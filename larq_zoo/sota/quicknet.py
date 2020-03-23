@@ -61,7 +61,9 @@ def squeeze_and_excite(inp: tf.Tensor, filters: int, r: int = 16):
 @factory
 class QuickNetBaseFactory(ModelFactory):
 
-    spec: Tuple[Sequence[int], Sequence[int], Sequence[bool]] = Field(None)
+    blocks_per_section: Sequence[int] = Field(None)
+    section_filters: Sequence[int] = Field(None)
+    use_squeeze_and_excite_in_section: Sequence[bool] = Field(None)
     transition_block: MethodType = Field(None)
     stem_filters: int = Field(64)
 
@@ -143,7 +145,11 @@ class QuickNetBaseFactory(ModelFactory):
         x = stem_module(self.stem_filters, self.image_input)
 
         for block, (layers, filters, use_squeeze_and_excite) in enumerate(
-            zip(*self.spec)
+            zip(
+                self.blocks_per_section,
+                self.section_filters,
+                self.use_squeeze_and_excite_in_section,
+            )
         ):
             for layer in range(layers):
                 if filters == x.shape[-1]:
@@ -172,8 +178,10 @@ class QuickNetBaseFactory(ModelFactory):
 class QuickNetFactory(QuickNetBaseFactory):
     """Quicknet - A model designed for fast inference using [Larq Compute Engine](https://github.com/larq/compute-engine)"""
 
-    spec = Field(
-        lambda: ([2, 3, 4, 4], [64, 128, 256, 512], [False, False, False, False])
+    blocks_per_section: Sequence[int] = Field((2, 3, 4, 4))
+    section_filters: Sequence[int] = Field((64, 128, 256, 512))
+    use_squeeze_and_excite_in_section: Sequence[bool] = Field(
+        (False, False, False, False)
     )
     transition_block = Field(lambda self: self.concat_transition_block)
 
@@ -208,8 +216,10 @@ class QuickNetLargeFactory(QuickNetBaseFactory):
     """QuickNetLarge - A model designed for fast inference using [Larq Compute Engine](https://github.com/larq/compute-engine)
     and high accuracy. This utilises Squeeze and Excite blocks as per [Training binary neural networks with real-to-binary convolutions](https://openreview.net/forum?id=BJg4NgBKvH)."""
 
-    spec = Field(
-        lambda: ([4, 4, 4, 4], [64, 128, 256, 512], [False, False, True, True])
+    blocks_per_section: Sequence[int] = Field((4, 4, 4, 4))
+    section_filters: Sequence[int] = Field((64, 128, 256, 512))
+    use_squeeze_and_excite_in_section: Sequence[bool] = Field(
+        (False, False, True, True)
     )
     transition_block = Field(lambda self: self.fp_pointwise_transition_block)
 
