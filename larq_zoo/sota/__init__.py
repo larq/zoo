@@ -1,3 +1,3 @@
-from larq_zoo.sota.quicknet import QuickNet, QuickNetLarge
+from larq_zoo.sota.quicknet import QuickNet, QuickNetLarge, QuickNetXL
 
-__all__ = ["QuickNet", "QuickNetLarge"]
+__all__ = ["QuickNet", "QuickNetLarge", "QuickNetXL"]

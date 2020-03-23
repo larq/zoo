@@ -248,6 +248,43 @@ class QuickNetLargeFactory(QuickNetBaseFactory):
         return model
 
 
+@factory
+class QuickNetXLFactory(QuickNetBaseFactory):
+    """QuickNetXL - A model designed for fast inference using [Larq Compute Engine](https://github.com/larq/compute-engine)
+    and high accuracy. This utilises Squeeze and Excite blocks as per [Training binary neural networks with real-to-binary convolutions](https://openreview.net/forum?id=BJg4NgBKvH)."""
+
+    blocks_per_section: Sequence[int] = Field((6, 8, 12, 6))
+    section_filters: Sequence[int] = Field((64, 128, 256, 512))
+    use_squeeze_and_excite_in_section: Sequence[bool] = Field(
+        (False, False, True, True)
+    )
+    transition_block = Field(lambda self: self.fp_pointwise_transition_block)
+
+    def build(self) -> tf.keras.models.Model:
+        model = super().build()
+        # Load weights.
+        if self.weights == "imagenet":
+            # Download appropriate file
+            if self.include_top:
+                weights_path = utils.download_pretrained_model(
+                    model="quicknet_xl",
+                    version="v0.1.0",
+                    file="quicknet_xl_weights.h5",
+                    file_hash="a85eea1204fa9a8401f922f94531858493e3518e3374347978ed7ba615410498",
+                )
+            else:
+                weights_path = utils.download_pretrained_model(
+                    model="quicknet_xl",
+                    version="v0.1.0",
+                    file="quicknet_xl_weights_notop.h5",
+                    file_hash="b97074d6618acde4201d1f8676d32272d27743ddfe27c6c97e4516511ebb5008",
+                )
+            model.load_weights(weights_path)
+        elif self.weights is not None:
+            model.load_weights(self.weights)
+        return model
+
+
 def QuickNet(
     *,  # Keyword arguments only
     input_shape: Optional[Sequence[Optional[int]]] = None,
@@ -326,6 +363,49 @@ def QuickNetLarge(
     ValueError: in case of invalid argument for `weights`, or invalid input shape.
     """
     return QuickNetLargeFactory(
+        input_shape=input_shape,
+        input_tensor=input_tensor,
+        weights=weights,
+        include_top=include_top,
+        num_classes=num_classes,
+    ).build()
+
+
+def QuickNetXL(
+    *,  # Keyword arguments only
+    input_shape: Optional[Sequence[Optional[int]]] = None,
+    input_tensor: Optional[tf.Tensor] = None,
+    weights: Optional[str] = "imagenet",
+    include_top: bool = True,
+    num_classes: int = 1000,
+) -> tf.keras.models.Model:
+    """Instantiates the QuickNetXL architecture.
+
+    Optionally loads weights pre-trained on ImageNet.
+
+    ```netron
+    quicknet_xl-v0.1.0/quicknet_xl.json
+    ```
+
+    # Arguments
+    input_shape: Optional shape tuple, to be specified if you would like to use a model
+        with an input image resolution that is not (224, 224, 3).
+        It should have exactly 3 inputs channels.
+    input_tensor: optional Keras tensor (i.e. output of `layers.Input()`) to use as
+        image input for the model.
+    weights: one of `None` (random initialization), "imagenet" (pre-training on
+        ImageNet), or the path to the weights file to be loaded.
+    include_top: whether to include the fully-connected layer at the top of the network.
+    num_classes: optional number of classes to classify images into, only to be specified
+        if `include_top` is True, and if no `weights` argument is specified.
+
+    # Returns
+    A Keras model instance.
+
+    # Raises
+    ValueError: in case of invalid argument for `weights`, or invalid input shape.
+    """
+    return QuickNetXLFactory(
         input_shape=input_shape,
         input_tensor=input_tensor,
         weights=weights,
