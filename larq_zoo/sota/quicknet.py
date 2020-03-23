@@ -9,7 +9,8 @@ from larq_zoo.core import utils
 from larq_zoo.core.model_factory import ModelFactory
 
 
-def LCEFirstLayer(filters: int, x: tf.Tensor) -> tf.Tensor:
+def stem_module(filters: int, x: tf.Tensor) -> tf.Tensor:
+    assert filters % 8 == 0
     x = tf.keras.layers.Conv2D(
         filters // 8,
         (3, 3),
@@ -32,7 +33,11 @@ def LCEFirstLayer(filters: int, x: tf.Tensor) -> tf.Tensor:
 
 
 def squeeze_and_excite(inp: tf.Tensor, filters: int, r: int = 16):
-    """Squeeze and Excite as per [Squeeze-and-Excitation Networks](https://arxiv.org/abs/1709.01507)"""
+    """Squeeze and Excite as per [Squeeze-and-Excitation Networks](https://arxiv.org/abs/1709.01507).
+
+    Use of S&E in BNNs was pioneered in [Training binary neural networks with
+    real-to-binary convolutions](https://openreview.net/forum?id=BJg4NgBKvH).
+    """
     C = inp.get_shape().as_list()[-1]
 
     out = utils.global_pool(inp)
@@ -60,7 +65,7 @@ class QuickNetBaseFactory(ModelFactory):
 
     spec: Tuple[Sequence[int], Sequence[int], Sequence[bool]] = Field(None)
     transition_block: MethodType = Field(None)
-    initial_filters: int = Field(64)
+    stem_filters: int = Field(64)
 
     input_quantizer = Field(lambda: lq.quantizers.SteSign(clip_value=1.25))
     kernel_quantizer = Field(lambda: lq.quantizers.SteSign(clip_value=1.25))
@@ -105,6 +110,8 @@ class QuickNetBaseFactory(ModelFactory):
         """Concat transition block.
 
         Doubles number of filters by concatenating shortcut with x + shortcut.
+        This module is loosely inspired by
+        [MeliusNet](https://arxiv.org/abs/2001.05936).
         """
         infilters = x.get_shape().as_list()[-1]
         assert filters == 2 * infilters
@@ -137,7 +144,7 @@ class QuickNetBaseFactory(ModelFactory):
         return tf.keras.layers.add([x, residual])
 
     def build(self) -> tf.keras.models.Model:
-        x = LCEFirstLayer(self.initial_filters, self.image_input)
+        x = stem_module(self.stem_filters, self.image_input)
 
         for block, (layers, filters, use_squeeze_and_excite) in enumerate(
             zip(*self.spec)
