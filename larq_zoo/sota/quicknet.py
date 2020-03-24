@@ -61,7 +61,7 @@ def squeeze_and_excite(inp: tf.Tensor, filters: int, r: int = 16):
 @factory
 class QuickNetBaseFactory(ModelFactory):
 
-    name: str = Field(None)
+    name: str = "model"
     blocks_per_section: Sequence[int] = Field(None)
     section_filters: Sequence[int] = Field(None)
     use_squeeze_and_excite_in_section: Sequence[bool] = Field(None)
@@ -179,7 +179,7 @@ class QuickNetBaseFactory(ModelFactory):
 class QuickNetFactory(QuickNetBaseFactory):
     """Quicknet - A model designed for fast inference using [Larq Compute Engine](https://github.com/larq/compute-engine)"""
 
-    name = Field("quicknet")
+    name = "quicknet"
     blocks_per_section: Sequence[int] = Field((2, 3, 4, 4))
     section_filters: Sequence[int] = Field((64, 128, 256, 512))
     use_squeeze_and_excite_in_section: Sequence[bool] = Field(
@@ -218,7 +218,7 @@ class QuickNetLargeFactory(QuickNetBaseFactory):
     """QuickNetLarge - A model designed for fast inference using [Larq Compute Engine](https://github.com/larq/compute-engine)
     and high accuracy. This utilises Squeeze and Excite blocks as per [Training binary neural networks with real-to-binary convolutions](https://openreview.net/forum?id=BJg4NgBKvH)."""
 
-    name = Field("quicknet_large")
+    name = "quicknet_large"
     blocks_per_section: Sequence[int] = Field((4, 4, 4, 4))
     section_filters: Sequence[int] = Field((64, 128, 256, 512))
     use_squeeze_and_excite_in_section: Sequence[bool] = Field(
@@ -256,7 +256,7 @@ class QuickNetXLFactory(QuickNetBaseFactory):
     """QuickNetXL - A model designed for fast inference using [Larq Compute Engine](https://github.com/larq/compute-engine)
     and high accuracy. This utilises Squeeze and Excite blocks as per [Training binary neural networks with real-to-binary convolutions](https://openreview.net/forum?id=BJg4NgBKvH)."""
 
-    name = Field("quicknet_xl")
+    name = "quicknet_xl"
     blocks_per_section: Sequence[int] = Field((6, 8, 12, 6))
     section_filters: Sequence[int] = Field((64, 128, 256, 512))
     use_squeeze_and_excite_in_section: Sequence[bool] = Field(
