@@ -29,7 +29,7 @@ setup(
             "pytest>=4.3.1",
             "pytest-cov>=2.6.1",
             "pytest-xdist==1.31.0",
-            "Pillow==7.0.0",
+            "Pillow==7.1.0",
             "scipy==1.4.1",
         ],
     },
