@@ -55,17 +55,16 @@ class MeliusNetFactory(ModelFactory):
 
         x_split = tf.split(x, groups, axis=-1)
 
-        y_split = []
-        for i in range(groups):
-            y_split.append(
-                tf.keras.layers.Conv2D(
-                    filters // groups,
-                    kernel,
-                    padding="same",
-                    use_bias=self.use_conv_bias,
-                    kernel_initializer=self.kernel_initializer,
-                )(x_split[i])
-            )
+y_split = [
+    tf.keras.layers.Conv2D(
+        filters // groups,
+        kernel,
+        padding="same",
+        use_bias=self.use_conv_bias,
+        kernel_initializer=self.kernel_initializer,
+    )(split)
+    for split in x_split
+]
 
         return tf.concat(y_split, axis=-1)
 
@@ -89,40 +88,35 @@ class MeliusNetFactory(ModelFactory):
         x = self.norm(x)
         x = self.act(x)
 
-        x = self.pool(x)
-
-        return x
+        return self.pool(x)
 
     def dense_block(self, x):
         w = x
         w = self.norm(w)
         w = self.quant_conv(w, 64, 3)
-        y = tf.concat([x, w], axis=-1)
-        return y
+        return tf.concat([x, w], axis=-1)
 
     def improvement_block(self, x):
         w = x
         w = self.norm(w)
         w = self.quant_conv(w, 64, 3)
-        f_in = x.shape.as_list()[-1]
-        return tf.math.add(x, tf.pad(w, [[0, 0], [0, 0], [0, 0], [f_in - 64, 0]]))
+        f_in = int(x.shape[-1])
+        return x + tf.pad(w, [[0, 0], [0, 0], [0, 0], [f_in - 64, 0]])
 
     def transition_block(self, x, filters):
         x = self.norm(x)
         x = self.pool(x)
         x = self.act(x)
-        x = tf.keras.layers.Conv2D(
+        return tf.keras.layers.Conv2D(
             filters,
             1,
             use_bias=self.use_conv_bias,
             kernel_initializer=self.kernel_initializer,
         )(x)
-        return x
 
     def block(self, x):
         x = self.dense_block(x)
-        x = self.improvement_block(x)
-        return x
+        return self.improvement_block(x)
 
     def build(self) -> tf.keras.models.Model:
         x = self.input_tensor
@@ -138,9 +132,9 @@ class MeliusNetFactory(ModelFactory):
         x = tf.keras.layers.GlobalAvgPool2D()(x)
         x = tf.keras.layers.Dense(
             self.num_classes,
-            activation="softmax",
             kernel_initializer=self.kernel_initializer,
         )(x)
+        x = tf.keras.layers.Activation("softmax", dtype="float32")(x)
 
         model = tf.keras.models.Model(
             inputs=self.input_tensor, outputs=x, name=self.name
