@@ -18,20 +18,21 @@ class MeliusNetFactory(ModelFactory):
     name: str
 
     # Some default layer arguments.
-    use_conv_bias: bool = Field(False)
     batch_norm_momentum: float = Field(0.9)
     kernel_initializer: Optional[Union[str, tf.keras.initializers.Initializer]] = Field(
         "glorot_normal"
     )
-    input_quantizer = Field("ste_sign")
-    kernel_quantizer = Field("ste_sign")
+    input_quantizer = Field(lq.quantizers.SteSign(1.3))
+    kernel_quantizer = Field(lq.quantizers.SteSign(1.3))
     kernel_constraint = Field("weight_clip")
 
     def pool(self, x):
         return tf.keras.layers.MaxPool2D(2, strides=2, padding="same")(x)
 
     def norm(self, x):
-        return tf.keras.layers.BatchNormalization(momentum=self.batch_norm_momentum)(x)
+        return tf.keras.layers.BatchNormalization(
+            momentum=self.batch_norm_momentum, epsilon=1e-5
+        )(x)
 
     def act(self, x):
         return tf.keras.layers.Activation("relu")(x)
@@ -42,7 +43,7 @@ class MeliusNetFactory(ModelFactory):
             kernel,
             strides=strides,
             padding="same",
-            use_bias=self.use_conv_bias,
+            use_bias=False,
             input_quantizer=self.input_quantizer,
             kernel_quantizer=self.kernel_quantizer,
             kernel_constraint=self.kernel_constraint,
@@ -55,16 +56,16 @@ class MeliusNetFactory(ModelFactory):
 
         x_split = tf.split(x, groups, axis=-1)
 
-y_split = [
-    tf.keras.layers.Conv2D(
-        filters // groups,
-        kernel,
-        padding="same",
-        use_bias=self.use_conv_bias,
-        kernel_initializer=self.kernel_initializer,
-    )(split)
-    for split in x_split
-]
+        y_split = [
+            tf.keras.layers.Conv2D(
+                filters // groups,
+                kernel,
+                padding="same",
+                use_bias=False,
+                kernel_initializer=self.kernel_initializer,
+            )(split)
+            for split in x_split
+        ]
 
         return tf.concat(y_split, axis=-1)
 
@@ -74,7 +75,7 @@ y_split = [
             3,
             strides=2,
             padding="same",
-            use_bias=self.use_conv_bias,
+            use_bias=False,
             kernel_initializer=self.kernel_initializer,
         )(x)
         x = self.norm(x)  # compare Fig 2 and Fig 3
@@ -108,10 +109,7 @@ y_split = [
         x = self.pool(x)
         x = self.act(x)
         return tf.keras.layers.Conv2D(
-            filters,
-            1,
-            use_bias=self.use_conv_bias,
-            kernel_initializer=self.kernel_initializer,
+            filters, 1, use_bias=False, kernel_initializer=self.kernel_initializer
         )(x)
 
     def block(self, x):
@@ -129,10 +127,9 @@ y_split = [
 
         x = self.norm(x)
         x = self.act(x)
-        x = tf.keras.layers.GlobalAvgPool2D()(x)
+        x = utils.global_pool(x)
         x = tf.keras.layers.Dense(
-            self.num_classes,
-            kernel_initializer=self.kernel_initializer,
+            self.num_classes, kernel_initializer=self.kernel_initializer
         )(x)
         x = tf.keras.layers.Activation("softmax", dtype="float32")(x)
 
