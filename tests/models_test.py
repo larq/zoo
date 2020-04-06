@@ -2,7 +2,6 @@ import functools
 import os
 from pathlib import Path
 
-import larq as lq
 import numpy as np
 import pytest
 from tensorflow import keras
@@ -35,16 +34,16 @@ def parametrize(func):
         [
             (lqz.literature.BinaryAlexNet, 256),
             (lqz.literature.BiRealNet, 512),
-            (lqz.literature.BinaryResNetE18, 512),
-            (lqz.literature.BinaryDenseNet28, 576),
-            (lqz.literature.BinaryDenseNet37, 640),
-            (lqz.literature.BinaryDenseNet37Dilated, 640),
-            (lqz.literature.BinaryDenseNet45, 800),
-            (lqz.literature.XNORNet, 4096),
-            (lqz.literature.DoReFaNet, 256),
-            (lqz.sota.QuickNet, 512),
-            (lqz.sota.QuickNetLarge, 512),
-            (lqz.sota.QuickNetXL, 512),
+            # (lqz.literature.BinaryResNetE18, 512),
+            # (lqz.literature.BinaryDenseNet28, 576),
+            # (lqz.literature.BinaryDenseNet37, 640),
+            # (lqz.literature.BinaryDenseNet37Dilated, 640),
+            # (lqz.literature.BinaryDenseNet45, 800),
+            # (lqz.literature.XNORNet, 4096),
+            # (lqz.literature.DoReFaNet, 256),
+            # (lqz.sota.QuickNet, 512),
+            # (lqz.sota.QuickNetLarge, 512),
+            # (lqz.sota.QuickNetXL, 512),
         ],
     )(func)
 
@@ -97,26 +96,25 @@ def test_no_top_variable_shape_4(app, last_feature_dim):
 
 
 @parametrize
-def test_model_summary(app, last_feature_dim, capsys, snapshot):
+def test_model_summary(app, last_feature_dim, snapshot):
     input_tensor = keras.layers.Input(shape=(224, 224, 3))
     model = app(weights=None, input_tensor=input_tensor)
-    lq.models.summary(model)
-    out, err = capsys.readouterr()
+    json = str(model.to_json())
 
     summary_file = (
         Path(__file__).parent
         / "snapshots"
         / "model_summaries"
-        / f"{app.__name__}_{last_feature_dim}.txt"
+        / f"{app.__name__}_{last_feature_dim}.json"
     )
 
     if summary_file.exists():
         with open(summary_file, "r") as file:
             content = file.read()
-        assert content == out
+        assert content == json
     else:
         with open(summary_file, "w") as file:
-            file.write(out)
+            file.write(json)
         raise FileNotFoundError(
             f"Could not find snapshot {summary_file}, so generated a new summary. "
             "If this was intentional, re-running the tests locally will make them pass."

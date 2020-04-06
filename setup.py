@@ -31,6 +31,7 @@ setup(
             "pytest-xdist==1.31.0",
             "Pillow==7.1.1",
             "scipy==1.4.1",
+            "snapshottest>=0.5.1",
         ],
     },
     entry_points="""
