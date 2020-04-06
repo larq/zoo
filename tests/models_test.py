@@ -118,7 +118,7 @@ def test_model_summary(app, last_feature_dim, capsys, snapshot):
         with open(summary_file, "w") as file:
             file.write(out)
         raise FileNotFoundError(
-            f"Could not find snapshot {summary_file}, generated new summary!"
+            f"Could not find snapshot {summary_file}, so generated a new summary. "
             "If this was intentional, re-running the tests locally will make them pass."
         )
 
