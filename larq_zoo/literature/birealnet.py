@@ -4,8 +4,8 @@ import larq as lq
 import tensorflow as tf
 from zookeeper import Field, factory
 
-from larq_zoo import utils
-from larq_zoo.model_factory import ModelFactory
+from larq_zoo.core import utils
+from larq_zoo.core.model_factory import ModelFactory
 
 
 @factory
@@ -86,8 +86,9 @@ class BiRealNetFactory(ModelFactory):
 
         # Layer 18
         if self.include_top:
-            out = tf.keras.layers.GlobalAvgPool2D()(out)
-            out = tf.keras.layers.Dense(self.num_classes, activation="softmax")(out)
+            out = utils.global_pool(out)
+            out = tf.keras.layers.Dense(self.num_classes)(out)
+            out = tf.keras.layers.Activation("softmax", dtype="float32")(out)
 
         model = tf.keras.Model(inputs=self.image_input, outputs=out, name="birealnet18")
 

@@ -44,6 +44,7 @@ def parametrize(func):
             (lqz.literature.DoReFaNet, 256),
             (lqz.sota.QuickNet, 512),
             (lqz.sota.QuickNetLarge, 512),
+            (lqz.sota.QuickNetXL, 512),
         ],
     )(func)
 

@@ -5,13 +5,19 @@ import sys
 from typing import Optional
 
 import tensorflow as tf
-from keras_applications.imagenet_utils import _obtain_input_shape
 from tensorflow import keras
 from tensorflow.keras.applications.vgg16 import (
     decode_predictions as keras_decode_predictions,
 )
 from tensorflow.python.eager.context import num_gpus
 from tensorflow.python.keras.backend import is_keras_tensor
+
+try:
+    from tensorflow.python.keras.applications.imagenet_utils import obtain_input_shape
+except ImportError:
+    from keras_applications.imagenet_utils import (
+        _obtain_input_shape as obtain_input_shape,
+    )
 
 
 def slash_join(*args):
@@ -85,10 +91,10 @@ def validate_input(input_shape, weights, include_top, classes):
         )
 
     # Determine proper input shape
-    return _obtain_input_shape(
+    return obtain_input_shape(
         input_shape,
         default_size=224,
-        min_size=64,
+        min_size=0,
         data_format=keras.backend.image_data_format(),
         require_flatten=include_top,
         weights=weights,
@@ -101,6 +107,51 @@ def get_input_layer(input_shape, input_tensor):
     if not is_keras_tensor(input_tensor):
         return keras.layers.Input(tensor=input_tensor, shape=input_shape)
     return input_tensor
+
+
+def global_pool(
+    x: tf.Tensor, data_format: str = "channels_last", name: str = None
+) -> tf.Tensor:
+    """Global average 2D pooling and flattening.
+
+    Alternative to existing Keras implementation of GlobalAveragePooling2D.
+    AveragePooling2D is much faster than GlobalAveragePooling2D on Larq Compute Engine.
+    If the width or height of the input is dynamic, the function falls back to
+    GlobalAveragePooling2D.
+
+    # Arguments
+    x: 4D TensorFlow tensor.
+    data_format: A string, one of channels_last (default) or
+        channels_first. The ordering of the dimensions in the inputs. channels_last
+        corresponds to inputs with shape (batch, height, width, channels) while
+        channels_first corresponds to inputs with shape (batch, channels, height,
+        width). It defaults to "channels_last".
+    name: String name of the layer
+
+    # Returns
+    2D TensorFlow tensor.
+
+    # Raises
+    ValueError: if tensor is not 4D or data_format is not recognized.
+    """
+    if len(x.get_shape()) != 4:
+        raise ValueError("Tensor is not 4D.")
+    if data_format not in ["channels_last", "channels_first"]:
+        raise ValueError("data_format not recognized.")
+
+    try:
+        input_shape = x.get_shape().as_list()
+        pool_size = (
+            input_shape[1:3] if data_format == "channels_last" else input_shape[2:4]
+        )
+        x = keras.layers.AveragePooling2D(pool_size=pool_size, data_format=data_format)(
+            x
+        )
+        x = keras.layers.Flatten()(x)
+    except ValueError:
+        x = keras.layers.GlobalAveragePooling2D(data_format=data_format, name=name)(x)
+
+    return x
 
 
 def decode_predictions(preds, top=5, **kwargs):

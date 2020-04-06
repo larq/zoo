@@ -1,14 +1,14 @@
 import pytest
 from click.testing import CliRunner
 
-from larq_zoo import experiments
-from tests import dummy_datasets  # noqa -- Needed to register the dummy dataset.
+from larq_zoo.training import basic_experiments
+from tests import dummy_datasets  # noqa
 
 
-@pytest.mark.parametrize("command", list(experiments.cli.commands.keys()))
+@pytest.mark.parametrize("command", list(basic_experiments.cli.commands.keys()))
 def test_cli(command):
     result = CliRunner().invoke(
-        experiments.cli,
+        basic_experiments.cli,
         [
             command,
             "dataset=DummyOxfordFlowers",

@@ -15,7 +15,7 @@ from larq_zoo.literature.densenet import (
 from larq_zoo.literature.dorefanet import DoReFaNetFactory
 from larq_zoo.literature.resnet_e import BinaryResNetE18Factory
 from larq_zoo.literature.xnornet import XNORNetFactory
-from larq_zoo.train import TrainLarqZooModel
+from larq_zoo.training.train import TrainLarqZooModel
 
 
 @task

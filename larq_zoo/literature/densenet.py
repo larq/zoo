@@ -4,8 +4,8 @@ import larq as lq
 import tensorflow as tf
 from zookeeper import Field, factory
 
-from larq_zoo import utils
-from larq_zoo.model_factory import ModelFactory
+from larq_zoo.core import utils
+from larq_zoo.core.model_factory import ModelFactory
 
 
 # A type alias only for type-checking.
@@ -95,10 +95,11 @@ class BinaryDenseNetFactory(ModelFactory):
         x = tf.keras.layers.Activation("relu")(x)
 
         if self.include_top:
-            x = tf.keras.layers.GlobalAvgPool2D()(x)
-            x = tf.keras.layers.Dense(
-                self.num_classes, activation="softmax", kernel_initializer="he_normal"
-            )(x)
+            x = utils.global_pool(x)
+            x = tf.keras.layers.Dense(self.num_classes, kernel_initializer="he_normal")(
+                x
+            )
+            x = tf.keras.layers.Activation("softmax", dtype="float32")(x)
 
         model = BinaryDenseNet(inputs=self.image_input, outputs=x, name=self.name)
 

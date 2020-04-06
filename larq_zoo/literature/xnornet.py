@@ -4,8 +4,8 @@ import larq as lq
 import tensorflow as tf
 from zookeeper import Field, factory
 
-from larq_zoo import utils
-from larq_zoo.model_factory import ModelFactory
+from larq_zoo.core import utils
+from larq_zoo.core.model_factory import ModelFactory
 
 
 @lq.utils.set_precision(1)
@@ -100,7 +100,7 @@ class XNORNetFactory(ModelFactory):
                 use_bias=False,
                 kernel_regularizer=self.kernel_regularizer,
             )(x)
-            x = tf.keras.layers.Activation("softmax")(x)
+            x = tf.keras.layers.Activation("softmax", dtype="float32")(x)
 
         model = tf.keras.models.Model(
             inputs=self.image_input, outputs=x, name="xnornet"
