@@ -8,10 +8,11 @@ from typing import Callable, List, Union
 import click
 import larq as lq
 import tensorflow as tf
-from larq_zoo import utils
 from tensorflow import keras
 from zookeeper import Field
 from zookeeper.tf import Experiment
+
+from larq_zoo import utils
 
 
 class TrainLarqZooModel(Experiment):

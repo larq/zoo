@@ -1,6 +1,7 @@
 from typing import Sequence
 
 import tensorflow as tf
+from zookeeper import ComponentField, Field, cli, task
 
 from larq_zoo.literature.binary_alex_net import BinaryAlexNetFactory
 from larq_zoo.literature.birealnet import BiRealNetFactory
@@ -15,7 +16,6 @@ from larq_zoo.literature.dorefanet import DoReFaNetFactory
 from larq_zoo.literature.resnet_e import BinaryResNetE18Factory
 from larq_zoo.literature.xnornet import XNORNetFactory
 from larq_zoo.train import TrainLarqZooModel
-from zookeeper import ComponentField, Field, cli, task
 
 
 @task
