@@ -3,11 +3,10 @@ import os
 from pathlib import Path
 
 import larq as lq
+import larq_zoo as lqz
 import numpy as np
 import pytest
 from tensorflow import keras
-
-import larq_zoo as lqz
 from zookeeper import cli
 
 
@@ -116,13 +115,17 @@ def test_model_summary(app, last_feature_dim, capsys, snapshot):
     else:
         with open(summary_file, "w") as file:
             file.write(out)
+        raise FileNotFoundError(
+            f"Could not find snapshot {summary_file}, generated new summary!"
+            "If this was intentional, re-running the tests locally will make them pass."
+        )
 
 
 @pytest.mark.parametrize("command_name", cli.commands.keys())
 def test_experiments(command_name: str, snapshot, capsys):
     try:
         cli.commands[command_name](
-            ["dataset=DummyOxfordFlowers", "batch_size=8", "testing=True"]
+            ["dataset=DummyOxfordFlowers", "batch_size=2", "dry_run=True"]
         )
     # Catch successful SystemExit to prevent exception
     except SystemExit as e:

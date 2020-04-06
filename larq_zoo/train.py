@@ -8,9 +8,8 @@ from typing import Callable, List, Union
 import click
 import larq as lq
 import tensorflow as tf
-from tensorflow import keras
-
 from larq_zoo import utils
+from tensorflow import keras
 from zookeeper import Field
 from zookeeper.tf import Experiment
 
@@ -26,7 +25,7 @@ class TrainLarqZooModel(Experiment):
     use_progress_bar: bool = Field(False)
 
     # Whether this experiment is compilation-only (i.e. no training)
-    testing: bool = Field(False)
+    dry_run: bool = Field(False)
 
     # How often to run validation.
     validation_frequency: int = Field(1)
@@ -118,7 +117,7 @@ class TrainLarqZooModel(Experiment):
                 self.model.load_weights(self.model_path)
                 print(f"Loaded model from epoch {initial_epoch}.")
 
-        if self.testing:
+        if self.dry_run:
             click.secho("Dry run: Not starting training!", fg="green")
             return
 
