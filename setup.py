@@ -8,7 +8,7 @@ def readme():
 
 setup(
     name="larq-zoo",
-    version="1.0.b2",
+    version="1.0.b4",
     author="Plumerai",
     author_email="lukas@plumerai.co.uk",
     description="Reference implementations of popular Binarized Neural Networks",
@@ -17,7 +17,7 @@ setup(
     url="https://github.com/plumerai/larq-zoo",
     packages=find_packages(),
     license="Apache 2.0",
-    install_requires=["numpy~=1.15", "larq~=0.8.4", "zookeeper~=1.0.b5"],
+    install_requires=["numpy~=1.15", "larq>=0.9.2,<0.10.0", "zookeeper~=1.0.b5"],
     extras_require={
         "tensorflow": ["tensorflow>=1.14.0"],
         "tensorflow_gpu": ["tensorflow-gpu>=1.14.0"],
@@ -29,7 +29,7 @@ setup(
             "pytest>=4.3.1",
             "pytest-cov>=2.6.1",
             "pytest-xdist==1.31.0",
-            "Pillow==7.0.0",
+            "Pillow==7.1.1",
             "scipy==1.4.1",
         ],
     },

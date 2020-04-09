@@ -4,8 +4,8 @@ import larq as lq
 import tensorflow as tf
 from zookeeper import Field, factory
 
-from larq_zoo import utils
-from larq_zoo.model_factory import ModelFactory
+from larq_zoo.core import utils
+from larq_zoo.core.model_factory import ModelFactory
 
 
 @factory
@@ -60,7 +60,6 @@ class BinaryResNetE18Factory(ModelFactory):
             kernel_constraint=self.kernel_constraint,
             kernel_initializer="glorot_normal",
             use_bias=False,
-            metrics=[],
         )(x)
         x = tf.keras.layers.BatchNormalization(momentum=0.9, epsilon=1e-5)(x)
 
@@ -101,12 +100,11 @@ class BinaryResNetE18Factory(ModelFactory):
         x = tf.keras.layers.Activation("relu")(x)
 
         if self.include_top:
-            x = tf.keras.layers.GlobalAvgPool2D()(x)
+            x = utils.global_pool(x)
             x = tf.keras.layers.Dense(
-                self.num_classes,
-                activation="softmax",
-                kernel_initializer="glorot_normal",
+                self.num_classes, kernel_initializer="glorot_normal"
             )(x)
+            x = tf.keras.layers.Activation("softmax", dtype="float32")(x)
 
         model = tf.keras.Model(
             inputs=self.image_input,

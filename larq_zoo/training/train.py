@@ -12,7 +12,7 @@ from tensorflow import keras
 from zookeeper import Field
 from zookeeper.tf import Experiment
 
-from larq_zoo import utils
+from larq_zoo.core import utils
 
 
 class TrainLarqZooModel(Experiment):
