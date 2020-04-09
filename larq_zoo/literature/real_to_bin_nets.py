@@ -10,8 +10,8 @@ import larq as lq
 import tensorflow as tf
 from zookeeper import Field, factory
 
-from core import utils
-from core.model_factory import ModelFactory, QuantizerType
+from larq_zoo.core import utils
+from larq_zoo.core.model_factory import ModelFactory, QuantizerType
 
 
 class _SharedBaseFactory(ModelFactory):
@@ -39,24 +39,24 @@ class _SharedBaseFactory(ModelFactory):
             momentum=self.momentum, name=f"{name}_batch_norm"
         )(x)
 
-        # Binary blocks use PReLU, ResNet blocks use ReLU
+        # StrongBaselineNet uses PReLU; ResNets and Real-to-Bin nets use ReLU.
         if use_prelu:
             x = tf.keras.layers.PReLU(shared_axes=[1, 2], name=f"{name}_prelu")(x)
         else:
-            x = tf.keras.layers.Activation("relu", name=f"{name}_relu")(x)
+            x = tf.keras.layers.ReLU(name=f"{name}_relu")(x)
 
         return tf.keras.layers.MaxPool2D(
             3, strides=2, padding="same", name=f"{name}_pool"
         )(x)
 
     def _last_block(self, x, name=""):
-        """Last block, shared across ResNet StrongBaselineNet and Real-to-Bin nets."""
+        """Last block, shared across ResNet, StrongBaselineNet and Real-to-Bin nets."""
 
         x = tf.keras.layers.GlobalAvgPool2D(name=f"{name}_global_pool")(x)
         x = tf.keras.layers.Dense(
             self.num_classes, activation=None, name=f"{name}_logits",
         )(x)
-        return tf.keras.layers.Activation(activation="softmax", name=f"{name}_probs")(x)
+        return tf.keras.layers.Softmax(name=f"{name}_probs")(x)
 
     def _block(self, x, downsample=False, name=""):
         """Main network block, different between ResNet and StrongBaseline / Real-to-Bin Nets.
@@ -76,7 +76,7 @@ class _SharedBaseFactory(ModelFactory):
         )(x)
         x = tf.keras.layers.Conv2D(
             out_channels,
-            1,
+            kernel_size=1,
             kernel_initializer=self.kernel_initializer,
             kernel_regularizer=self.kernel_regularizer,
             use_bias=False,
@@ -140,7 +140,7 @@ class StrongBaselineNetFactory(_SharedBaseFactory):
             super().__init__(**kwargs)
             assert (
                 len(output_dim) == 3
-            ), f"expected 3 dimensional output size, got {len(output_dim)} dimensional instead"
+            ), f"expected 3-dimensional output size, got {len(output_dim)}-dimensional"
             self.output_dim = output_dim
 
         def build(self, input_shapes):
@@ -177,9 +177,12 @@ class StrongBaselineNetFactory(_SharedBaseFactory):
     def _scale_binary_conv_output(
         self, conv_input: tf.Tensor, conv_output: tf.Tensor, name: str
     ):
-        """"The way in which the output of the binary convolution is scaled is the only structural difference
-        between the StrongBaseline networks and the Real-to-Binary networks. This function accepts all inputs
-        required for either function."""
+        """Flexible wrapper for the `LearnedRescaleLayer`.
+        
+        The way in which the output of the binary convolution is scaled is the only
+        structural difference between the StrongBaseline networks and the Real-to-Binary
+        networks. This function accepts all inputs required for either function.
+        """
         return self.LearnedRescaleLayer(conv_output.shape[1:], name=f"{name}_rescale",)(
             conv_output
         )
@@ -209,7 +212,7 @@ class StrongBaselineNetFactory(_SharedBaseFactory):
         # Convolution
         conv_output = lq.layers.QuantConv2D(
             out_channels,
-            3,
+            kernel_size=3,
             strides=2 if downsample else 1,
             padding="same",
             input_quantizer=self.input_quantizer,
@@ -234,7 +237,8 @@ class StrongBaselineNetFactory(_SharedBaseFactory):
         x = self._half_binary_block(x, downsample=downsample, name=f"{name}a")
         x = self._half_binary_block(x, downsample=False, name=f"{name}b")
 
-        # Add explicit name to the block output for attention matching (Section 4.2 of Martinez et al.)
+        # Add explicit name to the block output for attention matching (Section 4.2 of 
+        # Martinez et al.)
         return tf.keras.layers.Lambda(lambda x: x, name=f"{name}_out")(x)
 
     def _get_weights_path(self):
@@ -329,7 +333,6 @@ class ResNet18Factory(_SharedBaseFactory):
         """One full residual block, consisting of two convolutions.
 
         This follows the definition of a "block" from Figure 1 (Left) of Martinez et al.
-        (2019).
         """
 
         in_channels = x.shape[-1]
@@ -352,7 +355,7 @@ class ResNet18Factory(_SharedBaseFactory):
             x = tf.keras.layers.Activation("relu", name=f"{name}{convolution}_relu")(x)
 
         x = tf.keras.layers.Add(name=f"{name}_skip_add")([x, shortcut_add])
-        return tf.keras.layers.Activation("relu", name=f"{name}_out")(x)
+        return tf.keras.layers.ReLU(name=f"{name}_out")(x)
 
 
 @factory
