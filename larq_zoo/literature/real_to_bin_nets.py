@@ -1,6 +1,6 @@
-"""
-This file implements the networks described in `Training binary neural networks with
+"""This file implements the networks described in `Training binary neural networks with
 real-to-binary convolutions`
+
 [(Martinez et al., 2019)](https://openreview.net/forum?id=BJg4NgBKvH)
 """
 
@@ -15,14 +15,15 @@ from larq_zoo.core.model_factory import ModelFactory, QuantizerType
 
 
 class _SharedBaseFactory(ModelFactory):
-    """Base configuration and blocks shared across ResNet, StrongBaselineNets and Real-to-Bin Nets."""
+    """Base configuration and blocks shared across ResNet, StrongBaselineNets and Real-
+    to-Bin Nets."""
 
     model_name: str = Field()
     momentum: float = Field(0.99)
     kernel_initializer: str = Field("glorot_normal")
     kernel_regularizer: Optional[tf.keras.regularizers.Regularizer] = Field(None)
 
-    def _first_block(self, x, use_prelu=True, name=""):
+    def first_block(self, x, use_prelu=True, name=""):
         """First block, shared across ResNet, StrongBaselineNet and Real-to-Bin Nets."""
 
         x = tf.keras.layers.Conv2D(
@@ -49,7 +50,7 @@ class _SharedBaseFactory(ModelFactory):
             3, strides=2, padding="same", name=f"{name}_pool"
         )(x)
 
-    def _last_block(self, x, name=""):
+    def last_block(self, x, name=""):
         """Last block, shared across ResNet, StrongBaselineNet and Real-to-Bin nets."""
 
         x = tf.keras.layers.GlobalAvgPool2D(name=f"{name}_global_pool")(x)
@@ -58,15 +59,16 @@ class _SharedBaseFactory(ModelFactory):
         )(x)
         return tf.keras.layers.Softmax(name=f"{name}_probs")(x)
 
-    def _block(self, x, downsample=False, name=""):
-        """Main network block, different between ResNet and StrongBaseline / Real-to-Bin Nets.
+    def block(self, x, downsample=False, name=""):
+        """Main network block
 
-        This is left to be implemented by the ResNet18 and StrongBaselineNet subclasses.
+        This block differs between ResNet and StrongBaseline / Real-to-Bin Nets.
+        It is implemented by the ResNet18 and StrongBaselineNet subclasses.
         """
 
         raise NotImplementedError()
 
-    def _shortcut_connection(
+    def shortcut_connection(
         self, x: tf.Tensor, name: str, in_channels: int, out_channels: int
     ):
         if in_channels == out_channels:
@@ -89,20 +91,20 @@ class _SharedBaseFactory(ModelFactory):
     def build(self) -> tf.keras.models.Model:
         """Build the model."""
 
-        x = self._first_block(
+        x = self.first_block(
             self.image_input,
             name=f"{self.model_name}_block_1",
             use_prelu=isinstance(self, StrongBaselineNetFactory),
         )
         for block in range(2, 10):
-            x = self._block(
+            x = self.block(
                 x,
                 name=f"{self.model_name}_block_{block}",
                 downsample=block % 2 == 0 and block > 3,
             )
 
         if self.include_top:
-            x = self._last_block(x, name=f"{self.model_name}_block_10")
+            x = self.last_block(x, name=f"{self.model_name}_block_10")
 
         model = tf.keras.Model(
             inputs=self.image_input, outputs=x, name=self.model_name,
@@ -132,8 +134,8 @@ class StrongBaselineNetFactory(_SharedBaseFactory):
         """Implements the learned activation rescaling XNOR-Net++ style.
 
         This is used to scale the outputs of the binary convolutions in the Strong
-        Baseline networks.
-        [(Bulat & Tzimiropoulos, 2019)](https://arxiv.org/abs/1909.13863)
+        Baseline networks. [(Bulat & Tzimiropoulos,
+        2019)](https://arxiv.org/abs/1909.13863)
         """
 
         def __init__(self, output_dim: tuple, **kwargs):
@@ -178,18 +180,19 @@ class StrongBaselineNetFactory(_SharedBaseFactory):
         self, conv_input: tf.Tensor, conv_output: tf.Tensor, name: str
     ):
         """Flexible wrapper for the `LearnedRescaleLayer`.
-        
+
         The way in which the output of the binary convolution is scaled is the only
         structural difference between the StrongBaseline networks and the Real-to-Binary
         networks. This function accepts all inputs required for either function.
+
+        The Strong Baseline network uses the learned static rescale layer of
+        Bulat & Tzimiropoulos
         """
         return self.LearnedRescaleLayer(conv_output.shape[1:], name=f"{name}_rescale",)(
             conv_output
         )
 
-    def _half_binary_block(
-        self, x: tf.Tensor, downsample: bool = False, name: str = ""
-    ):
+    def half_binary_block(self, x: tf.Tensor, downsample: bool = False, name: str = ""):
         """One half of the binary block from Figure 1 (Left) of Martinez et al. (2019).
 
         This block gets repeated and matched up with/supervised by a single real block,
@@ -202,7 +205,7 @@ class StrongBaselineNetFactory(_SharedBaseFactory):
         out_channels = in_channels * 2 if downsample else in_channels
 
         # Shortcut, which gets downsampled if necessary
-        shortcut_add = self._shortcut_connection(x, name, in_channels, out_channels)
+        shortcut_add = self.shortcut_connection(x, name, in_channels, out_channels)
 
         # Batch Normalization
         conv_input = tf.keras.layers.BatchNormalization(
@@ -231,13 +234,16 @@ class StrongBaselineNetFactory(_SharedBaseFactory):
         # Skip connection
         return tf.keras.layers.Add(name=f"{name}_skip_add")([x, shortcut_add])
 
-    def _block(self, x, downsample=False, name=""):
-        """Full binary block from Figure 1 (Left) of Matrinez et al. (2019)."""
+    def block(self, x, downsample=False, name=""):
+        """Full binary block from Figure 1 (Left) of Matrinez et al.
 
-        x = self._half_binary_block(x, downsample=downsample, name=f"{name}a")
-        x = self._half_binary_block(x, downsample=False, name=f"{name}b")
+        (2019).
+        """
 
-        # Add explicit name to the block output for attention matching (Section 4.2 of 
+        x = self.half_binary_block(x, downsample=downsample, name=f"{name}a")
+        x = self.half_binary_block(x, downsample=False, name=f"{name}b")
+
+        # Add explicit name to the block output for attention matching (Section 4.2 of
         # Martinez et al.)
         return tf.keras.layers.Lambda(lambda x: x, name=f"{name}_out")(x)
 
@@ -271,8 +277,10 @@ class RealToBinNetFactory(StrongBaselineNetFactory):
     def _scale_binary_conv_output(
         self, conv_input: tf.Tensor, conv_output: tf.Tensor, name: str
     ):
-        """Data-dependent (squeeze and excite style) scaling of the convolution output as described in
-        Section 4.3 of Martinez at. al.
+        """Data-dependent convolution scaling.
+
+        Scales the output of the convolution in the 'data-dependent` squeeze-and-excite
+        style as described in Section 4.3 of Martinez at. al.
         """
         in_filters = conv_input.shape[-1]
         out_filters = conv_output.shape[-1]
@@ -329,7 +337,7 @@ class RealToBinNetFactory(StrongBaselineNetFactory):
 class ResNet18Factory(_SharedBaseFactory):
     """Constructor for a ResNet18 with layer names matching Real-to-Bin nets."""
 
-    def _block(self, x, downsample=False, name=""):
+    def block(self, x, downsample=False, name=""):
         """One full residual block, consisting of two convolutions.
 
         This follows the definition of a "block" from Figure 1 (Left) of Martinez et al.
@@ -339,7 +347,7 @@ class ResNet18Factory(_SharedBaseFactory):
         out_channels = in_channels * 2 if downsample else in_channels
 
         # Shortcut, which gets downsampled if necessary
-        shortcut_add = self._shortcut_connection(x, name, in_channels, out_channels)
+        shortcut_add = self.shortcut_connection(x, name, in_channels, out_channels)
 
         for convolution in ["a", "b"]:
             x = tf.keras.layers.Conv2D(
@@ -405,7 +413,7 @@ def StrongR2BBaselineBNN(
     include_top: bool = True,
     num_classes: int = 1000,
 ) -> tf.keras.models.Model:
-    """Instantiates the BNN version of the Strong Baseline network from Martinez et. al. (2019).
+    """Instantiates the BNN version of the Strong Baseline network from Martinez et. al.
 
     Optionally loads weights pre-trained on ImageNet.
 
@@ -455,7 +463,7 @@ def RealToBinaryBNN(
     include_top: bool = True,
     num_classes: int = 1000,
 ) -> tf.keras.models.Model:
-    """Instantiates the BNN version of the Real-to-Binary network from Martinez et. al. (2019).
+    """Instantiates the BNN version of the Real-to-Binary network from Martinez et. al.
 
     Optionally loads weights pre-trained on ImageNet.
 
