@@ -279,8 +279,8 @@ class RealToBinNetFactory(StrongBaselineNetFactory):
     ):
         """Data-dependent convolution scaling.
 
-        Scales the output of the convolution in the 'data-dependent` squeeze-and-excite
-        style as described in Section 4.3 of Martinez at. al.
+        Scales the output of the convolution in the (squeeze-and-excite
+        style) data-dependent way described in Section 4.3 of Martinez at. al.
         """
         in_filters = conv_input.shape[-1]
         out_filters = conv_output.shape[-1]
