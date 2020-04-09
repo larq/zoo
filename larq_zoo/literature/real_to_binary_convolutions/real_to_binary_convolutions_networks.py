@@ -1,81 +1,36 @@
 """
-This file implements the networks described in
-`[Martinez et. al., 2020, Training binary neural networks with real-to-binary convolutions](https://openreview.net/forum?id=BJg4NgBKvH)`
+This file implements the networks described in `Training binary neural networks with
+real-to-binary convolutions`
+[(Martinez et al., 2019)](https://openreview.net/forum?id=BJg4NgBKvH)
 """
-from typing import Optional, Any
+
+from typing import Optional, Sequence
 
 import larq as lq
 import tensorflow as tf
-from zookeeper import Field
-from zookeeper.core import component
+from zookeeper import Field, factory
 
-from larq_zoo.literature.real_to_binary_convolutions.teacher_student_model import KnowledgeDistillationModelFactory
-
-
-class LearnedRescaleLayer(tf.keras.layers.Layer):
-    """ Implements the learned activation rescaling XNOR-Net++ style
-    `[(Bulat & Tzimiropoulos 2019)](https://arxiv.org/abs/1909.13863)`
-    This is used to scale the outputs of the binary convolutions in the Strong Baseline networks."""
-
-    def __init__(self, output_dim: tuple, **kwargs):
-        super().__init__(**kwargs)
-        assert (
-                len(output_dim) == 3
-        ), f"Expected 3 dimensional output size, got {len(output_dim)} dimensional instead."
-        self.output_dim = output_dim
-
-    def build(self, input_shapes):
-        self.scale_h = self.add_weight(
-            name="scale_h",
-            shape=(self.output_dim[0], 1, 1),
-            initializer="ones",
-            trainable=True,
-        )
-        self.scale_w = self.add_weight(
-            name="scale_w",
-            shape=(1, self.output_dim[1], 1),
-            initializer="ones",
-            trainable=True,
-        )
-        self.scale_c = self.add_weight(
-            name="scale_c",
-            shape=(1, 1, self.output_dim[2]),
-            initializer="ones",
-            trainable=True,
-        )
-
-        super().build(input_shapes)
-
-    def call(self, inputs, **kwargs):
-        return inputs * (self.scale_h * self.scale_w * self.scale_c)
-
-    def compute_output_shape(self, **kwargs):
-        return self.output_dim
-
-    def get_config(self):
-        return {"output_dim": self.output_dim}
+from core import utils
+from core.model_factory import ModelFactory, QuantizerType
 
 
-class _SharedBaseFactory(KnowledgeDistillationModelFactory):
-    """Base configuration and blocks shared across ResNet18 and Real-to-Bin Nets."""
-
-    input_quantizer = Field(lambda: lq.quantizers.SteSign(clip_value=1.25))
-    kernel_quantizer = Field(lambda: lq.quantizers.SteSign(clip_value=1.25))
-    kernel_constraint = Field(lambda: lq.constraints.WeightClip(clip_value=1.25))
+class _SharedBaseFactory(ModelFactory):
+    """Base configuration and blocks shared across ResNet, StrongBaselineNets and Real-to-Bin Nets."""
 
     model_name: str = Field()
-
     momentum: float = Field(0.99)
     kernel_initializer: str = Field("glorot_normal")
+    kernel_regularizer: Optional[tf.keras.regularizers.Regularizer] = Field(None)
 
     def _first_block(self, x, use_prelu=True, name=""):
-        """First block, shared across ResNet and Real-to-Bin Nets."""
+        """First block, shared across ResNet, StrongBaselineNet and Real-to-Bin Nets."""
 
         x = tf.keras.layers.Conv2D(
-            filters=64,
+            64,
             kernel_size=7,
             strides=2,
             kernel_initializer=self.kernel_initializer,
+            kernel_regularizer=self.kernel_regularizer,
             padding="same",
             name=f"{name}_conv2d",
             use_bias=False,
@@ -95,26 +50,25 @@ class _SharedBaseFactory(KnowledgeDistillationModelFactory):
         )(x)
 
     def _last_block(self, x, name=""):
-        """Last block, shared across ResNet and Real-to-Bin Nets."""
+        """Last block, shared across ResNet StrongBaselineNet and Real-to-Bin nets."""
 
         x = tf.keras.layers.GlobalAvgPool2D(name=f"{name}_global_pool")(x)
         x = tf.keras.layers.Dense(
-            self.num_classes, activation=None, name=f"{name}_logits"
+            self.num_classes, activation=None, name=f"{name}_logits",
         )(x)
         return tf.keras.layers.Activation(activation="softmax", name=f"{name}_probs")(x)
 
     def _block(self, x, downsample=False, name=""):
-        """Main network block, different between ResNet and Real-to-Bin Nets.
+        """Main network block, different between ResNet and StrongBaseline / Real-to-Bin Nets.
 
-        This is left to be implemented by the _ResNet18 and _RealToBinNet subclasses.
+        This is left to be implemented by the ResNet18 and StrongBaselineNet subclasses.
         """
 
         raise NotImplementedError()
 
     def _shortcut_connection(
-            self, x: tf.Tensor, name: str, in_channels: int, out_channels: int
+        self, x: tf.Tensor, name: str, in_channels: int, out_channels: int
     ):
-        """Shortcut information"""
         if in_channels == out_channels:
             return x
         x = tf.keras.layers.AvgPool2D(
@@ -124,6 +78,7 @@ class _SharedBaseFactory(KnowledgeDistillationModelFactory):
             out_channels,
             1,
             kernel_initializer=self.kernel_initializer,
+            kernel_regularizer=self.kernel_regularizer,
             use_bias=False,
             name=f"{name}_shortcut_conv2d",
         )(x)
@@ -131,23 +86,13 @@ class _SharedBaseFactory(KnowledgeDistillationModelFactory):
             momentum=self.momentum, name=f"{name}_shortcut_batch_norm"
         )(x)
 
-    def build(
-            self,
-            input_shape: Optional[tuple] = None,
-            input_tensor: Optional[tf.keras.layers.Layer] = None,
-    ):
-        """Build a ResNet or Real-to-Bin Net."""
-
-        x_in = (
-            input_tensor
-            if input_tensor is not None
-            else tf.keras.Input(shape=input_shape, name="input")
-        )
+    def build(self) -> tf.keras.models.Model:
+        """Build the model."""
 
         x = self._first_block(
-            x_in,
+            self.image_input,
             name=f"{self.model_name}_block_1",
-            use_prelu=isinstance(self, _StrongBaselineNetFactory),
+            use_prelu=isinstance(self, StrongBaselineNetFactory),
         )
         for block in range(2, 10):
             x = self._block(
@@ -158,43 +103,91 @@ class _SharedBaseFactory(KnowledgeDistillationModelFactory):
 
         if self.include_top:
             x = self._last_block(x, name=f"{self.model_name}_block_10")
-            x = tf.keras.layers.Dense(
-                self.num_classes,
-                activation="softmax",
-                kernel_initializer="glorot_normal",
-            )(x)
 
         model = tf.keras.Model(
-            inputs=self.image_input,
-            outputs=x,
-            name=f"binary_resnet_e_{self.num_layers}",
+            inputs=self.image_input, outputs=x, name=self.model_name,
         )
 
-        x =
+        # Load weights.
+        if self.weights == "imagenet":
+            model.load_weights(self._get_weights_path())
+        elif self.weights is not None:
+            model.load_weights(self.weights)
+        return model
 
-        return tf.keras.Model(inputs=x_in, outputs=x, name=self.model_name)
+    def _get_weights_path(self):
+        raise NotImplementedError(f"No stored weights for {self.model_name}")
 
 
-class _StrongBaselineNetFactory(_SharedBaseFactory):
-    """Constructor for the strong baseline (Section 4.1 of Martinez et.al.)."""
+@factory
+class StrongBaselineNetFactory(_SharedBaseFactory):
+    """Constructor for the strong baseline network (Section 4.1 of Martinez et al.)."""
 
     scaling_r: int = 8
 
-    input_quantizer: Optional[str] = None
-    kernel_quantizer: Optional[str] = None
-    kernel_constraint: Optional[Any] = None
+    input_quantizer: QuantizerType = Field(None)
+    kernel_quantizer: QuantizerType = Field(None)
+
+    class LearnedRescaleLayer(tf.keras.layers.Layer):
+        """Implements the learned activation rescaling XNOR-Net++ style.
+
+        This is used to scale the outputs of the binary convolutions in the Strong
+        Baseline networks.
+        [(Bulat & Tzimiropoulos, 2019)](https://arxiv.org/abs/1909.13863)
+        """
+
+        def __init__(self, output_dim: tuple, **kwargs):
+            super().__init__(**kwargs)
+            assert (
+                len(output_dim) == 3
+            ), f"expected 3 dimensional output size, got {len(output_dim)} dimensional instead"
+            self.output_dim = output_dim
+
+        def build(self, input_shapes):
+            self.scale_h = self.add_weight(
+                name="scale_h",
+                shape=(self.output_dim[0], 1, 1),
+                initializer="ones",
+                trainable=True,
+            )
+            self.scale_w = self.add_weight(
+                name="scale_w",
+                shape=(1, self.output_dim[1], 1),
+                initializer="ones",
+                trainable=True,
+            )
+            self.scale_c = self.add_weight(
+                name="scale_c",
+                shape=(1, 1, self.output_dim[2]),
+                initializer="ones",
+                trainable=True,
+            )
+
+            super().build(input_shapes)
+
+        def call(self, inputs, **kwargs):
+            return inputs * (self.scale_h * self.scale_w * self.scale_c)
+
+        def compute_output_shape(self, **kwargs):
+            return self.output_dim
+
+        def get_config(self):
+            return {"output_dim": self.output_dim}
 
     def _scale_binary_conv_output(
-            self, conv_input: tf.Tensor, conv_output: tf.Tensor, name: str
+        self, conv_input: tf.Tensor, conv_output: tf.Tensor, name: str
     ):
-        return LearnedRescaleLayer(conv_output.shape[1:], name=f"{name}_rescale")(
+        """"The way in which the output of the binary convolution is scaled is the only structural difference
+        between the StrongBaseline networks and the Real-to-Binary networks. This function accepts all inputs
+        required for either function."""
+        return self.LearnedRescaleLayer(conv_output.shape[1:], name=f"{name}_rescale",)(
             conv_output
         )
 
     def _half_binary_block(
-            self, x: tf.Tensor, down_sample: bool = False, name: str = ""
+        self, x: tf.Tensor, downsample: bool = False, name: str = ""
     ):
-        """One half of the binary block from Figure 1 (Left) of Martinez et. al (2019).
+        """One half of the binary block from Figure 1 (Left) of Martinez et al. (2019).
 
         This block gets repeated and matched up with/supervised by a single real block,
         which has two convolutions.
@@ -203,7 +196,7 @@ class _StrongBaselineNetFactory(_SharedBaseFactory):
         """
 
         in_channels = x.shape[-1]
-        out_channels = in_channels * 2 if down_sample else in_channels
+        out_channels = in_channels * 2 if downsample else in_channels
 
         # Shortcut, which gets downsampled if necessary
         shortcut_add = self._shortcut_connection(x, name, in_channels, out_channels)
@@ -217,12 +210,11 @@ class _StrongBaselineNetFactory(_SharedBaseFactory):
         conv_output = lq.layers.QuantConv2D(
             out_channels,
             3,
-            strides=2 if down_sample else 1,
+            strides=2 if downsample else 1,
             padding="same",
             input_quantizer=self.input_quantizer,
             kernel_quantizer=self.kernel_quantizer,
             kernel_initializer=self.kernel_initializer,
-            kernel_constraint=self.kernel_constraint,
             use_bias=False,
             name=f"{name}_conv2d",
         )(conv_input)
@@ -237,21 +229,47 @@ class _StrongBaselineNetFactory(_SharedBaseFactory):
         return tf.keras.layers.Add(name=f"{name}_skip_add")([x, shortcut_add])
 
     def _block(self, x, downsample=False, name=""):
-        """Full binary block from Figure 1 (Left) of Matrinez et. al (2019)."""
+        """Full binary block from Figure 1 (Left) of Matrinez et al. (2019)."""
 
-        x = self._half_binary_block(x, down_sample=downsample, name=f"{name}a")
-        x = self._half_binary_block(x, down_sample=False, name=f"{name}b")
+        x = self._half_binary_block(x, downsample=downsample, name=f"{name}a")
+        x = self._half_binary_block(x, downsample=False, name=f"{name}b")
 
-        # Add explicit name to the block output for attention matching (Section 4.2 of Martinez et.al.)
+        # Add explicit name to the block output for attention matching (Section 4.2 of Martinez et al.)
         return tf.keras.layers.Lambda(lambda x: x, name=f"{name}_out")(x)
 
+    def _get_weights_path(self):
+        if (
+            not self.kernel_quantizer == "ste_sign"
+            and self.input_quantizer == "ste_sign"
+        ):
+            raise NotImplementedError(
+                f"{self.model_name} only has stored weights for the BNN variant"
+            )
+        if self.include_top:
+            weights_path = utils.download_pretrained_model(
+                model="baseline_bnn",
+                version="v0.1.0",
+                file="r2b_strong_baseline_bnn_weights.h5",
+                file_hash="",  # TODO
+            )
+        else:
+            weights_path = utils.download_pretrained_model(
+                model="baseline_bnn",
+                version="v0.1.0",
+                file="r2b_strong_baseline_bnn_weights_notop.h5",
+                file_hash="",  # TODO
+            )
+        return weights_path
 
-class _RealToBinNetFactory(_StrongBaselineNetFactory):
-    """Constructor for the full real-to-binary network of Martinez et.al."""
 
+@factory
+class RealToBinNetFactory(StrongBaselineNetFactory):
     def _scale_binary_conv_output(
-            self, conv_input: tf.Tensor, conv_output: tf.Tensor, name: str
+        self, conv_input: tf.Tensor, conv_output: tf.Tensor, name: str
     ):
+        """Data-dependent (squeeze and excite style) scaling of the convolution output as described in
+        Section 4.3 of Martinez at. al.
+        """
         in_filters = conv_input.shape[-1]
         out_filters = conv_output.shape[-1]
 
@@ -278,8 +296,33 @@ class _RealToBinNetFactory(_StrongBaselineNetFactory):
             [conv_output, scales]
         )
 
+    def _get_weights_path(self):
+        if (
+            not self.kernel_quantizer == "ste_sign"
+            and self.input_quantizer == "ste_sign"
+        ):
+            raise NotImplementedError(
+                f"{self.model_name} only has stored weights for the BNN variant"
+            )
+        if self.include_top:
+            weights_path = utils.download_pretrained_model(
+                model="r2b_bnn",
+                version="v0.1.0",
+                file="r2b_bnn_weights.h5",
+                file_hash="",  # TODO
+            )
+        else:
+            weights_path = utils.download_pretrained_model(
+                model="r2b_bnn",
+                version="v0.1.0",
+                file="r2b_bnn_weights_notop.h5",
+                file_hash="",  # TODO
+            )
+        return weights_path
 
-class _ResNet18Factory(_SharedBaseFactory):
+
+@factory
+class ResNet18Factory(_SharedBaseFactory):
     """Constructor for a ResNet18 with layer names matching Real-to-Bin nets."""
 
     def _block(self, x, downsample=False, name=""):
@@ -312,41 +355,140 @@ class _ResNet18Factory(_SharedBaseFactory):
         return tf.keras.layers.Activation("relu", name=f"{name}_out")(x)
 
 
-@component
-class StrongBaselineNetBAN(_StrongBaselineNetFactory):
-    model_name = "baseline_ban"
-    input_quantizer = "ste_sign"
+@factory
+class StrongBaselineNetBAN(StrongBaselineNetFactory):
+    model_name = Field("baseline_ban")
+    input_quantizer = Field("ste_sign")
 
 
-@component
-class StrongBaselineNetBNN(_StrongBaselineNetFactory):
-    model_name = "baseline_bnn"
-    input_quantizer = "ste_sign"
-    kernel_quantizer = "ste_sign"
-    kernel_constraint = "weight_clip"
+@factory
+class StrongBaselineNetBNN(StrongBaselineNetFactory):
+    model_name = Field("baseline_bnn")
+    input_quantizer = Field("ste_sign")
+    kernel_quantizer = Field("ste_sign")
 
 
-@component
-class ResNet18FP(_ResNet18Factory):
-    model_name = "resnet_fp"
-    input_quantizer = None
+@factory
+class RealToBinNetFP(RealToBinNetFactory):
+    model_name = Field("r2b_fp")
+    input_quantizer = Field(lambda: tf.keras.layers.Activation("tanh"))
 
 
-@component
-class RealToBinNetFP(_RealToBinNetFactory):
-    model_name = "r2b_fp"
-    input_quantizer = tf.keras.layers.Activation("tanh")  # soft binarization
+@factory
+class RealToBinNetBAN(RealToBinNetFactory):
+    model_name = Field("r2b_ban")
+    input_quantizer = Field("ste_sign")
 
 
-@component
-class RealToBinNetBAN(_RealToBinNetFactory):
-    model_name = "r2b_ban"
-    input_quantizer = "ste_sign"
+@factory
+class RealToBinNetBNN(RealToBinNetFactory):
+    model_name = Field("r2b_bnn")
+    input_quantizer = Field("ste_sign")
+    kernel_quantizer = Field("ste_sign")
 
 
-@component
-class RealToBinNetBNN(_RealToBinNetFactory):
-    model_name = "r2b_bnn"
-    input_quantizer = "ste_sign"
-    kernel_quantizer = "ste_sign"
-    kernel_constraint = "weight_clip"
+@factory
+class ResNet18FP(ResNet18Factory):
+    model_name = Field("resnet_fp")
+    input_quantizer = Field(None)
+    kernel_quantizer = Field(None)
+
+
+def StrongR2BBaselineBNN(
+    *,  # Keyword arguments only
+    input_shape: Optional[Sequence[Optional[int]]] = None,
+    input_tensor: Optional[tf.Tensor] = None,
+    weights: Optional[str] = "imagenet",
+    include_top: bool = True,
+    num_classes: int = 1000,
+) -> tf.keras.models.Model:
+    """Instantiates the BNN version of the Strong Baseline network from Martinez et. al. (2019).
+
+    Optionally loads weights pre-trained on ImageNet.
+
+    ```netron
+    resnet_e-v0.1.0/strong_baseline_bnn.json #TODO
+    ```
+    ```plot-altair
+    /plots/strong_baseline_bnn.vg.json #TODO
+    ```
+
+    # Arguments
+    input_shape: Optional shape tuple, to be specified if you would like to use a model
+        with an input image resolution that is not (224, 224, 3).
+        It should have exactly 3 inputs channels.
+    input_tensor: optional Keras tensor (i.e. output of `layers.Input()`) to use as
+        image input for the model.
+    weights: one of `None` (random initialization), "imagenet" (pre-training on
+        ImageNet), or the path to the weights file to be loaded.
+    include_top: whether to include the fully-connected layer at the top of the network.
+    num_classes: optional number of classes to classify images into, only to be specified
+        if `include_top` is True, and if no `weights` argument is specified.
+
+    # Returns
+    A Keras model instance.
+
+    # Raises
+    ValueError: in case of invalid argument for `weights`, or invalid input shape.
+
+    # References
+    - [Training binary neural networks with
+        real-to-binary convolutions](https://openreview.net/forum?id=BJg4NgBKvH)
+    """
+    return StrongBaselineNetBNN(
+        input_shape=input_shape,
+        input_tensor=input_tensor,
+        weights=weights,
+        include_top=include_top,
+        num_classes=num_classes,
+    ).build()
+
+
+def RealToBinaryBNN(
+    *,  # Keyword arguments only
+    input_shape: Optional[Sequence[Optional[int]]] = None,
+    input_tensor: Optional[tf.Tensor] = None,
+    weights: Optional[str] = "imagenet",
+    include_top: bool = True,
+    num_classes: int = 1000,
+) -> tf.keras.models.Model:
+    """Instantiates the BNN version of the Real-to-Binary network from Martinez et. al. (2019).
+
+    Optionally loads weights pre-trained on ImageNet.
+
+    ```netron
+    resnet_e-v0.1.0/r2b_bnn.json #TODO
+    ```
+    ```plot-altair
+    /plots/r2b_bnn.vg.json #TODO
+    ```
+
+    # Arguments
+    input_shape: Optional shape tuple, to be specified if you would like to use a model
+        with an input image resolution that is not (224, 224, 3).
+        It should have exactly 3 inputs channels.
+    input_tensor: optional Keras tensor (i.e. output of `layers.Input()`) to use as
+        image input for the model.
+    weights: one of `None` (random initialization), "imagenet" (pre-training on
+        ImageNet), or the path to the weights file to be loaded.
+    include_top: whether to include the fully-connected layer at the top of the network.
+    num_classes: optional number of classes to classify images into, only to be specified
+        if `include_top` is True, and if no `weights` argument is specified.
+
+    # Returns
+    A Keras model instance.
+
+    # Raises
+    ValueError: in case of invalid argument for `weights`, or invalid input shape.
+
+    # References
+    - [Training binary neural networks with
+        real-to-binary convolutions](https://openreview.net/forum?id=BJg4NgBKvH)
+    """
+    return RealToBinNetBNN(
+        input_shape=input_shape,
+        input_tensor=input_tensor,
+        weights=weights,
+        include_top=include_top,
+        num_classes=num_classes,
+    ).build()

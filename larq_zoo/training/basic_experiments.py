@@ -196,37 +196,5 @@ class TrainDoReFaNet(TrainLarqZooModel):
     )
 
 
-@task
-class TrainR2BStrongBaseline(TrainLarqZooModel):
-    model = ComponentField(DoReFaNetFactory)
-
-    epochs = Field(90)
-    batch_size = Field(256)
-
-    learning_rate: float = Field(2e-4)
-    decay_start: int = Field(60)
-    decay_step_2: int = Field(75)
-    fast_decay_start: int = Field(82)
-
-    def learning_rate_schedule(self, epoch):
-        if epoch < self.decay_start:
-            return self.learning_rate
-        elif epoch < self.decay_step_2:
-            return self.learning_rate * 0.2
-        elif epoch < self.fast_decay_start:
-            return self.learning_rate * 0.2 * 0.2
-        else:
-            return (
-                self.learning_rate
-                * 0.2
-                * 0.2
-                * 0.1 ** ((epoch - self.fast_decay_start) // 2 + 1)
-            )
-
-    optimizer = Field(
-        lambda self: tf.keras.optimizers.Adam(self.learning_rate, epsilon=1e-5)
-    )
-
-
 if __name__ == "__main__":
     cli()
