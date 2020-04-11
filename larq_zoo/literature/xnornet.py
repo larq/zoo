@@ -149,10 +149,9 @@ def XNORNet(
     ```
 
     # ImageNet Metrics
-    Top-1 Accuracy: 44.96 %
-    Top-5 Accuracy: 69.18 %
-    Parameters: 62 396 768
-    Memory: 22.81 MB
+    | Top-1 Accuracy | Top-5 Accuracy | Parameters | Memory  |
+    | -------------- | -------------- | ---------- | ------- |
+    | 44.96 %        | 69.18 %        | 62 396 768 | 22.81 MB |
 
     # Arguments
     input_shape: Optional shape tuple, to be specified if you would like to use a model
