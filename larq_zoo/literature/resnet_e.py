@@ -155,10 +155,9 @@ def BinaryResNetE18(
     ```
 
     # ImageNet Metrics
-    Top-1 Accuracy: 58.32 %
-    Top-5 Accuracy: 80.79 %
-    Parameters: 11 699 368
-    Memory: 4.03 MB
+    | Top-1 Accuracy | Top-5 Accuracy | Parameters | Memory  |
+    | -------------- | -------------- | ---------- | ------- |
+    | 58.32 %        | 80.79 %        | 11 699 368 | 4.03 MB |
 
     # Arguments
     input_shape: Optional shape tuple, to be specified if you would like to use a model
