@@ -129,10 +129,9 @@ def BinaryAlexNet(
     ```
 
     # ImageNet Metrics
-    Top-1 Accuracy: 36.30 %
-    Top-5 Accuracy: 61.53 %
-    Parameters: 61 859 192
-    Memory: 7.49 MB
+    | Top-1 Accuracy | Top-5 Accuracy | Parameters | Memory  |
+    | -------------- | -------------- | ---------- | ------- |
+    | 36.30 %        | 61.53 %        | 61 859 192 | 7.49 MB |
 
     # Arguments
     input_shape: Optional shape tuple, to be specified if you would like to use a model
