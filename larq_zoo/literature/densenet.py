@@ -249,9 +249,10 @@ def BinaryDenseNet28(
     ```
 
     # ImageNet Metrics
+
     | Top-1 Accuracy | Top-5 Accuracy | Parameters | Memory  |
     | -------------- | -------------- | ---------- | ------- |
-    | 60.91 %        | 82.83 %        | 5 150 504 | 4.12 MB |
+    | 60.91 %        | 82.83 %        | 5 150 504  | 4.12 MB |
 
     # Arguments
     input_shape: Optional shape tuple, to be specified if you would like to use a model
@@ -304,9 +305,10 @@ def BinaryDenseNet37(
     ```
 
     # ImageNet Metrics
+
     | Top-1 Accuracy | Top-5 Accuracy | Parameters | Memory  |
     | -------------- | -------------- | ---------- | ------- |
-    | 62.89 %        | 84.19 %        | 8 734 120 | 5.25 MB |
+    | 62.89 %        | 84.19 %        | 8 734 120  | 5.25 MB |
 
     # Arguments
     input_shape: Optional shape tuple, to be specified if you would like to use a model
@@ -359,9 +361,10 @@ def BinaryDenseNet37Dilated(
     ```
 
     # ImageNet Metrics
+
     | Top-1 Accuracy | Top-5 Accuracy | Parameters | Memory  |
     | -------------- | -------------- | ---------- | ------- |
-    | 64.34 %        | 85.15 %        | 8 734 120 | 5.25 MB |
+    | 64.34 %        | 85.15 %        | 8 734 120  | 5.25 MB |
 
     # Arguments
     input_shape: Optional shape tuple, to be specified if you would like to use a model
@@ -414,6 +417,7 @@ def BinaryDenseNet45(
     ```
 
     # ImageNet Metrics
+
     | Top-1 Accuracy | Top-5 Accuracy | Parameters | Memory  |
     | -------------- | -------------- | ---------- | ------- |
     | 64.59 %        | 85.21 %        | 13 939 240 | 7.54 MB |

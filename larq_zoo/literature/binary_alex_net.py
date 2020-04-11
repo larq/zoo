@@ -129,6 +129,7 @@ def BinaryAlexNet(
     ```
 
     # ImageNet Metrics
+
     | Top-1 Accuracy | Top-5 Accuracy | Parameters | Memory  |
     | -------------- | -------------- | ---------- | ------- |
     | 36.30 %        | 61.53 %        | 61 859 192 | 7.49 MB |

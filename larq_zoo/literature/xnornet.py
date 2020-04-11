@@ -149,6 +149,7 @@ def XNORNet(
     ```
 
     # ImageNet Metrics
+
     | Top-1 Accuracy | Top-5 Accuracy | Parameters | Memory  |
     | -------------- | -------------- | ---------- | ------- |
     | 44.96 %        | 69.18 %        | 62 396 768 | 22.81 MB |

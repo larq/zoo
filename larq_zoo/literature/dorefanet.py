@@ -142,11 +142,7 @@ def DoReFaNet(
     ```
 
     # ImageNet Metrics
-    Top-1 Accuracy: 53.39 %
-    Top-5 Accuracy: 76.50 %
-    Parameters: 62 403 912
-    Memory: 22.84 MB
-    # ImageNet Metrics
+
     | Top-1 Accuracy | Top-5 Accuracy | Parameters | Memory  |
     | -------------- | -------------- | ---------- | ------- |
     | 53.39 %        | 76.50 %        | 62 403 912 | 22.84 MB |

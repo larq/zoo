@@ -135,6 +135,7 @@ def BiRealNet(
     ```
 
     # ImageNet Metrics
+
     | Top-1 Accuracy | Top-5 Accuracy | Parameters | Memory  |
     | -------------- | -------------- | ---------- | ------- |
     | 57.47 %        | 79.84 %        | 11 699 112 | 4.03 MB |

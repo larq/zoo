@@ -155,6 +155,7 @@ def BinaryResNetE18(
     ```
 
     # ImageNet Metrics
+
     | Top-1 Accuracy | Top-5 Accuracy | Parameters | Memory  |
     | -------------- | -------------- | ---------- | ------- |
     | 58.32 %        | 80.79 %        | 11 699 368 | 4.03 MB |
