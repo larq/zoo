@@ -306,10 +306,9 @@ def QuickNet(
     ```
 
     # ImageNet Metrics
-    Top-1 Accuracy: 58.6 %
-    Top-5 Accuracy: 81.0 %
-    Parameters: 10 518 528
-    Memory: 3.21 MB
+    | Top-1 Accuracy | Top-5 Accuracy | Parameters | Memory  |
+    | -------------- | -------------- | ---------- | ------- |
+    | 58.6 %        | 81.0 %        | 10 518 528 | 3.21 MB |
 
     # Arguments
     input_shape: Optional shape tuple, to be specified if you would like to use a model
@@ -355,10 +354,9 @@ def QuickNetLarge(
     ```
 
     # ImageNet Metrics
-    Top-1 Accuracy: 62.7 %
-    Top-5 Accuracy: 84.0 %
-    Parameters: 11 837 696
-    Memory: 4.56 MB
+    | Top-1 Accuracy | Top-5 Accuracy | Parameters | Memory  |
+    | -------------- | -------------- | ---------- | ------- |
+    | 62.7 %        | 84.0 %        | 11 837 696 | 4.56 MB |
 
     # Arguments
     input_shape: Optional shape tuple, to be specified if you would like to use a model
@@ -404,10 +402,9 @@ def QuickNetXL(
     ```
 
     # ImageNet Metrics
-    Top-1 Accuracy: 67.0 %
-    Top-5 Accuracy: 87.3 %
-    Parameters: 22 058 368
-    Memory: 6.22 MB
+    | Top-1 Accuracy | Top-5 Accuracy | Parameters | Memory  |
+    | -------------- | -------------- | ---------- | ------- |
+    | 67.0 %        | 87.3 %        | 22 058 368 | 6.22 MB |
 
     # Arguments
     input_shape: Optional shape tuple, to be specified if you would like to use a model
