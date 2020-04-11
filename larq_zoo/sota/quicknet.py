@@ -305,6 +305,12 @@ def QuickNet(
     quicknet-v0.2.0/quicknet.json
     ```
 
+    # ImageNet Metrics
+    Top-1 Accuracy: 58.6 %
+    Top-5 Accuracy: 81.0 %
+    Parameters: 10 518 528
+    Memory: 3.21 MB
+
     # Arguments
     input_shape: Optional shape tuple, to be specified if you would like to use a model
         with an input image resolution that is not (224, 224, 3).
@@ -348,6 +354,12 @@ def QuickNetLarge(
     quicknet_large-v0.2.0/quicknet_large.json
     ```
 
+    # ImageNet Metrics
+    Top-1 Accuracy: 62.7 %
+    Top-5 Accuracy: 84.0 %
+    Parameters: 11 837 696
+    Memory: 4.56 MB
+
     # Arguments
     input_shape: Optional shape tuple, to be specified if you would like to use a model
         with an input image resolution that is not (224, 224, 3).
@@ -390,6 +402,12 @@ def QuickNetXL(
     ```netron
     quicknet_xl-v0.1.0/quicknet_xl.json
     ```
+
+    # ImageNet Metrics
+    Top-1 Accuracy: 67.0 %
+    Top-5 Accuracy: 87.3 %
+    Parameters: 22 058 368
+    Memory: 6.22 MB
 
     # Arguments
     input_shape: Optional shape tuple, to be specified if you would like to use a model
