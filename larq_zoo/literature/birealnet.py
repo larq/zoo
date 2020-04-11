@@ -134,6 +134,12 @@ def BiRealNet(
     /plots/birealnet.vg.json
     ```
 
+    # ImageNet Metrics
+
+    | Top-1 Accuracy | Top-5 Accuracy | Parameters | Memory  |
+    | -------------- | -------------- | ---------- | ------- |
+    | 57.47 %        | 79.84 %        | 11 699 112 | 4.03 MB |
+
     # Arguments
     input_shape: Optional shape tuple, to be specified if you would like to use a model
         with an input image resolution that is not (224, 224, 3).

@@ -128,6 +128,12 @@ def BinaryAlexNet(
     /plots/binary_alexnet.vg.json
     ```
 
+    # ImageNet Metrics
+
+    | Top-1 Accuracy | Top-5 Accuracy | Parameters | Memory  |
+    | -------------- | -------------- | ---------- | ------- |
+    | 36.30 %        | 61.53 %        | 61 859 192 | 7.49 MB |
+
     # Arguments
     input_shape: Optional shape tuple, to be specified if you would like to use a model
         with an input image resolution that is not (224, 224, 3).
