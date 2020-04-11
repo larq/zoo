@@ -49,8 +49,13 @@ class Default(ImageClassification):
     input_shape = Field((IMAGE_SIZE, IMAGE_SIZE, 3))
 
     def input(self, data, training):
+        image = data["image"]
+        # tfds.testing.mock_data currently doesn't correctly handle custom decoders.
+        # See https://github.com/tensorflow/datasets/pull/1861
+        if image.dtype.is_integer:
+            image = tf.image.encode_jpeg(image)
         return preprocess_image_bytes(
-            data["image"], is_training=training, image_size=IMAGE_SIZE
+            image, is_training=training, image_size=IMAGE_SIZE
         )
 
 
