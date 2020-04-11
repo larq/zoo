@@ -135,10 +135,9 @@ def BiRealNet(
     ```
 
     # ImageNet Metrics
-    Top-1 Accuracy: 57.47 %
-    Top-5 Accuracy: 79.84 %
-    Parameters: 11 699 112
-    Memory: 4.03 MB
+    | Top-1 Accuracy | Top-5 Accuracy | Parameters | Memory  |
+    | -------------- | -------------- | ---------- | ------- |
+    | 57.47 %        | 79.84 %        | 11 699 112 | 4.03 MB |
 
     # Arguments
     input_shape: Optional shape tuple, to be specified if you would like to use a model
