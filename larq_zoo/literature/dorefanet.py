@@ -141,6 +141,12 @@ def DoReFaNet(
     /plots/dorefanet.vg.json
     ```
 
+    # ImageNet Metrics
+    Top-1 Accuracy: 53.39 %
+    Top-5 Accuracy: 76.50 %
+    Parameters: 62 403 912
+    Memory: 22.84 MB
+
     # Arguments
     input_shape: Optional shape tuple, to be specified if you would like to use a model
         with an input image resolution that is not (224, 224, 3).
