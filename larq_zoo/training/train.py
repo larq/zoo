@@ -112,7 +112,7 @@ class TrainLarqZooModel(Experiment):
             lq.models.summary(self.model)
 
             if initial_epoch > 0:
-                self.model.load_weights(self.model_path)
+                self.model.load_weights(str(self.model_path))
                 print(f"Loaded model from epoch {initial_epoch}.")
 
         click.secho(str(self))

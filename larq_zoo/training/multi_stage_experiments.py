@@ -1,79 +1,141 @@
-import functools
-import math
-from pathlib import Path
+from typing import Sequence
 
-import click
-import larq as lq
 import tensorflow as tf
 
-from larq_zoo.core import utils
-from training.train import TrainLarqZooModel
+from larq_zoo.literature.real_to_bin_nets import (
+    StrongBaselineNetBAN,
+    StrongBaselineNetBNN,
+)
+from larq_zoo.training.datasets import ImageNet
+from zookeeper import ComponentField, Field, cli, task
+
+from larq_zoo.training.knowledge_distillation.multi_stage_training import (
+    LarqZooModelTrainingPhase,
+    MultiStageExperiment,
+)
 
 
-class MultiStageLarqZooTraining(TrainLarqZooModel):
+class R2BStepSchedule(tf.keras.optimizers.schedules.LearningRateSchedule):
+    def __init__(
+        self, initial_learning_rate, steps_per_epoch, decay_fraction, name=None
+    ):
+        super().__init__()
+        self.initial_learning_rate = initial_learning_rate
+        self.steps_per_epoch = steps_per_epoch
+        self.decay_fraction = decay_fraction
+        self.name = name
 
-
-
-    def run(self):
-        self.output_dir.mkdir(parents=True, exist_ok=True)
-
-        train_data, num_train_examples = self.dataset.train(
-            decoders=self.preprocessing.decoders
+        self.warm_up_schedule = tf.keras.optimizers.schedules.PolynomialDecay(
+            0.0,
+            5 * steps_per_epoch,
+            end_learning_rate=initial_learning_rate,
+            power=1.0,
         )
-        train_data = (
-            train_data.cache()
-                .shuffle(10 * self.batch_size)
-                .repeat()
-                .map(
-                functools.partial(self.preprocessing, training=True),
-                num_parallel_calls=tf.data.experimental.AUTOTUNE,
+        self.decay_schedule = tf.keras.optimizers.schedules.PiecewiseConstantDecay(
+            boundaries=[
+                40 * self.steps_per_epoch,
+                60 * self.steps_per_epoch,
+                70 * self.steps_per_epoch,
+            ],
+            values=[
+                self.initial_learning_rate * self.decay_fraction ** i for i in range(4)
+            ],
+        )
+
+    def __call__(self, step):
+        return tf.cond(
+            step <= 5 * self.steps_per_epoch,
+            lambda: self.warm_up_schedule(step),
+            lambda: self.decay_schedule(step),
+        )
+
+    def get_config(self):
+        return {
+            "initial_learning_rate": self.initial_learning_rate,
+            "steps_per_epoch": self.steps_per_epoch,
+            "decay_fraction": self.decay_fraction,
+            "name": self.name,
+        }
+
+
+class CosineDecayWithWarmup(tf.keras.optimizers.schedules.LearningRateSchedule):
+    def __init__(self, max_learning_rate, warmup_steps, decay_steps):
+        super().__init__()
+        self.max_learning_rate = max_learning_rate
+        self.warmup_steps = warmup_steps
+        self.decay_steps = decay_steps
+
+        self.warm_up_schedule = tf.keras.optimizers.schedules.PolynomialDecay(
+            initial_learning_rate=0.0,
+            decay_steps=warmup_steps,
+            end_learning_rate=max_learning_rate,
+            power=1.0,
+        )
+        self.decay_schedule = tf.keras.experimental.CosineDecay(
+            initial_learning_rate=max_learning_rate, decay_steps=decay_steps
+        )
+
+    def __call__(self, step):
+        return tf.cond(
+            step <= self.warmup_steps,
+            lambda: self.warm_up_schedule(step),
+            lambda: self.decay_schedule(step - self.warmup_steps),
+        )
+
+    def get_config(self):
+        return {
+            "max_learning_rate": self.max_learning_rate,
+            "warmup_steps": self.warmup_steps,
+            "decay_steps": self.decay_steps,
+        }
+
+
+@task
+class TrainR2BStrongBaselineBAN(LarqZooModelTrainingPhase):
+    stage = Field(0)
+
+    dataset = ComponentField(ImageNet)
+
+    learning_rate: float = Field(1e-3)
+    learning_rate_decay: float = Field(0.1)
+    # epochs: int = Field(75)
+    # batch_size: int = Field(256) # TODO
+    epochs: int = Field(6)
+    batch_size: int = Field(8)
+    amount_of_images: int = Field(256)
+    # amount_of_images: int = Field(1281167) #TODO
+    warmup_duration: int = Field(5)
+
+    @property
+    def steps_per_epoch(self):
+        return self.amount_of_images // self.batch_size
+
+    optimizer = Field(
+        lambda self: tf.keras.optimizers.Adam(
+            R2BStepSchedule(
+                initial_learning_rate=self.learning_rate,
+                steps_per_epoch=self.steps_per_epoch,
+                decay_fraction=self.learning_rate_decay,
             )
-                .batch(self.batch_size)
-                .prefetch(1)
         )
+    )
 
-        validation_data, num_validation_examples = self.dataset.validation(
-            decoders=self.preprocessing.decoders
-        )
-        validation_data = (
-            validation_data.cache()
-                .repeat()
-                .map(self.preprocessing, num_parallel_calls=tf.data.experimental.AUTOTUNE)
-                .batch(self.batch_size)
-                .prefetch(1)
-        )
+    student_model = ComponentField(StrongBaselineNetBAN)
 
-        with utils.get_distribution_scope(self.batch_size):
-            self.model.compile(
-                optimizer=self.optimizer, loss=self.loss, metrics=self.metrics,
-            )
 
-            lq.models.summary(self.model)
+@task
+class TrainR2BStrongBaselineBNN(TrainR2BStrongBaselineBAN):
+    stage = Field(1)
+    learning_rate: float = Field(2e-4)
+    student_model = ComponentField(StrongBaselineNetBNN)
+    initialize_student_weights_from = Field("baseline_ban")
 
-            # if initial_epoch > 0:
-            #     self.model.load_weights(self.model_path)
-            #     print(f"Loaded model from epoch {initial_epoch}.")
 
-        click.secho(str(self))
+@task
+class TrainR2BStrongBaseline(MultiStageExperiment):
+    stage_0 = ComponentField(TrainR2BStrongBaselineBAN)
+    stage_1 = ComponentField(TrainR2BStrongBaselineBNN)
 
-        self.model.fit(
-            train_data,
-            epochs=self.epochs,
-            steps_per_epoch=math.ceil(num_train_examples / self.batch_size),
-            validation_data=validation_data,
-            validation_steps=math.ceil(num_validation_examples / self.batch_size),
-            validation_freq=self.validation_frequency,
-            verbose=1 if self.use_progress_bar else 2,
-            callbacks=self.callbacks,
-        )
 
-        # Save model, weights, and config JSON.
-        if self.save_weights:
-            self.model.save(str(Path(self.output_dir) / f"{self.model.name}.h5"))
-            self.model.save_weights(
-                str(Path(self.output_dir) / f"{self.model.name}_weights.h5")
-            )
-            with open(
-                    Path(self.output_dir) / f"{self.model.name}.json", "w"
-            ) as json_file:
-                json_file.write(self.model.to_json())
+if __name__ == "__main__":
+    cli()
