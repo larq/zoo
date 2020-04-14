@@ -138,30 +138,39 @@ class StrongBaselineNetFactory(_SharedBaseFactory):
         2019)](https://arxiv.org/abs/1909.13863)
         """
 
-        def __init__(self, output_dim: tuple, **kwargs):
+        def __init__(
+            self,
+            output_dim: tuple,
+            regularizer: Optional[tf.keras.regularizers.Regularizer],
+            **kwargs,
+        ):
             super().__init__(**kwargs)
             assert (
                 len(output_dim) == 3
             ), f"expected 3-dimensional output size, got {len(output_dim)}-dimensional"
             self.output_dim = output_dim
+            self.kernel_regularizer = regularizer
 
         def build(self, input_shapes):
             self.scale_h = self.add_weight(
                 name="scale_h",
                 shape=(self.output_dim[0], 1, 1),
                 initializer="ones",
+                regularizer=self.kernel_regularizer,
                 trainable=True,
             )
             self.scale_w = self.add_weight(
                 name="scale_w",
                 shape=(1, self.output_dim[1], 1),
                 initializer="ones",
+                regularizer=self.kernel_regularizer,
                 trainable=True,
             )
             self.scale_c = self.add_weight(
                 name="scale_c",
                 shape=(1, 1, self.output_dim[2]),
                 initializer="ones",
+                regularizer=self.kernel_regularizer,
                 trainable=True,
             )
 
@@ -188,9 +197,11 @@ class StrongBaselineNetFactory(_SharedBaseFactory):
         The Strong Baseline network uses the learned static rescale layer of
         Bulat & Tzimiropoulos
         """
-        return self.LearnedRescaleLayer(conv_output.shape[1:], name=f"{name}_rescale",)(
-            conv_output
-        )
+        return self.LearnedRescaleLayer(
+            conv_output.shape[1:],
+            regularizer=self.kernel_regularizer,
+            name=f"{name}_rescale",
+        )(conv_output)
 
     def half_binary_block(self, x: tf.Tensor, downsample: bool = False, name: str = ""):
         """One half of the binary block from Figure 1 (Left) of Martinez et al. (2019).
@@ -220,6 +231,10 @@ class StrongBaselineNetFactory(_SharedBaseFactory):
             padding="same",
             input_quantizer=self.input_quantizer,
             kernel_quantizer=self.kernel_quantizer,
+            kernel_constraint=self.kernel_constraint,
+            kernel_regularizer=self.kernel_regularizer
+            if self.kernel_quantizer is None
+            else None,
             kernel_initializer=self.kernel_initializer,
             use_bias=False,
             name=f"{name}_conv2d",
@@ -290,6 +305,7 @@ class RealToBinNetFactory(StrongBaselineNetFactory):
             int(in_filters / self.scaling_r),
             activation="relu",
             kernel_initializer="he_normal",
+            kernel_regularizer=self.kernel_regularizer,
             name=f"{name}_scaling_dense_reduce",
             use_bias=False,
         )(z)
@@ -297,6 +313,7 @@ class RealToBinNetFactory(StrongBaselineNetFactory):
             out_filters,
             activation="sigmoid",
             kernel_initializer="he_normal",
+            kernel_regularizer=self.kernel_regularizer,
             name=f"{name}_scaling_dense_expand",
             use_bias=False,
         )(dim_reduction)
@@ -351,8 +368,9 @@ class ResNet18Factory(_SharedBaseFactory):
 
         for convolution in ["a", "b"]:
             x = tf.keras.layers.Conv2D(
-                out_channels,
-                3,
+                filters=out_channels,
+                kernel_size=3,
+                kernel_regularizer=self.kernel_regularizer,
                 strides=2 if downsample and convolution == "a" else 1,
                 padding="same",
                 name=f"{name}{convolution}_conv2d",
@@ -370,6 +388,9 @@ class ResNet18Factory(_SharedBaseFactory):
 class StrongBaselineNetBAN(StrongBaselineNetFactory):
     model_name = Field("baseline_ban")
     input_quantizer = Field("ste_sign")
+    kernel_quantizer = Field(None)
+    kernel_constraint = Field(None)
+    kernel_regularizer = Field(lambda: tf.keras.regularizers.l2(l=1e-5))
 
 
 @factory
@@ -377,6 +398,7 @@ class StrongBaselineNetBNN(StrongBaselineNetFactory):
     model_name = Field("baseline_bnn")
     input_quantizer = Field("ste_sign")
     kernel_quantizer = Field("ste_sign")
+    kernel_constraint = Field("weight_clip")
 
 
 @factory
