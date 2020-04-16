@@ -248,6 +248,12 @@ def BinaryDenseNet28(
     /plots/densenet_28.vg.json
     ```
 
+    # ImageNet Metrics
+
+    | Top-1 Accuracy | Top-5 Accuracy | Parameters | Memory  |
+    | -------------- | -------------- | ---------- | ------- |
+    | 60.91 %        | 82.83 %        | 5 150 504  | 4.12 MB |
+
     # Arguments
     input_shape: Optional shape tuple, to be specified if you would like to use a model
         with an input image resolution that is not (224, 224, 3).
@@ -297,6 +303,12 @@ def BinaryDenseNet37(
     ```plot-altair
     /plots/densenet_37.vg.json
     ```
+
+    # ImageNet Metrics
+
+    | Top-1 Accuracy | Top-5 Accuracy | Parameters | Memory  |
+    | -------------- | -------------- | ---------- | ------- |
+    | 62.89 %        | 84.19 %        | 8 734 120  | 5.25 MB |
 
     # Arguments
     input_shape: Optional shape tuple, to be specified if you would like to use a model
@@ -348,6 +360,12 @@ def BinaryDenseNet37Dilated(
     /plots/densenet_37_dilated.vg.json
     ```
 
+    # ImageNet Metrics
+
+    | Top-1 Accuracy | Top-5 Accuracy | Parameters | Memory  |
+    | -------------- | -------------- | ---------- | ------- |
+    | 64.34 %        | 85.15 %        | 8 734 120  | 5.25 MB |
+
     # Arguments
     input_shape: Optional shape tuple, to be specified if you would like to use a model
         with an input image resolution that is not (224, 224, 3).
@@ -397,6 +415,12 @@ def BinaryDenseNet45(
     ```plot-altair
     /plots/densenet_45.vg.json
     ```
+
+    # ImageNet Metrics
+
+    | Top-1 Accuracy | Top-5 Accuracy | Parameters | Memory  |
+    | -------------- | -------------- | ---------- | ------- |
+    | 64.59 %        | 85.21 %        | 13 939 240 | 7.54 MB |
 
     # Arguments
     input_shape: Optional shape tuple, to be specified if you would like to use a model

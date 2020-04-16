@@ -154,6 +154,12 @@ def BinaryResNetE18(
     /plots/resnet_e_18.vg.json
     ```
 
+    # ImageNet Metrics
+
+    | Top-1 Accuracy | Top-5 Accuracy | Parameters | Memory  |
+    | -------------- | -------------- | ---------- | ------- |
+    | 58.32 %        | 80.79 %        | 11 699 368 | 4.03 MB |
+
     # Arguments
     input_shape: Optional shape tuple, to be specified if you would like to use a model
         with an input image resolution that is not (224, 224, 3).
