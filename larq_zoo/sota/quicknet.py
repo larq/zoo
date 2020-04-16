@@ -304,6 +304,9 @@ def QuickNet(
     ```netron
     quicknet-v0.2.0/quicknet.json
     ```
+    ```summary
+    sota.QuickNet
+    ```
 
     # ImageNet Metrics
 
@@ -353,6 +356,9 @@ def QuickNetLarge(
     ```netron
     quicknet_large-v0.2.0/quicknet_large.json
     ```
+    ```summary
+    sota.QuickNetLarge
+    ```
 
     # ImageNet Metrics
 
@@ -401,6 +407,9 @@ def QuickNetXL(
 
     ```netron
     quicknet_xl-v0.1.0/quicknet_xl.json
+    ```
+    ```summary
+    sota.QuickNetXL
     ```
 
     # ImageNet Metrics

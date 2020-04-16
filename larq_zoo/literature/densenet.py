@@ -244,6 +244,9 @@ def BinaryDenseNet28(
     ```netron
     binary_densenet-v0.1.0/binary_densenet_28.json
     ```
+    ```summary
+    literature.BinaryDenseNet28
+    ```
     ```plot-altair
     /plots/densenet_28.vg.json
     ```
@@ -299,6 +302,9 @@ def BinaryDenseNet37(
 
     ```netron
     binary_densenet-v0.1.0/binary_densenet_37.json
+    ```
+    ```summary
+    literature.BinaryDenseNet37
     ```
     ```plot-altair
     /plots/densenet_37.vg.json
@@ -356,6 +362,9 @@ def BinaryDenseNet37Dilated(
     ```netron
     binary_densenet-v0.1.0/binary_densenet_37_dilated.json
     ```
+    ```summary
+    literature.BinaryDenseNet37Dilated
+    ```
     ```plot-altair
     /plots/densenet_37_dilated.vg.json
     ```
@@ -411,6 +420,9 @@ def BinaryDenseNet45(
 
     ```netron
     binary_densenet-v0.1.0/binary_densenet_45.json
+    ```
+    ```summary
+    literature.BinaryDenseNet45
     ```
     ```plot-altair
     /plots/densenet_45.vg.json

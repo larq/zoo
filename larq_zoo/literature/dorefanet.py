@@ -137,6 +137,9 @@ def DoReFaNet(
     ```netron
     dorefanet-v0.1.0/dorefanet.json
     ```
+    ```summary
+    literature.DoReFaNet
+    ```
     ```plot-altair
     /plots/dorefanet.vg.json
     ```
