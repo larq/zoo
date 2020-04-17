@@ -124,6 +124,9 @@ def BinaryAlexNet(
     ```netron
     binary_alexnet-v0.2.0/binary_alexnet.json
     ```
+    ```summary
+    literature.BinaryAlexNet
+    ```
     ```plot-altair
     /plots/binary_alexnet.vg.json
     ```

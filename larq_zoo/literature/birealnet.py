@@ -130,6 +130,9 @@ def BiRealNet(
     ```netron
     birealnet-v0.3.0/birealnet.json
     ```
+    ```summary
+    literature.BiRealNet
+    ```
     ```plot-altair
     /plots/birealnet.vg.json
     ```

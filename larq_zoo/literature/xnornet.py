@@ -144,6 +144,9 @@ def XNORNet(
     ```netron
     xnornet-v0.2.0/xnornet.json
     ```
+    ```summary
+    literature.XNORNet
+    ```
     ```plot-altair
     /plots/xnornet.vg.json
     ```

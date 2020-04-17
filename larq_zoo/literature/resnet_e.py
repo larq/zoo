@@ -150,6 +150,9 @@ def BinaryResNetE18(
     ```netron
     resnet_e-v0.1.0/resnet_e_18.json
     ```
+    ```summary
+    literature.BinaryResNetE18
+    ```
     ```plot-altair
     /plots/resnet_e_18.vg.json
     ```
