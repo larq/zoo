@@ -451,7 +451,7 @@ def RealToBinaryNet(
     real-to-bin-net-v0.1.0/r2b.json
     ```
     ```plot-altair
-    /plots/r2b.vg.json
+    /plots/r2b_final_stage.vg.json
     ```
 
     # ImageNet Metrics
