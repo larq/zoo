@@ -113,12 +113,12 @@ class _SharedBaseFactory(ModelFactory, abc.ABC):
 
         # Load weights.
         if self.weights == "imagenet":
-            model.load_weights(self._get_weights_path())
+            model.load_weights(self._get_imagenet_weights_path())
         elif self.weights is not None:
             model.load_weights(self.weights)
         return model
 
-    def _get_weights_path(self):
+    def _get_imagenet_weights_path(self):
         raise ValueError(f"No stored weights for {self.model_name}")
 
 
@@ -304,7 +304,7 @@ class RealToBinNetFactory(StrongBaselineNetFactory):
             [conv_output, scales]
         )
 
-    def _get_weights_path(self):
+    def _get_imagenet_weights_path(self):
         if (
             not self.kernel_quantizer == "ste_sign"
             and self.input_quantizer == "ste_sign"
