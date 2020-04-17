@@ -23,7 +23,7 @@ class _SharedBaseFactory(ModelFactory):
     kernel_initializer: str = Field("glorot_normal")
     kernel_regularizer: Optional[tf.keras.regularizers.Regularizer] = Field(None)
 
-    def first_block(self, x, use_prelu=True, name=""):
+    def first_block(self, x: tf.Tensor, use_prelu: bool = True, name: str = "") -> tf.Tensor:
         """First block, shared across ResNet, StrongBaselineNet and Real-to-Bin Nets."""
 
         x = tf.keras.layers.Conv2D(
@@ -50,7 +50,7 @@ class _SharedBaseFactory(ModelFactory):
             3, strides=2, padding="same", name=f"{name}_pool"
         )(x)
 
-    def last_block(self, x, name=""):
+    def last_block(self, x: tf.Tensor, name: str = "") -> tf.Tensor:
         """Last block, shared across ResNet, StrongBaselineNet and Real-to-Bin nets."""
 
         x = tf.keras.layers.GlobalAvgPool2D(name=f"{name}_global_pool")(x)
@@ -66,11 +66,11 @@ class _SharedBaseFactory(ModelFactory):
         It is implemented by the ResNet18 and StrongBaselineNet subclasses.
         """
 
-        raise NotImplementedError()
+        raise NotImplementedError
 
     def shortcut_connection(
         self, x: tf.Tensor, name: str, in_channels: int, out_channels: int
-    ):
+    ) -> tf.Tensor:
         if in_channels == out_channels:
             return x
         x = tf.keras.layers.AvgPool2D(
@@ -140,7 +140,7 @@ class StrongBaselineNetFactory(_SharedBaseFactory):
 
         def __init__(
             self,
-            output_dim: tuple,
+            output_dim: Tuple[int, int, int],
             regularizer: Optional[tf.keras.regularizers.Regularizer],
             **kwargs,
         ):
@@ -187,7 +187,7 @@ class StrongBaselineNetFactory(_SharedBaseFactory):
 
     def _scale_binary_conv_output(
         self, conv_input: tf.Tensor, conv_output: tf.Tensor, name: str
-    ):
+    ) -> tf.Tensor:
         """Flexible wrapper for the `LearnedRescaleLayer`.
 
         The way in which the output of the binary convolution is scaled is the only
@@ -203,7 +203,9 @@ class StrongBaselineNetFactory(_SharedBaseFactory):
             name=f"{name}_rescale",
         )(conv_output)
 
-    def half_binary_block(self, x: tf.Tensor, downsample: bool = False, name: str = ""):
+    def half_binary_block(
+        self, x: tf.Tensor, downsample: bool = False, name: str = ""
+    ) -> tf.Tensor:
         """One half of the binary block from Figure 1 (Left) of Martinez et al. (2019).
 
         This block gets repeated and matched up with/supervised by a single real block,
@@ -249,11 +251,8 @@ class StrongBaselineNetFactory(_SharedBaseFactory):
         # Skip connection
         return tf.keras.layers.Add(name=f"{name}_skip_add")([x, shortcut_add])
 
-    def block(self, x, downsample=False, name=""):
-        """Full binary block from Figure 1 (Left) of Matrinez et al.
-
-        (2019).
-        """
+    def block(self, x: tf.Tensor, downsample: bool = False, name: str = "") -> tf.Tensor:
+        """Full binary block from Figure 1 (Left) of Matrinez et al. (2019)."""
 
         x = self.half_binary_block(x, downsample=downsample, name=f"{name}a")
         x = self.half_binary_block(x, downsample=False, name=f"{name}b")
@@ -268,7 +267,7 @@ class StrongBaselineNetFactory(_SharedBaseFactory):
             and self.input_quantizer == "ste_sign"
         ):
             raise NotImplementedError(
-                f"{self.model_name} only has stored weights for the BNN variant"
+                f"{self.model_name} only has ImageNet weights for the BNN variant"
             )
         if self.include_top:
             weights_path = utils.download_pretrained_model(
@@ -291,7 +290,7 @@ class StrongBaselineNetFactory(_SharedBaseFactory):
 class RealToBinNetFactory(StrongBaselineNetFactory):
     def _scale_binary_conv_output(
         self, conv_input: tf.Tensor, conv_output: tf.Tensor, name: str
-    ):
+    ) -> tf.Tensor:
         """Data-dependent convolution scaling.
 
         Scales the output of the convolution in the (squeeze-and-excite
@@ -331,7 +330,7 @@ class RealToBinNetFactory(StrongBaselineNetFactory):
             and self.input_quantizer == "ste_sign"
         ):
             raise NotImplementedError(
-                f"{self.model_name} only has stored weights for the BNN variant"
+                f"{self.model_name} only has ImageNet weights for the BNN variant"
             )
         if self.include_top:
             weights_path = utils.download_pretrained_model(
@@ -354,7 +353,7 @@ class RealToBinNetFactory(StrongBaselineNetFactory):
 class ResNet18Factory(_SharedBaseFactory):
     """Constructor for a ResNet18 with layer names matching Real-to-Bin nets."""
 
-    def block(self, x, downsample=False, name=""):
+    def block(self, x: tf.Tensor, downsample: bool = False, name: str = "") -> tf.Tensor:
         """One full residual block, consisting of two convolutions.
 
         This follows the definition of a "block" from Figure 1 (Left) of Martinez et al.
