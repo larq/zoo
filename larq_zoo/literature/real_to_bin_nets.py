@@ -409,6 +409,7 @@ class RealToBinNetFP(RealToBinNetFactory):
     kernel_constraint = Field(None)
     kernel_regularizer = Field(lambda: tf.keras.regularizers.l2(1e-5))
 
+
 @factory
 class RealToBinNetBAN(RealToBinNetFactory):
     model_name = Field("r2b_ban")
@@ -416,6 +417,7 @@ class RealToBinNetBAN(RealToBinNetFactory):
     kernel_quantizer = Field(None)
     kernel_constraint = Field(None)
     kernel_regularizer = Field(lambda: tf.keras.regularizers.l2(1e-5))
+
 
 @factory
 class RealToBinNetBNN(RealToBinNetFactory):
