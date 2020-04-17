@@ -57,7 +57,7 @@ class _SharedBaseFactory(ModelFactory, abc.ABC):
 
         x = tf.keras.layers.GlobalAvgPool2D(name=f"{name}_global_pool")(x)
         x = tf.keras.layers.Dense(
-            self.num_classes, activation=None, name=f"{name}_logits",
+            self.num_classes, name=f"{name}_logits",
         )(x)
         return tf.keras.layers.Softmax(name=f"{name}_probs", dtype=tf.float32)(x)
 
