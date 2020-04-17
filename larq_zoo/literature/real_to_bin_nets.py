@@ -57,7 +57,7 @@ class _SharedBaseFactory(ModelFactory):
         x = tf.keras.layers.Dense(
             self.num_classes, activation=None, name=f"{name}_logits",
         )(x)
-        return tf.keras.layers.Softmax(name=f"{name}_probs")(x)
+        return tf.keras.layers.Softmax(name=f"{name}_probs", dtype=tf.float32)(x)
 
     def block(self, x, downsample=False, name=""):
         """Main network block
@@ -335,17 +335,17 @@ class RealToBinNetFactory(StrongBaselineNetFactory):
             )
         if self.include_top:
             weights_path = utils.download_pretrained_model(
-                model="r2b_bnn",
+                model="r2b",
                 version="v0.1.0",
-                file="r2b_bnn_weights.h5",
-                file_hash="",  # TODO
+                file="r2b_weights.h5",
+                file_hash="e8fd16ca1ab9810ac3835f24f5c62758a57bc32a615f73aaa50d382d2b9617e1",
             )
         else:
             weights_path = utils.download_pretrained_model(
-                model="r2b_bnn",
+                model="r2b",
                 version="v0.1.0",
-                file="r2b_bnn_weights_notop.h5",
-                file_hash="",  # TODO
+                file="r2b_weights_notop.h5",
+                file_hash="4ec47abf1a4da5c65f4908076257e8d5c812673891089a88c9d9e84e949d1dab",
             )
         return weights_path
 
@@ -405,19 +405,24 @@ class StrongBaselineNetBNN(StrongBaselineNetFactory):
 class RealToBinNetFP(RealToBinNetFactory):
     model_name = Field("r2b_fp")
     input_quantizer = Field(lambda: tf.keras.layers.Activation("tanh"))
-
+    kernel_quantizer = Field(None)
+    kernel_constraint = Field(None)
+    kernel_regularizer = Field(lambda: tf.keras.regularizers.l2(1e-5))
 
 @factory
 class RealToBinNetBAN(RealToBinNetFactory):
     model_name = Field("r2b_ban")
     input_quantizer = Field("ste_sign")
-
+    kernel_quantizer = Field(None)
+    kernel_constraint = Field(None)
+    kernel_regularizer = Field(lambda: tf.keras.regularizers.l2(1e-5))
 
 @factory
 class RealToBinNetBNN(RealToBinNetFactory):
     model_name = Field("r2b_bnn")
     input_quantizer = Field("ste_sign")
     kernel_quantizer = Field("ste_sign")
+    kernel_constraint = Field("weight_clip")
 
 
 @factory
@@ -425,59 +430,10 @@ class ResNet18FP(ResNet18Factory):
     model_name = Field("resnet_fp")
     input_quantizer = Field(None)
     kernel_quantizer = Field(None)
+    kernel_constraint = Field(None)
 
 
-def StrongR2BBaselineBNN(
-    *,  # Keyword arguments only
-    input_shape: Optional[Sequence[Optional[int]]] = None,
-    input_tensor: Optional[tf.Tensor] = None,
-    weights: Optional[str] = "imagenet",
-    include_top: bool = True,
-    num_classes: int = 1000,
-) -> tf.keras.models.Model:
-    """Instantiates the BNN version of the Strong Baseline network from Martinez et. al.
-
-    Optionally loads weights pre-trained on ImageNet.
-
-    ```netron
-    resnet_e-v0.1.0/strong_baseline_bnn.json #TODO
-    ```
-    ```plot-altair
-    /plots/strong_baseline_bnn.vg.json #TODO
-    ```
-
-    # Arguments
-    input_shape: Optional shape tuple, to be specified if you would like to use a model
-        with an input image resolution that is not (224, 224, 3).
-        It should have exactly 3 inputs channels.
-    input_tensor: optional Keras tensor (i.e. output of `layers.Input()`) to use as
-        image input for the model.
-    weights: one of `None` (random initialization), "imagenet" (pre-training on
-        ImageNet), or the path to the weights file to be loaded.
-    include_top: whether to include the fully-connected layer at the top of the network.
-    num_classes: optional number of classes to classify images into, only to be specified
-        if `include_top` is True, and if no `weights` argument is specified.
-
-    # Returns
-    A Keras model instance.
-
-    # Raises
-    ValueError: in case of invalid argument for `weights`, or invalid input shape.
-
-    # References
-    - [Training binary neural networks with
-        real-to-binary convolutions](https://openreview.net/forum?id=BJg4NgBKvH)
-    """
-    return StrongBaselineNetBNN(
-        input_shape=input_shape,
-        input_tensor=input_tensor,
-        weights=weights,
-        include_top=include_top,
-        num_classes=num_classes,
-    ).build()
-
-
-def RealToBinaryBNN(
+def RealToBinaryNet(
     *,  # Keyword arguments only
     input_shape: Optional[Sequence[Optional[int]]] = None,
     input_tensor: Optional[tf.Tensor] = None,
@@ -490,11 +446,17 @@ def RealToBinaryBNN(
     Optionally loads weights pre-trained on ImageNet.
 
     ```netron
-    resnet_e-v0.1.0/r2b_bnn.json #TODO
+    real-to-bin-net-v0.1.0/r2b.json
     ```
     ```plot-altair
-    /plots/r2b_bnn.vg.json #TODO
+    /plots/r2b.vg.json
     ```
+
+    # ImageNet Metrics
+
+    | Top-1 Accuracy | Top-5 Accuracy | Parameters | Memory  |
+    | -------------- | -------------- | ---------- | ------- |
+    | 65.01 %        | 85.72 %        | 11 995 624 | 5.13 MB |
 
     # Arguments
     input_shape: Optional shape tuple, to be specified if you would like to use a model
@@ -505,8 +467,8 @@ def RealToBinaryBNN(
     weights: one of `None` (random initialization), "imagenet" (pre-training on
         ImageNet), or the path to the weights file to be loaded.
     include_top: whether to include the fully-connected layer at the top of the network.
-    num_classes: optional number of classes to classify images into, only to be specified
-        if `include_top` is True, and if no `weights` argument is specified.
+    num_classes: optional number of classes to classify images into, only to be
+        specified if `include_top` is True, and if no `weights` argument is specified.
 
     # Returns
     A Keras model instance.
