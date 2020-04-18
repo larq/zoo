@@ -39,6 +39,7 @@ def parametrize(func):
             (lqz.literature.BinaryDenseNet45, 800),
             (lqz.literature.XNORNet, 4096),
             (lqz.literature.DoReFaNet, 256),
+            (lqz.literature.RealToBinaryNet, 512),
             (lqz.sota.QuickNet, 512),
             (lqz.sota.QuickNetLarge, 512),
             (lqz.sota.QuickNetXL, 512),
