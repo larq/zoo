@@ -208,7 +208,7 @@ class StrongBaselineNetFactory(_SharedBaseFactory):
         """
 
         in_channels = x.shape[-1]
-        out_channels = in_channels * 2 if downsample else in_channels
+        out_channels = int(in_channels * 2 if downsample else in_channels)
 
         # Shortcut, which gets downsampled if necessary
         shortcut_add = self.shortcut_connection(x, name, in_channels, out_channels)
