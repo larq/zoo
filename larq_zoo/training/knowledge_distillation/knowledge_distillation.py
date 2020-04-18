@@ -5,7 +5,7 @@ import tensorflow as tf
 from cached_property import cached_property
 from zookeeper import ComponentField, Field, factory
 
-from larq_zoo.core.model_factory import ModelFactory, QuantizerType, ConstraintType
+from larq_zoo.core.model_factory import ConstraintType, ModelFactory, QuantizerType
 
 
 class AttentionMatchingLossLayer(tf.keras.layers.Layer):

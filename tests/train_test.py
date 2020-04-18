@@ -34,13 +34,17 @@ def test_cli(_, command):
 def test_multi_stage_experiments(command, phases):
     arguments = [command] + ["--no-use_tensorboard", "--no-use_model_checkpointing"]
     for phase in range(phases):
-        arguments.extend([f'stage_{phase}.{c}' for c in ["dataset=DummyOxfordFlowers",
-            "epochs=1",
-            "batch_size=2",
-            "validation_frequency=5",]])
+        arguments.extend(
+            [
+                f"stage_{phase}.{c}"
+                for c in [
+                    "dataset=DummyOxfordFlowers",
+                    "epochs=1",
+                    "batch_size=2",
+                    "validation_frequency=5",
+                ]
+            ]
+        )
 
-    result = CliRunner().invoke(
-        multi_stage_experiments.cli,
-        args=arguments
-    )
+    result = CliRunner().invoke(multi_stage_experiments.cli, args=arguments)
     assert result.exit_code == 0
