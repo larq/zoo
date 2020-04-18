@@ -3,7 +3,7 @@ real-to-binary convolutions`
 
 [(Martinez et al., 2019)](https://openreview.net/forum?id=BJg4NgBKvH)
 """
-import abc
+from abc import ABCMeta, abstractmethod
 from typing import Optional, Sequence
 
 import larq as lq
@@ -14,7 +14,7 @@ from larq_zoo.core import utils
 from larq_zoo.core.model_factory import ModelFactory, QuantizerType
 
 
-class _SharedBaseFactory(ModelFactory, abc.ABC):
+class _SharedBaseFactory(ModelFactory, metaclass=ABCMeta):
     """Base configuration and blocks shared across ResNet, StrongBaselineNets and Real-
     to-Bin Nets."""
 
@@ -59,7 +59,7 @@ class _SharedBaseFactory(ModelFactory, abc.ABC):
         x = tf.keras.layers.Dense(self.num_classes, name=f"{name}_logits",)(x)
         return tf.keras.layers.Softmax(name=f"{name}_probs", dtype=tf.float32)(x)
 
-    @abc.abstractmethod
+    @abstractmethod
     def block(self, x, downsample=False, name=""):
         """Main network block
 
@@ -272,7 +272,7 @@ class RealToBinNetFactory(StrongBaselineNetFactory):
 
         z = tf.keras.layers.GlobalAvgPool2D(name=f"{name}_scaling_pool")(conv_input)
         dim_reduction = tf.keras.layers.Dense(
-            int(in_filters / self.scaling_r),
+            int(in_filters // self.scaling_r),
             activation="relu",
             kernel_initializer="he_normal",
             kernel_regularizer=self.kernel_regularizer,
