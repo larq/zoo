@@ -141,7 +141,7 @@ class StrongBaselineNetFactory(_SharedBaseFactory):
             self, regularizer: Optional[tf.keras.regularizers.Regularizer], **kwargs,
         ) -> None:
             super().__init__(**kwargs)
-            self.kernel_regularizer = regularizer
+            self.kernel_regularizer = tf.keras.regularizers.get(regularizer)
 
         def build(self, input_shapes):
             self.scale_h = self.add_weight(
@@ -176,16 +176,9 @@ class StrongBaselineNetFactory(_SharedBaseFactory):
 
         def get_config(self):
             return {
-                "output_dim": self.output_dim,
-                "regularizer": self.kernel_regularizer.get_config(),
+                **super().get_config(),
+                "regularizer": tf.keras.regularizers.serialize(self.kernel_regularizer),
             }
-
-        @classmethod
-        def from_config(cls, config):
-            return cls(
-                output_dim=config["output_dim"],
-                regularizer=tf.keras.regularizers.deserialize(config["regularizer"]),
-            )
 
     def _scale_binary_conv_output(
         self, conv_input: tf.Tensor, conv_output: tf.Tensor, name: str
