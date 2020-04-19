@@ -1,5 +1,3 @@
-from typing import Sequence
-
 import tensorflow as tf
 from zookeeper import ComponentField, Field, cli, task
 
