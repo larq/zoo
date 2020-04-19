@@ -447,7 +447,7 @@ class TeacherStudentModelFactory(ModelFactory):
         # the classification loss is added when the model is compiled, as it depends on the targets
         # Return a model which takes a single input and passes it to both the teacher and the student.
         return tf.keras.Model(
-            inputs=self.input_tensor,
-            outputs=combined_model([self.input_tensor, self.input_tensor]),
+            inputs=self.image_input,
+            outputs=combined_model([self.image_input, self.image_input]),
             name="teacher_student_model",
         )
