@@ -8,8 +8,8 @@ from larq_zoo.literature.real_to_bin_nets import (
     RealToBinNetBNNFactory,
     RealToBinNetFPFactory,
     ResNet18FPFactory,
-    StrongBaselineNetBAN,
-    StrongBaselineNetBNN,
+    StrongBaselineNetBANFactory,
+    StrongBaselineNetBNNFactory,
 )
 from larq_zoo.training.datasets import ImageNet
 from larq_zoo.training.knowledge_distillation.multi_stage_training import (
@@ -125,14 +125,14 @@ class TrainR2BStrongBaselineBAN(LarqZooModelTrainingPhase):
         )
     )
 
-    student_model = ComponentField(StrongBaselineNetBAN)
+    student_model = ComponentField(StrongBaselineNetBANFactory)
 
 
 @task
 class TrainR2BStrongBaselineBNN(TrainR2BStrongBaselineBAN):
     stage = Field(1)
     learning_rate: float = Field(2e-4)
-    student_model = ComponentField(StrongBaselineNetBNN)
+    student_model = ComponentField(StrongBaselineNetBNNFactory)
     initialize_student_weights_from = Field("baseline_ban")
 
 
@@ -194,9 +194,9 @@ class TrainR2BBFP(TrainFPResnet18):
     initialize_teacher_weights_from = Field("resnet_fp")
     student_model = ComponentField(RealToBinNetFPFactory)
 
-    classification_weight = Field(1.0)  # TODO double check
-    attention_matching_weight = Field(30.0)  # TODO double check
-    output_matching_weight = Field(3.0)  # TODO double check
+    classification_weight = Field(1.0)
+    attention_matching_weight = Field(30.0)
+    output_matching_weight = Field(3.0)
 
     attention_matching_volume_names = Field(
         lambda: [f"block_{b}_out" for b in range(2, 10)]
@@ -207,12 +207,6 @@ class TrainR2BBFP(TrainFPResnet18):
 class TrainR2BBAN(TrainR2BBFP):
     stage = Field(2)
     learning_rate: float = Field(1e-3)
-
-    classification_weight = Field(1.0)  # TODO double check
-    attention_matching_weight = Field(30.0)  # TODO double check
-    output_matching_weight = Field(3.0)  # TODO double check
-    attention_matching_train_teacher = Field(False)
-    output_matching_train_teacher = Field(False)
 
     teacher_model = ComponentField(RealToBinNetFPFactory)
     student_model = ComponentField(RealToBinNetBANFactory)
@@ -225,12 +219,10 @@ class TrainR2BBNN(TrainR2BBFP):
     stage = Field(3)
     learning_rate: float = Field(2e-4)
 
-    classification_weight = Field(1.0)  # TODO double check
-    attention_matching_weight = Field(0.0)  # TODO double check
-    output_matching_weight = Field(1.25)  # TODO double check
-    output_matching_softmax_temperature = Field(3.0)  # TODO double check
-    attention_matching_train_teacher = Field(False)  # TODO default?
-    output_matching_train_teacher = Field(False)
+    classification_weight = Field(1.0)
+    attention_matching_weight = Field(0.0)
+    output_matching_weight = Field(0.8)
+    output_matching_softmax_temperature = Field(1.0)
 
     teacher_model = ComponentField(RealToBinNetBANFactory)
     student_model = ComponentField(RealToBinNetBNNFactory)
@@ -243,13 +235,13 @@ class TrainR2BBNN(TrainR2BBFP):
 class TrainR2BBNNAlternative(TrainR2BBNN):
     """We deviate slightly from Martinez et. al. here"""
 
-    epochs = Field(100)
+    warmup_duration = Field(10)
     optimizer = Field(
         lambda self: tf.keras.optimizers.Adam(
             CosineDecayWithWarmup(
-                max_learning_rate=1.75e-4,
-                warmup_steps=self.steps_per_epoch * 10,
-                decay_steps=self.steps_per_epoch * (self.epochs - 10),
+                max_learning_rate=self.learning_rate,
+                warmup_steps=self.steps_per_epoch * self.warmup_duration,
+                decay_steps=self.steps_per_epoch * (self.epochs - self.warmup_duration),
             )
         )
     )

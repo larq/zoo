@@ -405,6 +405,7 @@ class ResNet18FPFactory(ResNet18Factory):
     input_quantizer = Field(None)
     kernel_quantizer = Field(None)
     kernel_constraint = Field(None)
+    kernel_regularizer = Field(lambda: tf.keras.regularizers.l2(1e-5))
 
 
 def RealToBinaryNet(
