@@ -2,7 +2,6 @@ from pathlib import Path
 from typing import List, Optional
 
 import tensorflow as tf
-from cached_property import cached_property
 from zookeeper import ComponentField, Field, factory
 
 from larq_zoo.core.model_factory import ConstraintType, ModelFactory, QuantizerType
@@ -316,9 +315,14 @@ class TeacherStudentModelFactory(ModelFactory):
     #  - weight on the loss component for standard classification
     classification_weight: float = Field()
 
-    @cached_property
+    _classification_loss = None
+
     def classification_loss(self):
-        return WeightedCrossEntropyLoss(self.classification_weight)
+        if self._classification_loss is None:
+            self._classification_loss = WeightedCrossEntropyLoss(
+                self.classification_weight
+            )
+        return self._classification_loss
 
     # parameters related to the training through attention matching between teacher and student activation volumes
     #  - weight on the loss component for spatial attention matching
