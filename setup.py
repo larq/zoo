@@ -19,8 +19,8 @@ setup(
     license="Apache 2.0",
     install_requires=["numpy~=1.15", "larq>=0.9.2,<0.10.0", "zookeeper~=1.0.b5"],
     extras_require={
-        "tensorflow": ["tensorflow>=1.14.0"],
-        "tensorflow_gpu": ["tensorflow-gpu>=1.14.0"],
+        "tensorflow": ["tensorflow>=1.15.0"],
+        "tensorflow_gpu": ["tensorflow-gpu>=1.15.0"],
         "test": [
             "black==19.10b0",
             "flake8~=3.7.9",
