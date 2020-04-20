@@ -10,7 +10,7 @@ from larq_zoo.training import basic_experiments, multi_stage_experiments
 
 @pytest.mark.parametrize(
     "command",
-    [e for e in list(basic_experiments.cli.commands.keys()) if not "R2B" in e],
+    [e for e in list(basic_experiments.cli.commands.keys()) if "R2B" not in e],
 )
 @tfds.testing.mock_data(num_examples=2, data_dir="gs://tfds-data/dataset_info")
 @mock.patch.object(TFDSDataset, "num_examples", return_value=2)
