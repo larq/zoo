@@ -317,7 +317,8 @@ class TeacherStudentModelFactory(ModelFactory):
 
     _classification_loss = None
 
-    def classification_loss(self):
+    @property
+    def classification_loss(self) -> tf.keras.losses.Loss:
         if self._classification_loss is None:
             self._classification_loss = WeightedCrossEntropyLoss(
                 self.classification_weight
