@@ -1,5 +1,5 @@
-from types import MethodType
-from typing import Optional, Sequence
+import abc
+from typing import Callable, Optional, Sequence
 
 import larq as lq
 import tensorflow as tf
@@ -46,7 +46,6 @@ def squeeze_and_excite(inp: tf.Tensor, filters: int, r: int = 16):
         use_bias=False,
         kernel_regularizer=tf.keras.regularizers.l2(1e-5),
     )(out)
-
     out = tf.keras.layers.Dense(
         filters,
         activation="sigmoid",
@@ -58,19 +57,34 @@ def squeeze_and_excite(inp: tf.Tensor, filters: int, r: int = 16):
     return tf.reshape(out, [-1, 1, 1, filters])
 
 
-@factory
-class QuickNetBaseFactory(ModelFactory):
-
+class QuickNetBaseFactory(ModelFactory, abc.ABC):
     name: str = "model"
-    blocks_per_section: Sequence[int] = Field(None)
-    section_filters: Sequence[int] = Field(None)
-    use_squeeze_and_excite_in_section: Sequence[bool] = Field(None)
-    transition_block: MethodType = Field(None)
+    blocks_per_section: Sequence[int] = Field()
+    section_filters: Sequence[int] = Field()
+    use_squeeze_and_excite_in_section: Sequence[bool] = Field()
+    transition_block: Callable[..., tf.Tensor] = Field()
     stem_filters: int = Field(64)
 
     input_quantizer = Field(lambda: lq.quantizers.SteSign(clip_value=1.25))
     kernel_quantizer = Field(lambda: lq.quantizers.SteSign(clip_value=1.25))
     kernel_constraint = Field(lambda: lq.constraints.WeightClip(clip_value=1.25))
+
+    def __post_configure__(self):
+        assert (
+            len(self.blocks_per_section)
+            == len(self.section_filters)
+            == len(self.use_squeeze_and_excite_in_section)
+        )
+
+    @property
+    @abc.abstractmethod
+    def imagenet_weights_path(self) -> str:
+        raise NotImplementedError
+
+    @property
+    @abc.abstractmethod
+    def imagenet_no_top_weights_path(self) -> str:
+        raise NotImplementedError
 
     def conv_block(
         self, x: tf.Tensor, filters: int, use_squeeze_and_excite: bool, strides: int = 1
@@ -110,7 +124,7 @@ class QuickNetBaseFactory(ModelFactory):
     ) -> tf.Tensor:
         """Concat transition block.
 
-        Doubles number of filters by concatenating shortcut with x + shortcut.
+        Doubles the number of filters by concatenating shortcut with x + shortcut.
         """
         infilters = int(x.shape[-1])
         assert filters == 2 * infilters
@@ -172,6 +186,16 @@ class QuickNetBaseFactory(ModelFactory):
 
         model = tf.keras.Model(inputs=self.image_input, outputs=x, name=self.name)
 
+        # Load weights.
+        if self.weights == "imagenet":
+            weights_path = (
+                self.imagenet_weights_path
+                if self.include_top
+                else self.imagenet_no_top_weights_path
+            )
+            model.load_weights(weights_path)
+        elif self.weights is not None:
+            model.load_weights(self.weights)
         return model
 
 
@@ -187,30 +211,23 @@ class QuickNetFactory(QuickNetBaseFactory):
     )
     transition_block = Field(lambda self: self.concat_transition_block)
 
-    def build(self) -> tf.keras.models.Model:
-        model = super().build()
+    @property
+    def imagenet_weights_path(self):
+        return utils.download_pretrained_model(
+            model="quicknet",
+            version="v0.2.0",
+            file="quicknet_weights.h5",
+            file_hash="6a765f120ba7b62a7740e842c4f462eb7ba3dd65eb46b4694c5bc8169618fae7",
+        )
 
-        # Load weights.
-        if self.weights == "imagenet":
-            # Download appropriate file
-            if self.include_top:
-                weights_path = utils.download_pretrained_model(
-                    model="quicknet",
-                    version="v0.2.0",
-                    file="quicknet_weights.h5",
-                    file_hash="6a765f120ba7b62a7740e842c4f462eb7ba3dd65eb46b4694c5bc8169618fae7",
-                )
-            else:
-                weights_path = utils.download_pretrained_model(
-                    model="quicknet",
-                    version="v0.2.0",
-                    file="quicknet_weights_notop.h5",
-                    file_hash="5bf2fc450fb8cc322b33a16410bf88fed09d05c221550c2d5805a04985383ac2",
-                )
-            model.load_weights(weights_path)
-        elif self.weights is not None:
-            model.load_weights(self.weights)
-        return model
+    @property
+    def imagenet_no_top_weights_path(self):
+        return utils.download_pretrained_model(
+            model="quicknet",
+            version="v0.2.0",
+            file="quicknet_weights_notop.h5",
+            file_hash="5bf2fc450fb8cc322b33a16410bf88fed09d05c221550c2d5805a04985383ac2",
+        )
 
 
 @factory
@@ -226,29 +243,23 @@ class QuickNetLargeFactory(QuickNetBaseFactory):
     )
     transition_block = Field(lambda self: self.fp_pointwise_transition_block)
 
-    def build(self) -> tf.keras.models.Model:
-        model = super().build()
-        # Load weights.
-        if self.weights == "imagenet":
-            # Download appropriate file
-            if self.include_top:
-                weights_path = utils.download_pretrained_model(
-                    model="quicknet_large",
-                    version="v0.2.0",
-                    file="quicknet_large_weights.h5",
-                    file_hash="2d9ebbf8ba0500552e4dd243c3e52fd8291f965ef6a0e1dbba13cc72bf6eee8b",
-                )
-            else:
-                weights_path = utils.download_pretrained_model(
-                    model="quicknet_large",
-                    version="v0.2.0",
-                    file="quicknet_large_weights_notop.h5",
-                    file_hash="067655ef8a1a1e99ef1c71fa775c09aca44bdfad0b9b71538b4ec500c3beee4f",
-                )
-            model.load_weights(weights_path)
-        elif self.weights is not None:
-            model.load_weights(self.weights)
-        return model
+    @property
+    def imagenet_weights_path(self):
+        return utils.download_pretrained_model(
+            model="quicknet_large",
+            version="v0.2.0",
+            file="quicknet_large_weights.h5",
+            file_hash="2d9ebbf8ba0500552e4dd243c3e52fd8291f965ef6a0e1dbba13cc72bf6eee8b",
+        )
+
+    @property
+    def imagenet_no_top_weights_path(self):
+        return utils.download_pretrained_model(
+            model="quicknet_large",
+            version="v0.2.0",
+            file="quicknet_large_weights_notop.h5",
+            file_hash="067655ef8a1a1e99ef1c71fa775c09aca44bdfad0b9b71538b4ec500c3beee4f",
+        )
 
 
 @factory
@@ -264,29 +275,23 @@ class QuickNetXLFactory(QuickNetBaseFactory):
     )
     transition_block = Field(lambda self: self.fp_pointwise_transition_block)
 
-    def build(self) -> tf.keras.models.Model:
-        model = super().build()
-        # Load weights.
-        if self.weights == "imagenet":
-            # Download appropriate file
-            if self.include_top:
-                weights_path = utils.download_pretrained_model(
-                    model="quicknet_xl",
-                    version="v0.1.0",
-                    file="quicknet_xl_weights.h5",
-                    file_hash="a85eea1204fa9a8401f922f94531858493e3518e3374347978ed7ba615410498",
-                )
-            else:
-                weights_path = utils.download_pretrained_model(
-                    model="quicknet_xl",
-                    version="v0.1.0",
-                    file="quicknet_xl_weights_notop.h5",
-                    file_hash="b97074d6618acde4201d1f8676d32272d27743ddfe27c6c97e4516511ebb5008",
-                )
-            model.load_weights(weights_path)
-        elif self.weights is not None:
-            model.load_weights(self.weights)
-        return model
+    @property
+    def imagenet_weights_path(self):
+        return utils.download_pretrained_model(
+            model="quicknet_xl",
+            version="v0.1.0",
+            file="quicknet_xl_weights.h5",
+            file_hash="a85eea1204fa9a8401f922f94531858493e3518e3374347978ed7ba615410498",
+        )
+
+    @property
+    def imagenet_no_top_weights_path(self):
+        return utils.download_pretrained_model(
+            model="quicknet_xl",
+            version="v0.1.0",
+            file="quicknet_xl_weights_notop.h5",
+            file_hash="b97074d6618acde4201d1f8676d32272d27743ddfe27c6c97e4516511ebb5008",
+        )
 
 
 def QuickNet(
