@@ -7,6 +7,7 @@ from larq_zoo.literature.densenet import (
     BinaryDenseNet45,
 )
 from larq_zoo.literature.dorefanet import DoReFaNet
+from larq_zoo.literature.real_to_bin_nets import RealToBinaryNet
 from larq_zoo.literature.resnet_e import BinaryResNetE18
 from larq_zoo.literature.xnornet import XNORNet
 
@@ -19,5 +20,6 @@ __all__ = [
     "BinaryDenseNet37Dilated",
     "BinaryDenseNet45",
     "DoReFaNet",
+    "RealToBinaryNet",
     "XNORNet",
 ]
