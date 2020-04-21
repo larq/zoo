@@ -443,6 +443,13 @@ class TeacherStudentModelFactory(ModelFactory):
                 propagate_teacher_gradients=self.output_matching_train_teacher,
             )([combined_output, tl, sl])
 
+        if (
+            not self.attention_matching_train_teacher
+            and not self.output_matching_train_teacher
+        ):
+            for layer in self.teacher_model.layers:
+                layer.trainable = False
+
         combined_model = tf.keras.models.Model(
             inputs=[*self.teacher_model.inputs, *self.student_model.inputs],
             outputs=combined_output,
