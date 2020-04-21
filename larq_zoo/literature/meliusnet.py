@@ -7,7 +7,6 @@ from zookeeper import Field, factory
 from larq_zoo.core import utils
 from larq_zoo.core.model_factory import ModelFactory
 
-
 ################
 # Base factory #
 ################
@@ -29,21 +28,22 @@ class MeliusNetFactory(ModelFactory):
     kernel_quantizer = Field(lambda: lq.quantizers.SteSign(1.3))
     kernel_constraint = Field(lambda: lq.constraints.WeightClip(1.3))
 
-    def pool(self, x: tf.Tensor) -> tf.Tensor:
+    def pool(self, x: tf.Tensor, name: str) -> tf.Tensor:
         return tf.keras.layers.MaxPool2D(2, strides=2, padding="same")(x)
 
-    def norm(self, x: tf.Tensor) -> tf.Tensor:
+    def norm(self, x: tf.Tensor, name: str) -> tf.Tensor:
         return tf.keras.layers.BatchNormalization(
             momentum=self.batch_norm_momentum, epsilon=1e-5
         )(x)
 
-    def act(self, x: tf.Tensor) -> tf.Tensor:
+    def act(self, x: tf.Tensor, name: str) -> tf.Tensor:
         return tf.keras.layers.Activation("relu")(x)
 
     def quant_conv(
         self,
         x: tf.Tensor,
         filters: int,
+        name: str,
         kernel: Union[int, Tuple[int, int]],
         strides: Union[int, Tuple[int, int]] = 1,
     ) -> tf.Tensor:
