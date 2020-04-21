@@ -1,4 +1,4 @@
-from typing import Optional, Sequence, Union
+from typing import Optional, Sequence, Tuple, Union
 
 import larq as lq
 import tensorflow as tf
@@ -40,7 +40,13 @@ class MeliusNetFactory(ModelFactory):
     def act(self, x: tf.Tensor) -> tf.Tensor:
         return tf.keras.layers.Activation("relu")(x)
 
-    def quant_conv(self, x: tf.Tensor, filters: int, kernel: Union[int, Tuple[int, int]], strides: Union[int, Tuple[int, int]] = 1) -> tf.Tensor:
+    def quant_conv(
+        self,
+        x: tf.Tensor,
+        filters: int,
+        kernel: Union[int, Tuple[int, int]],
+        strides: Union[int, Tuple[int, int]] = 1,
+    ) -> tf.Tensor:
         return lq.layers.QuantConv2D(
             filters,
             kernel,
@@ -53,7 +59,13 @@ class MeliusNetFactory(ModelFactory):
             kernel_initializer=self.kernel_initializer,
         )(x)
 
-    def group_conv(self, x: tf.Tensor, filters: int, kernel: Union[int, Tuple[int, int]], groups: int) -> tf.Tensor:
+    def group_conv(
+        self,
+        x: tf.Tensor,
+        filters: int,
+        kernel: Union[int, Tuple[int, int]],
+        groups: int,
+    ) -> tf.Tensor:
         assert filters % groups == 0
         assert x.shape.as_list()[-1] % groups == 0
 
