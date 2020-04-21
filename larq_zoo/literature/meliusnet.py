@@ -8,11 +8,14 @@ from larq_zoo.core import utils
 from larq_zoo.core.model_factory import ModelFactory
 
 
-@factory
-class MeliusNetFactory(ModelFactory):
-    weights: Optional[str] = Field(None)
+################
+# Base factory #
+################
 
-    # overall architecture configuration
+
+class MeliusNetFactory(ModelFactory):
+    # Overall architecture configuration. These are not `Fields`, as they should
+    # not be configurable, but set in the various concrete subclasses.
     num_blocks: Sequence[int]
     transition_features: Sequence[int]
     name: str
@@ -26,18 +29,18 @@ class MeliusNetFactory(ModelFactory):
     kernel_quantizer = Field(lambda: lq.quantizers.SteSign(1.3))
     kernel_constraint = Field(lambda: lq.constraints.WeightClip(1.3))
 
-    def pool(self, x):
+    def pool(self, x: tf.Tensor) -> tf.Tensor:
         return tf.keras.layers.MaxPool2D(2, strides=2, padding="same")(x)
 
-    def norm(self, x):
+    def norm(self, x: tf.Tensor) -> tf.Tensor:
         return tf.keras.layers.BatchNormalization(
             momentum=self.batch_norm_momentum, epsilon=1e-5
         )(x)
 
-    def act(self, x):
+    def act(self, x: tf.Tensor) -> tf.Tensor:
         return tf.keras.layers.Activation("relu")(x)
 
-    def quant_conv(self, x, filters, kernel, strides=1):
+    def quant_conv(self, x: tf.Tensor, filters: int, kernel: Union[int, Tuple[int, int]], strides: Union[int, Tuple[int, int]] = 1) -> tf.Tensor:
         return lq.layers.QuantConv2D(
             filters,
             kernel,
@@ -50,7 +53,7 @@ class MeliusNetFactory(ModelFactory):
             kernel_initializer=self.kernel_initializer,
         )(x)
 
-    def group_conv(self, x, filters, kernel, groups):
+    def group_conv(self, x: tf.Tensor, filters: int, kernel: Union[int, Tuple[int, int]], groups: int) -> tf.Tensor:
         assert filters % groups == 0
         assert x.shape.as_list()[-1] % groups == 0
 
@@ -69,7 +72,7 @@ class MeliusNetFactory(ModelFactory):
 
         return tf.concat(y_split, axis=-1)
 
-    def group_stem(self, x):
+    def group_stem(self, x: tf.Tensor) -> tf.Tensor:
         x = tf.keras.layers.Conv2D(
             32,
             3,
@@ -91,20 +94,20 @@ class MeliusNetFactory(ModelFactory):
 
         return self.pool(x)
 
-    def dense_block(self, x):
+    def dense_block(self, x: tf.Tensor) -> tf.Tensor:
         w = x
         w = self.norm(w)
         w = self.quant_conv(w, 64, 3)
         return tf.concat([x, w], axis=-1)
 
-    def improvement_block(self, x):
+    def improvement_block(self, x: tf.Tensor) -> tf.Tensor:
         w = x
         w = self.norm(w)
         w = self.quant_conv(w, 64, 3)
         f_in = int(x.shape[-1])
         return x + tf.pad(w, [[0, 0], [0, 0], [0, 0], [f_in - 64, 0]])
 
-    def transition_block(self, x, filters):
+    def transition_block(self, x: tf.Tensor, filters: int) -> tf.Tensor:
         x = self.norm(x)
         x = self.pool(x)
         x = self.act(x)
@@ -112,7 +115,7 @@ class MeliusNetFactory(ModelFactory):
             filters, 1, use_bias=False, kernel_initializer=self.kernel_initializer
         )(x)
 
-    def block(self, x):
+    def block(self, x: tf.Tensor) -> tf.Tensor:
         x = self.dense_block(x)
         return self.improvement_block(x)
 
@@ -201,13 +204,15 @@ def MeliusNet22(
     ```netron
     meliusnet22-v0.1.0/meliusnet22.json
     ```
-    ```plot-altair
-    /plots/meliusnet22.vg.json
-    ```
     ```summary
     literature.MeliusNet22
     ```
+    ```plot-altair
+    /plots/meliusnet22.vg.json
+    ```
+
     # ImageNet Metrics
+
     | Top-1 Accuracy | Top-5 Accuracy | Parameters | Memory   |
     | -------------- | -------------- | ---------- | -------- |
     | 62.4 %         | 83.9 %         | 6 944 584  | 3.88 MiB |
