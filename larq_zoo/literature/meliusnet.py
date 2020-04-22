@@ -18,6 +18,8 @@ class MeliusNetFactory(ModelFactory):
     num_blocks: Sequence[int]
     transition_features: Sequence[int]
     name: str = None
+    imagenet_weights_path: str
+    imagenet_no_top_weights_path: str
 
     # Some default layer arguments.
     batch_norm_momentum: float = Field(0.9)
