@@ -17,7 +17,7 @@ class MeliusNetFactory(ModelFactory):
     # not be configurable, but set in the various concrete subclasses.
     num_blocks: Sequence[int]
     transition_features: Sequence[int]
-    name: str
+    name: str = None
 
     # Some default layer arguments.
     batch_norm_momentum: float = Field(0.9)
@@ -28,24 +28,24 @@ class MeliusNetFactory(ModelFactory):
     kernel_quantizer = Field(lambda: lq.quantizers.SteSign(1.3))
     kernel_constraint = Field(lambda: lq.constraints.WeightClip(1.3))
 
-    def pool(self, x: tf.Tensor, name: str) -> tf.Tensor:
-        return tf.keras.layers.MaxPool2D(2, strides=2, padding="same")(x)
+    def pool(self, x: tf.Tensor, name: str = None) -> tf.Tensor:
+        return tf.keras.layers.MaxPool2D(2, strides=2, padding="same", name=name)(x)
 
-    def norm(self, x: tf.Tensor, name: str) -> tf.Tensor:
+    def norm(self, x: tf.Tensor, name: str = None) -> tf.Tensor:
         return tf.keras.layers.BatchNormalization(
-            momentum=self.batch_norm_momentum, epsilon=1e-5
+            momentum=self.batch_norm_momentum, epsilon=1e-5, name=name
         )(x)
 
-    def act(self, x: tf.Tensor, name: str) -> tf.Tensor:
-        return tf.keras.layers.Activation("relu")(x)
+    def act(self, x: tf.Tensor, name: str = None) -> tf.Tensor:
+        return tf.keras.layers.Activation("relu", name=name)(x)
 
     def quant_conv(
         self,
         x: tf.Tensor,
         filters: int,
-        name: str,
         kernel: Union[int, Tuple[int, int]],
         strides: Union[int, Tuple[int, int]] = 1,
+        name: str = None,
     ) -> tf.Tensor:
         return lq.layers.QuantConv2D(
             filters,
@@ -57,6 +57,7 @@ class MeliusNetFactory(ModelFactory):
             kernel_quantizer=self.kernel_quantizer,
             kernel_constraint=self.kernel_constraint,
             kernel_initializer=self.kernel_initializer,
+            name=name,
         )(x)
 
     def group_conv(
@@ -65,11 +66,12 @@ class MeliusNetFactory(ModelFactory):
         filters: int,
         kernel: Union[int, Tuple[int, int]],
         groups: int,
+        name: str = None,
     ) -> tf.Tensor:
         assert filters % groups == 0
         assert x.shape.as_list()[-1] % groups == 0
 
-        x_split = tf.split(x, groups, axis=-1)
+        x_split = utils.TFOpLayer(tf.split)(x, groups, axis=-1, name=f"{name}_split")
 
         y_split = [
             tf.keras.layers.Conv2D(
@@ -78,13 +80,14 @@ class MeliusNetFactory(ModelFactory):
                 padding="same",
                 use_bias=False,
                 kernel_initializer=self.kernel_initializer,
+                name=f"{name}_conv{i}",
             )(split)
-            for split in x_split
+            for i, split in enumerate(x_split)
         ]
 
-        return tf.concat(y_split, axis=-1)
+        return utils.TFOpLayer(tf.concat)(y_split, axis=-1, name=f"{name}_concat")
 
-    def group_stem(self, x: tf.Tensor) -> tf.Tensor:
+    def group_stem(self, x: tf.Tensor, name: str = None) -> tf.Tensor:
         x = tf.keras.layers.Conv2D(
             32,
             3,
@@ -92,63 +95,77 @@ class MeliusNetFactory(ModelFactory):
             padding="same",
             use_bias=False,
             kernel_initializer=self.kernel_initializer,
+            name=f"{name}_s0_conv",
         )(x)
-        x = self.norm(x)  # compare Fig 2 and Fig 3
-        x = self.act(x)
+        x = self.norm(x, name=f"{name}_s0_bn")
+        x = self.act(x, name=f"{name}_s0_relu")
 
-        x = self.group_conv(x, 32, 3, 4)
-        x = self.norm(x)
-        x = self.act(x)
+        x = self.group_conv(x, 32, 3, 4, name=f"{name}_s1_groupconv")
+        x = self.norm(x, name=f"{name}_s1_bn")
+        x = self.act(x, name=f"{name}_s1_relu")
 
-        x = self.group_conv(x, 64, 3, 8)
-        x = self.norm(x)
-        x = self.act(x)
+        x = self.group_conv(x, 64, 3, 8, name=f"{name}_s2_groupconv")
+        x = self.norm(x, name=f"{name}_s2_bn")
+        x = self.act(x, name=f"{name}_s2_relu")
 
-        return self.pool(x)
+        return self.pool(x, name=f"{name}_pool")
 
-    def dense_block(self, x: tf.Tensor) -> tf.Tensor:
+    def dense_block(self, x: tf.Tensor, name: str = None) -> tf.Tensor:
         w = x
-        w = self.norm(w)
-        w = self.quant_conv(w, 64, 3)
-        return tf.concat([x, w], axis=-1)
+        w = self.norm(w, name=f"{name}_bn")
+        w = self.quant_conv(w, 64, 3, name=f"{name}_binconv")
+        return utils.TFOpLayer(tf.concat)([x, w], axis=-1, name=f"{name}_concat")
 
-    def improvement_block(self, x: tf.Tensor) -> tf.Tensor:
+    def improvement_block(self, x: tf.Tensor, name: str = None) -> tf.Tensor:
         w = x
-        w = self.norm(w)
-        w = self.quant_conv(w, 64, 3)
+        w = self.norm(w, name=f"{name}_bn")
+        w = self.quant_conv(w, 64, 3, name=f"{name}_binconv")
         f_in = int(x.shape[-1])
-        return x + tf.pad(w, [[0, 0], [0, 0], [0, 0], [f_in - 64, 0]])
+        return tf.keras.layers.Lambda(
+            lambda x_: x_[0] + tf.pad(x_[1], [[0, 0], [0, 0], [0, 0], [f_in - 64, 0]]),
+            name=f"{name}_merge",
+        )([x, w])
 
-    def transition_block(self, x: tf.Tensor, filters: int) -> tf.Tensor:
-        x = self.norm(x)
-        x = self.pool(x)
-        x = self.act(x)
+    def transition_block(
+        self, x: tf.Tensor, filters: int, name: str = None
+    ) -> tf.Tensor:
+        x = self.norm(x, name=f"{name}_bn")
+        x = self.pool(x, name=f"{name}_maxpool")
+        x = self.act(x, name=f"{name}_relu")
         return tf.keras.layers.Conv2D(
-            filters, 1, use_bias=False, kernel_initializer=self.kernel_initializer
+            filters,
+            1,
+            use_bias=False,
+            kernel_initializer=self.kernel_initializer,
+            name=f"{name}_pw",
         )(x)
 
-    def block(self, x: tf.Tensor) -> tf.Tensor:
-        x = self.dense_block(x)
-        return self.improvement_block(x)
+    def block(self, x: tf.Tensor, name: str = None) -> tf.Tensor:
+        x = self.dense_block(x, name=f"{name}_dense")
+        return self.improvement_block(x, name=f"{name}_improve")
 
     def build(self) -> tf.keras.models.Model:
         x = self.image_input
-        x = self.group_stem(x)
+        x = self.group_stem(x, name="stem")
         for i, (n, f) in enumerate(zip(self.num_blocks, self.transition_features)):
             for j in range(n):
-                x = self.block(x)
+                x = self.block(x, f"section_{i}_block_{j}")
             if f:
-                x = self.transition_block(x, f)
+                x = self.transition_block(x, f, f"section_{i}_transition")
 
-        x = self.norm(x)
-        x = self.act(x)
+        x = self.norm(x, "head_bn")
+        x = self.act(x, "head_relu")
 
         if self.include_top:
-            x = utils.global_pool(x)
+            x = utils.global_pool(x, name="head_globalpool")
             x = tf.keras.layers.Dense(
-                self.num_classes, kernel_initializer=self.kernel_initializer
+                self.num_classes,
+                kernel_initializer=self.kernel_initializer,
+                name="head_dense",
             )(x)
-            x = tf.keras.layers.Activation("softmax", dtype="float32")(x)
+            x = tf.keras.layers.Activation(
+                "softmax", dtype="float32", name="head_softmax"
+            )(x)
 
         model = tf.keras.models.Model(
             inputs=self.image_input, outputs=x, name=self.name
