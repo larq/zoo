@@ -170,27 +170,18 @@ def decode_predictions(preds, top=5, **kwargs):
     return keras_decode_predictions(preds, top=top, **kwargs)
 
 
-def TFOpLayer(tf_op):
+def TFOpLayer(tf_op: tf.Operation, *args, **kwargs) -> tf.keras.layers.Layer:
     """Wrap a tensorflow op using a Lambda layer. This facilitates naming the op as a
     proper keras layer.
 
-    Example: TFOpLayer(tf.split)(x, groups, axis=-1, name="split")
+    Example: `TFOpLayer(tf.split, groups, axis=-1, name="split")(x)`.
 
     # Arguments
-    tf_op: tensorflow that needs to be wrapped
+    tf_op: tensorflow that needs to be wrapped.
 
     # Returns
-    A function with the same signature as `tf_op`. Internally, the function creates
-        a keras lambda layer and passes the `name` argument to the lambda layer instead
-        of the tensorflow op.
+    A keras layer wrapping `tf_op`.
 
     """
-
-    def wrapped_fun(*args, **kwargs):
-        name = kwargs.pop("name", None)
-        x = args[0] if args else kwargs.pop("x")
-        return tf.keras.layers.Lambda(
-            lambda x_: tf_op(x_, *args[1:], **kwargs), name=name
-        )(x)
-
-    return wrapped_fun
+    name = kwargs.pop("name", None)
+    return tf.keras.layers.Lambda(lambda x_: tf_op(x_, *args, **kwargs), name=name)

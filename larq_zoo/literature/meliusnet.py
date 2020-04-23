@@ -73,7 +73,7 @@ class MeliusNetFactory(ModelFactory):
         assert filters % groups == 0
         assert x.shape.as_list()[-1] % groups == 0
 
-        x_split = utils.TFOpLayer(tf.split)(x, groups, axis=-1, name=f"{name}_split")
+        x_split = utils.TFOpLayer(tf.split, groups, axis=-1, name=f"{name}_split")(x)
 
         y_split = [
             tf.keras.layers.Conv2D(
@@ -87,7 +87,7 @@ class MeliusNetFactory(ModelFactory):
             for i, split in enumerate(x_split)
         ]
 
-        return utils.TFOpLayer(tf.concat)(y_split, axis=-1, name=f"{name}_concat")
+        return utils.TFOpLayer(tf.concat, axis=-1, name=f"{name}_concat")(y_split)
 
     def group_stem(self, x: tf.Tensor, name: str = None) -> tf.Tensor:
         x = tf.keras.layers.Conv2D(
@@ -116,7 +116,7 @@ class MeliusNetFactory(ModelFactory):
         w = x
         w = self.norm(w, name=f"{name}_bn")
         w = self.quant_conv(w, 64, 3, name=f"{name}_binconv")
-        return utils.TFOpLayer(tf.concat)([x, w], axis=-1, name=f"{name}_concat")
+        return utils.TFOpLayer(tf.concat, axis=-1, name=f"{name}_concat")([x, w])
 
     def improvement_block(self, x: tf.Tensor, name: str = None) -> tf.Tensor:
         w = x
@@ -202,7 +202,7 @@ class MeliusNet22Factory(MeliusNetFactory):
             model="meliusnet22",
             version="v0.1.0",
             file="meliusnet22_weights.h5",
-            file_hash="bb8dda20642508bbe5e0ff95012fec450103c4b23989f4c9c9d853d67b6ff806",
+            file_hash="c1ba85e8389ae326009665ec13331e49fc3df4d0f925fa8553e224f7362c18ed",
         )
 
     @property
@@ -211,7 +211,7 @@ class MeliusNet22Factory(MeliusNetFactory):
             model="meliusnet22",
             version="v0.1.0",
             file="meliusnet22_weights_notop.h5",
-            file_hash="9ca867806bff0c2995ff5f1ad085d1627c8dabf12bffbf0bea86eb39ab3cf724",
+            file_hash="b64c8296a3d07ce2799846caf0ad6d390f6cd9bbf21ea3390fafbab87bb79aa5",
         )
 
 
