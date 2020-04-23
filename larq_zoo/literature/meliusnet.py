@@ -174,11 +174,11 @@ class MeliusNetFactory(ModelFactory):
         )
 
         if self.weights == "imagenet":
-            if self.include_top:
-                weights_path = self.imagenet_weights_path
-            else:
-                weights_path = self.imagenet_no_top_weights_path
-            model.load_weights(weights_path)
+            model.load_weights(
+                self.imagenet_weights_path
+                if self.include_top
+                else self.imagenet_no_top_weights_path
+            )
         elif self.weights is not None:
             model.load_weights(self.weights)
 
