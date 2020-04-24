@@ -61,6 +61,10 @@ def test_prediction(app, last_feature_dim):
     names = [p[1] for p in lqz.decode_predictions(preds, top=3)[0]]
     assert "African_elephant" in names
 
+    notop_model = app(weights="imagenet", include_top=False)
+    for weight, notop_weight in zip(model.get_weights(), notop_model.get_weights()):
+        np.testing.assert_allclose(notop_weight, weight)
+
 
 @parametrize
 def test_basic(app, last_feature_dim):
