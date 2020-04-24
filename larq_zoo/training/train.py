@@ -52,6 +52,10 @@ class TrainLarqZooModel(Experiment):
 
     loss = Field("sparse_categorical_crossentropy")
 
+    @property
+    def steps_per_epoch(self):
+        return self.dataset.num_examples("train") // self.batch_size
+
     @Field
     def callbacks(self) -> List[tf.keras.callbacks.Callback]:
         callbacks = []
@@ -112,7 +116,7 @@ class TrainLarqZooModel(Experiment):
             lq.models.summary(self.model)
 
             if initial_epoch > 0:
-                self.model.load_weights(self.model_path)
+                self.model.load_weights(str(self.model_path))
                 print(f"Loaded model from epoch {initial_epoch}.")
 
         click.secho(str(self))
