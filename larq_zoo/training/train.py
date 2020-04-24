@@ -52,6 +52,10 @@ class TrainLarqZooModel(Experiment):
 
     loss = Field("sparse_categorical_crossentropy")
 
+    @property
+    def steps_per_epoch(self):
+        return self.dataset.num_examples("train") // self.batch_size
+
     @Field
     def callbacks(self) -> List[tf.keras.callbacks.Callback]:
         callbacks = []
