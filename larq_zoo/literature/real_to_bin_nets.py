@@ -21,7 +21,7 @@ class _SharedBaseFactory(ModelFactory, metaclass=ABCMeta):
     model_name: str = Field()
     momentum: float = Field(0.99)
     kernel_initializer: str = Field("glorot_normal")
-    kernel_regularizer: Optional[tf.keras.regularizers.Regularizer] = Field(None)
+    kernel_regularizer = None
 
     def first_block(
         self, x: tf.Tensor, use_prelu: bool = True, name: str = ""
