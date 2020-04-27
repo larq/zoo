@@ -98,9 +98,9 @@ class BinaryAlexNetFactory(ModelFactory):
             else:
                 weights_path = utils.download_pretrained_model(
                     model="binary_alexnet",
-                    version="v0.2.0",
+                    version="v0.2.1",
                     file="binary_alexnet_weights_notop.h5",
-                    file_hash="1c7e2ef156edd8e7615e75a3b8929f9025279a948d1911824c2f5a798042475e",
+                    file_hash="1d41b33ff39cd28d13679392641bf7711174a96d182417f91df45d0548f5bb47",
                 )
             model.load_weights(weights_path)
         elif self.weights is not None:
