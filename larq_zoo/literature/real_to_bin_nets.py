@@ -11,7 +11,7 @@ import tensorflow as tf
 from zookeeper import Field, factory
 
 from larq_zoo.core import utils
-from larq_zoo.core.model_factory import ModelFactory, QuantizerType
+from larq_zoo.core.model_factory import ModelFactory
 
 
 class _SharedBaseFactory(ModelFactory, metaclass=ABCMeta):
@@ -126,8 +126,8 @@ class StrongBaselineNetFactory(_SharedBaseFactory):
 
     scaling_r: int = 8
 
-    input_quantizer: QuantizerType = Field(None)
-    kernel_quantizer: QuantizerType = Field(None)
+    input_quantizer = None
+    kernel_quantizer = None
 
     class LearnedRescaleLayer(tf.keras.layers.Layer):
         """Implements the learned activation rescaling XNOR-Net++ style.
@@ -359,53 +359,68 @@ class ResNet18Factory(_SharedBaseFactory):
 @factory
 class StrongBaselineNetBANFactory(StrongBaselineNetFactory):
     model_name = Field("baseline_ban")
-    input_quantizer = Field("ste_sign")
-    kernel_quantizer = Field(None)
-    kernel_constraint = Field(None)
-    kernel_regularizer = Field(lambda: tf.keras.regularizers.l2(1e-5))
+    input_quantizer = "ste_sign"
+    kernel_quantizer = None
+    kernel_constraint = None
+
+    @property
+    def kernel_regularizer(self):
+        return tf.keras.regularizers.l2(1e-5)
 
 
 @factory
 class StrongBaselineNetBNNFactory(StrongBaselineNetFactory):
     model_name = Field("baseline_bnn")
-    input_quantizer = Field("ste_sign")
-    kernel_quantizer = Field("ste_sign")
-    kernel_constraint = Field("weight_clip")
+    input_quantizer = "ste_sign"
+    kernel_quantizer = "ste_sign"
+    kernel_constraint = "weight_clip"
 
 
 @factory
 class RealToBinNetFPFactory(RealToBinNetFactory):
     model_name = Field("r2b_fp")
-    input_quantizer = Field(lambda: tf.keras.layers.Activation("tanh"))
-    kernel_quantizer = Field(None)
-    kernel_constraint = Field(None)
-    kernel_regularizer = Field(lambda: tf.keras.regularizers.l2(1e-5))
+    kernel_quantizer = None
+    kernel_constraint = None
+
+    @property
+    def input_quantizer(self):
+        return tf.keras.layers.Activation("tanh")
+
+    @property
+    def kernel_regularizer(self):
+        return tf.keras.regularizers.l2(1e-5)
 
 
 @factory
 class RealToBinNetBANFactory(RealToBinNetFactory):
     model_name = Field("r2b_ban")
-    input_quantizer = Field("ste_sign")
-    kernel_quantizer = Field(None)
-    kernel_constraint = Field(None)
-    kernel_regularizer = Field(lambda: tf.keras.regularizers.l2(1e-5))
+    input_quantizer = "ste_sign"
+    kernel_quantizer = None
+    kernel_constraint = None
+
+    @property
+    def kernel_regularizer(self):
+        return tf.keras.regularizers.l2(1e-5)
 
 
 @factory
 class RealToBinNetBNNFactory(RealToBinNetFactory):
     model_name = Field("r2b_bnn")
-    input_quantizer = Field("ste_sign")
-    kernel_quantizer = Field("ste_sign")
-    kernel_constraint = Field("weight_clip")
+    input_quantizer = "ste_sign"
+    kernel_quantizer = "ste_sign"
+    kernel_constraint = "weight_clip"
 
 
 @factory
 class ResNet18FPFactory(ResNet18Factory):
     model_name = Field("resnet_fp")
-    input_quantizer = Field(None)
-    kernel_quantizer = Field(None)
-    kernel_constraint = Field(None)
-    kernel_regularizer = Field(lambda: tf.keras.regularizers.l2(1e-5))
+    input_quantizer = None
+    kernel_quantizer = None
+    kernel_constraint = None
+
+    @property
+    def kernel_regularizer(self):
+        return tf.keras.regularizers.l2(1e-5)
 
 
 def RealToBinaryNet(

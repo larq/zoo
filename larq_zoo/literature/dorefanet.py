@@ -38,11 +38,15 @@ class DoReFaNetFactory(ModelFactory):
 
     activations_k_bit: int = Field(2)
 
-    input_quantizer = Field(
-        lambda self: lq.quantizers.DoReFaQuantizer(k_bit=self.activations_k_bit)
-    )
-    kernel_quantizer = Field(lambda: magnitude_aware_sign_unclipped)
-    kernel_constraint = Field(None)
+    @property
+    def input_quantizer(self):
+        return lq.quantizers.DoReFaQuantizer(k_bit=self.activations_k_bit)
+
+    @property
+    def kernel_quantizer(self):
+        return magnitude_aware_sign_unclipped
+
+    kernel_constraint = None
 
     def conv_block(
         self, x, filters, kernel_size, strides=1, pool=False, pool_padding="same"

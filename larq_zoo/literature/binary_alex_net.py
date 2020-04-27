@@ -17,9 +17,9 @@ class BinaryAlexNetFactory(ModelFactory):
 
     inflation_ratio: int = Field(1)
 
-    input_quantizer = Field("ste_sign")
-    kernel_quantizer = Field("ste_sign")
-    kernel_constraint = Field("weight_clip")
+    input_quantizer = "ste_sign"
+    kernel_quantizer = "ste_sign"
+    kernel_constraint = "weight_clip"
 
     def conv_block(
         self,

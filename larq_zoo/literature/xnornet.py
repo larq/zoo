@@ -24,9 +24,9 @@ def xnor_weight_scale(x):
 class XNORNetFactory(ModelFactory):
     """Implementation of [XNOR-Net](https://arxiv.org/abs/1603.05279)"""
 
-    input_quantizer = Field("ste_sign")
-    kernel_quantizer = Field("xnor_weight_scale")
-    kernel_constraint = Field("weight_clip")
+    input_quantizer = "ste_sign"
+    kernel_quantizer = "xnor_weight_scale"
+    kernel_constraint = "weight_clip"
 
     kernel_regularizer: Optional[tf.keras.regularizers.Regularizer] = Field(
         lambda: tf.keras.regularizers.l2(5e-7)
