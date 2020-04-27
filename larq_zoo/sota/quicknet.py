@@ -215,18 +215,18 @@ class QuickNetFactory(QuickNetBaseFactory):
     def imagenet_weights_path(self):
         return utils.download_pretrained_model(
             model="quicknet",
-            version="v0.2.0",
+            version="v0.2.1",
             file="quicknet_weights.h5",
-            file_hash="6a765f120ba7b62a7740e842c4f462eb7ba3dd65eb46b4694c5bc8169618fae7",
+            file_hash="7b4fa94f5241c7aad3412ca42b5db6517dbc4847cff710cb82be10c2f83bc0be",
         )
 
     @property
     def imagenet_no_top_weights_path(self):
         return utils.download_pretrained_model(
             model="quicknet",
-            version="v0.2.0",
+            version="v0.2.1",
             file="quicknet_weights_notop.h5",
-            file_hash="5bf2fc450fb8cc322b33a16410bf88fed09d05c221550c2d5805a04985383ac2",
+            file_hash="359eed6dae43525eddf520ea87ec9b54750ee0e022647775d115a38856be396f",
         )
 
 
