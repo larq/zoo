@@ -12,6 +12,10 @@ DimType = Optional[int]
 class ModelFactory:
     """A base class for Larq Zoo models. Defines some common fields."""
 
+    input_quantizer = None
+    kernel_quantizer = None
+    kernel_constraint = None
+
     # This field is included for automatic inference of `num_clases`, if no
     # value is otherwise provided. We set `allow_missing` because we don't want
     # to throw an error if a dataset is not provided, as long as `num_classes`

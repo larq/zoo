@@ -296,10 +296,6 @@ class TeacherStudentModelFactory(ModelFactory):
     teacher_model: tf.keras.models.Model = ComponentField(allow_missing=True)
     student_model: tf.keras.models.Model = ComponentField()
 
-    input_quantizer = None
-    kernel_quantizer = None
-    kernel_constraint = None
-
     # Must be set if there is a teacher and allow_missing teacher weights is not True.
     # Either a full path or the name of a network (in which case it will be sought in the current `model_dir`).
     initialize_teacher_weights_from: str = Field(allow_missing=True)
