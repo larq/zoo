@@ -112,9 +112,9 @@ class DoReFaNetFactory(ModelFactory):
             else:
                 weights_path = utils.download_pretrained_model(
                     model="dorefanet",
-                    version="v0.1.0",
+                    version="v0.1.1",
                     file="dorefanet_weights_notop.h5",
-                    file_hash="679368128e19a2a181bfe06ca3a3dec368b1fd8011d5f42647fbbf5a7f36d45f",
+                    file_hash="8650e8a86d8d3968722cf5f20bcebe74d6d7bb45bbf03c4bb8c6486343f37e31",
                 )
             model.load_weights(weights_path)
         elif self.weights is not None:
