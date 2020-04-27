@@ -192,9 +192,9 @@ class BinaryDenseNet37DilatedFactory(BinaryDenseNetFactory):
     def imagenet_no_top_weights_path(self):
         return utils.download_pretrained_model(
             model="binary_densenet",
-            version="v0.1.0",
+            version="v0.1.1",
             file="binary_densenet_37_dilated_weights_notop.h5",
-            file_hash="eaf3eac19fc90708f56a27435fb06d0e8aef40e6e0411ff7a8eefbe479226e4f",
+            file_hash="8b31fbfdc8de08a46c6adcda1ced48ace0a2ff0ce45a05c72b2acc27901dd88b",
         )
 
 
