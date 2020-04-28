@@ -119,9 +119,9 @@ class XNORNetFactory(ModelFactory):
             else:
                 weights_path = utils.download_pretrained_model(
                     model="xnornet",
-                    version="v0.2.0",
+                    version="v0.2.1",
                     file="xnornet_weights_notop.h5",
-                    file_hash="0b8e3d0d60a7a728b5e387b8cd9f0fedc1dd72bcf9f4c693a2245d3a3c596b91",
+                    file_hash="20a17423090b2c80c6b7a6b62346faa4b2b7dc8d4da99efa792c9351cf86c3d5",
                 )
             model.load_weights(weights_path)
         elif self.weights is not None:

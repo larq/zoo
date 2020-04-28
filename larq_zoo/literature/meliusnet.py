@@ -209,9 +209,9 @@ class MeliusNet22Factory(MeliusNetFactory):
     def imagenet_no_top_weights_path(self):
         return utils.download_pretrained_model(
             model="meliusnet22",
-            version="v0.1.0",
+            version="v0.1.1",
             file="meliusnet22_weights_notop.h5",
-            file_hash="b64c8296a3d07ce2799846caf0ad6d390f6cd9bbf21ea3390fafbab87bb79aa5",
+            file_hash="abfc5c50049d72a14e44df0c1cb73896ece2a1ab4bf9bb48fede6cc2f5e0b58f",
         )
 
 
