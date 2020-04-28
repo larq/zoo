@@ -26,9 +26,18 @@ class MeliusNetFactory(ModelFactory):
     kernel_initializer: Optional[Union[str, tf.keras.initializers.Initializer]] = Field(
         "glorot_normal"
     )
-    input_quantizer = Field(lambda: lq.quantizers.SteSign(1.3))
-    kernel_quantizer = Field(lambda: lq.quantizers.SteSign(1.3))
-    kernel_constraint = Field(lambda: lq.constraints.WeightClip(1.3))
+
+    @property
+    def input_quantizer(self):
+        return lq.quantizers.SteSign(1.3)
+
+    @property
+    def kernel_quantizer(self):
+        return lq.quantizers.SteSign(1.3)
+
+    @property
+    def kernel_constraint(self):
+        return lq.constraints.WeightClip(1.3)
 
     def pool(self, x: tf.Tensor, name: str = None) -> tf.Tensor:
         return tf.keras.layers.MaxPool2D(2, strides=2, padding="same", name=name)(x)

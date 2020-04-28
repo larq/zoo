@@ -2,7 +2,7 @@ from typing import Optional, Sequence
 
 import larq as lq
 import tensorflow as tf
-from zookeeper import Field, factory
+from zookeeper import factory
 
 from larq_zoo.core import utils
 from larq_zoo.core.model_factory import ModelFactory
@@ -24,13 +24,9 @@ def xnor_weight_scale(x):
 class XNORNetFactory(ModelFactory):
     """Implementation of [XNOR-Net](https://arxiv.org/abs/1603.05279)"""
 
-    input_quantizer = Field("ste_sign")
-    kernel_quantizer = Field("xnor_weight_scale")
-    kernel_constraint = Field("weight_clip")
-
-    kernel_regularizer: Optional[tf.keras.regularizers.Regularizer] = Field(
-        lambda: tf.keras.regularizers.l2(5e-7)
-    )
+    input_quantizer = "ste_sign"
+    kernel_quantizer = "xnor_weight_scale"
+    kernel_constraint = "weight_clip"
 
     @property
     def kernel_regularizer(self):

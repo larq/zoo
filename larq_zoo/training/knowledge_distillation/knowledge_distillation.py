@@ -4,7 +4,7 @@ from typing import List, Optional
 import tensorflow as tf
 from zookeeper import ComponentField, Field, factory
 
-from larq_zoo.core.model_factory import ConstraintType, ModelFactory, QuantizerType
+from larq_zoo.core.model_factory import ModelFactory
 
 
 class AttentionMatchingLossLayer(tf.keras.layers.Layer):
@@ -295,10 +295,6 @@ class TeacherStudentModelFactory(ModelFactory):
 
     teacher_model: tf.keras.models.Model = ComponentField(allow_missing=True)
     student_model: tf.keras.models.Model = ComponentField()
-
-    input_quantizer: QuantizerType = Field(allow_missing=True)
-    kernel_quantizer: QuantizerType = Field(allow_missing=True)
-    kernel_constraint: ConstraintType = Field(allow_missing=True)
 
     # Must be set if there is a teacher and allow_missing teacher weights is not True.
     # Either a full path or the name of a network (in which case it will be sought in the current `model_dir`).

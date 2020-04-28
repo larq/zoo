@@ -14,9 +14,9 @@ class BiRealNetFactory(ModelFactory):
 
     filters: int = Field(64)
 
-    input_quantizer = Field("approx_sign")
-    kernel_quantizer = Field("magnitude_aware_sign")
-    kernel_constraint = Field("weight_clip")
+    input_quantizer = "approx_sign"
+    kernel_quantizer = "magnitude_aware_sign"
+    kernel_constraint = "weight_clip"
 
     kernel_initializer: Union[tf.keras.initializers.Initializer, str] = Field(
         "glorot_normal"

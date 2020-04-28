@@ -65,9 +65,17 @@ class QuickNetBaseFactory(ModelFactory, abc.ABC):
     transition_block: Callable[..., tf.Tensor] = Field()
     stem_filters: int = Field(64)
 
-    input_quantizer = Field(lambda: lq.quantizers.SteSign(clip_value=1.25))
-    kernel_quantizer = Field(lambda: lq.quantizers.SteSign(clip_value=1.25))
-    kernel_constraint = Field(lambda: lq.constraints.WeightClip(clip_value=1.25))
+    @property
+    def input_quantizer(self):
+        return lq.quantizers.SteSign(clip_value=1.25)
+
+    @property
+    def kernel_quantizer(self):
+        return lq.quantizers.SteSign(clip_value=1.25)
+
+    @property
+    def kernel_constraint(self):
+        return lq.constraints.WeightClip(clip_value=1.25)
 
     def __post_configure__(self):
         assert (
