@@ -14,9 +14,9 @@ class BiRealNetFactory(ModelFactory):
 
     filters: int = Field(64)
 
-    input_quantizer = Field("approx_sign")
-    kernel_quantizer = Field("magnitude_aware_sign")
-    kernel_constraint = Field("weight_clip")
+    input_quantizer = "approx_sign"
+    kernel_quantizer = "magnitude_aware_sign"
+    kernel_constraint = "weight_clip"
 
     kernel_initializer: Union[tf.keras.initializers.Initializer, str] = Field(
         "glorot_normal"
@@ -130,9 +130,18 @@ def BiRealNet(
     ```netron
     birealnet-v0.3.0/birealnet.json
     ```
+    ```summary
+    literature.BiRealNet
+    ```
     ```plot-altair
     /plots/birealnet.vg.json
     ```
+
+    # ImageNet Metrics
+
+    | Top-1 Accuracy | Top-5 Accuracy | Parameters | Memory  |
+    | -------------- | -------------- | ---------- | ------- |
+    | 57.47 %        | 79.84 %        | 11 699 112 | 4.03 MB |
 
     # Arguments
     input_shape: Optional shape tuple, to be specified if you would like to use a model

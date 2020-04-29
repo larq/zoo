@@ -2,7 +2,7 @@ from typing import Optional, Sequence
 
 import larq as lq
 import tensorflow as tf
-from zookeeper import Field, factory
+from zookeeper import factory
 
 from larq_zoo.core import utils
 from larq_zoo.core.model_factory import ModelFactory
@@ -24,13 +24,9 @@ def xnor_weight_scale(x):
 class XNORNetFactory(ModelFactory):
     """Implementation of [XNOR-Net](https://arxiv.org/abs/1603.05279)"""
 
-    input_quantizer = Field("ste_sign")
-    kernel_quantizer = Field("xnor_weight_scale")
-    kernel_constraint = Field("weight_clip")
-
-    kernel_regularizer: Optional[tf.keras.regularizers.Regularizer] = Field(
-        lambda: tf.keras.regularizers.l2(5e-7)
-    )
+    input_quantizer = "ste_sign"
+    kernel_quantizer = "xnor_weight_scale"
+    kernel_constraint = "weight_clip"
 
     @property
     def kernel_regularizer(self):
@@ -119,9 +115,9 @@ class XNORNetFactory(ModelFactory):
             else:
                 weights_path = utils.download_pretrained_model(
                     model="xnornet",
-                    version="v0.2.0",
+                    version="v0.2.1",
                     file="xnornet_weights_notop.h5",
-                    file_hash="0b8e3d0d60a7a728b5e387b8cd9f0fedc1dd72bcf9f4c693a2245d3a3c596b91",
+                    file_hash="20a17423090b2c80c6b7a6b62346faa4b2b7dc8d4da99efa792c9351cf86c3d5",
                 )
             model.load_weights(weights_path)
         elif self.weights is not None:
@@ -144,9 +140,18 @@ def XNORNet(
     ```netron
     xnornet-v0.2.0/xnornet.json
     ```
+    ```summary
+    literature.XNORNet
+    ```
     ```plot-altair
     /plots/xnornet.vg.json
     ```
+
+    # ImageNet Metrics
+
+    | Top-1 Accuracy | Top-5 Accuracy | Parameters | Memory  |
+    | -------------- | -------------- | ---------- | ------- |
+    | 44.96 %        | 69.18 %        | 62 396 768 | 22.81 MB |
 
     # Arguments
     input_shape: Optional shape tuple, to be specified if you would like to use a model

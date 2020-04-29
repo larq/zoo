@@ -1,4 +1,4 @@
-from typing import Callable, Optional, Tuple, Union
+from typing import Optional, Tuple
 
 import tensorflow as tf
 from zookeeper import ComponentField, Field
@@ -6,20 +6,15 @@ from zookeeper.tf import Dataset
 
 from larq_zoo.core import utils
 
-QuantizerType = Union[
-    tf.keras.layers.Layer, Callable[[tf.Tensor], tf.Tensor], str, None
-]
-ConstraintType = Union[tf.keras.constraints.Constraint, str, None]
 DimType = Optional[int]
 
 
 class ModelFactory:
     """A base class for Larq Zoo models. Defines some common fields."""
 
-    # Don't set any defaults here.
-    input_quantizer: QuantizerType = Field()
-    kernel_quantizer: QuantizerType = Field()
-    kernel_constraint: ConstraintType = Field()
+    input_quantizer = None
+    kernel_quantizer = None
+    kernel_constraint = None
 
     # This field is included for automatic inference of `num_clases`, if no
     # value is otherwise provided. We set `allow_missing` because we don't want

@@ -17,9 +17,9 @@ class BinaryAlexNetFactory(ModelFactory):
 
     inflation_ratio: int = Field(1)
 
-    input_quantizer = Field("ste_sign")
-    kernel_quantizer = Field("ste_sign")
-    kernel_constraint = Field("weight_clip")
+    input_quantizer = "ste_sign"
+    kernel_quantizer = "ste_sign"
+    kernel_constraint = "weight_clip"
 
     def conv_block(
         self,
@@ -98,9 +98,9 @@ class BinaryAlexNetFactory(ModelFactory):
             else:
                 weights_path = utils.download_pretrained_model(
                     model="binary_alexnet",
-                    version="v0.2.0",
+                    version="v0.2.1",
                     file="binary_alexnet_weights_notop.h5",
-                    file_hash="1c7e2ef156edd8e7615e75a3b8929f9025279a948d1911824c2f5a798042475e",
+                    file_hash="1d41b33ff39cd28d13679392641bf7711174a96d182417f91df45d0548f5bb47",
                 )
             model.load_weights(weights_path)
         elif self.weights is not None:
@@ -124,9 +124,18 @@ def BinaryAlexNet(
     ```netron
     binary_alexnet-v0.2.0/binary_alexnet.json
     ```
+    ```summary
+    literature.BinaryAlexNet
+    ```
     ```plot-altair
     /plots/binary_alexnet.vg.json
     ```
+
+    # ImageNet Metrics
+
+    | Top-1 Accuracy | Top-5 Accuracy | Parameters | Memory  |
+    | -------------- | -------------- | ---------- | ------- |
+    | 36.30 %        | 61.53 %        | 61 859 192 | 7.49 MB |
 
     # Arguments
     input_shape: Optional shape tuple, to be specified if you would like to use a model

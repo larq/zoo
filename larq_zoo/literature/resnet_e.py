@@ -15,9 +15,17 @@ class BinaryResNetE18Factory(ModelFactory):
     num_layers: int = Field(18)
     initial_filters: int = Field(64)
 
-    input_quantizer = Field(lambda: lq.quantizers.SteSign(clip_value=1.25))
-    kernel_quantizer = Field(lambda: lq.quantizers.SteSign(clip_value=1.25))
-    kernel_constraint = Field(lambda: lq.constraints.WeightClip(clip_value=1.25))
+    @property
+    def input_quantizer(self):
+        return lq.quantizers.SteSign(clip_value=1.25)
+
+    @property
+    def kernel_quantizer(self):
+        return lq.quantizers.SteSign(clip_value=1.25)
+
+    @property
+    def kernel_constraint(self):
+        return lq.constraints.WeightClip(clip_value=1.25)
 
     @property
     def spec(self):
@@ -150,9 +158,18 @@ def BinaryResNetE18(
     ```netron
     resnet_e-v0.1.0/resnet_e_18.json
     ```
+    ```summary
+    literature.BinaryResNetE18
+    ```
     ```plot-altair
     /plots/resnet_e_18.vg.json
     ```
+
+    # ImageNet Metrics
+
+    | Top-1 Accuracy | Top-5 Accuracy | Parameters | Memory  |
+    | -------------- | -------------- | ---------- | ------- |
+    | 58.32 %        | 80.79 %        | 11 699 368 | 4.03 MB |
 
     # Arguments
     input_shape: Optional shape tuple, to be specified if you would like to use a model

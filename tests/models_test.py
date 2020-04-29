@@ -39,8 +39,10 @@ def parametrize(func):
             (lqz.literature.BinaryDenseNet37, 640),
             (lqz.literature.BinaryDenseNet37Dilated, 640),
             (lqz.literature.BinaryDenseNet45, 800),
+            (lqz.literature.MeliusNet22, 512),
             (lqz.literature.XNORNet, 4096),
             (lqz.literature.DoReFaNet, 256),
+            (lqz.literature.RealToBinaryNet, 512),
             (lqz.sota.QuickNet, 512),
             (lqz.sota.QuickNetLarge, 512),
             (lqz.sota.QuickNetXL, 512),
@@ -60,6 +62,10 @@ def test_prediction(app, last_feature_dim):
     # Test correct label is in top 3 (weak correctness test).
     names = [p[1] for p in lqz.decode_predictions(preds, top=3)[0]]
     assert "African_elephant" in names
+
+    notop_model = app(weights="imagenet", include_top=False)
+    for weight, notop_weight in zip(model.get_weights(), notop_model.get_weights()):
+        np.testing.assert_allclose(notop_weight, weight)
 
 
 @parametrize

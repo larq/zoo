@@ -25,11 +25,7 @@ def slash_join(*args):
 
 
 def download_pretrained_model(
-    model: str,
-    version: str,
-    file: str,
-    file_hash: str,
-    cache_dir: Optional[str] = None,
+    model: str, version: str, file: str, file_hash: str, cache_dir: Optional[str] = None
 ) -> str:
     root_url = "https://github.com/larq/zoo/releases/download/"
 
@@ -144,10 +140,12 @@ def global_pool(
         pool_size = (
             input_shape[1:3] if data_format == "channels_last" else input_shape[2:4]
         )
-        x = keras.layers.AveragePooling2D(pool_size=pool_size, data_format=data_format)(
-            x
-        )
-        x = keras.layers.Flatten()(x)
+        x = keras.layers.AveragePooling2D(
+            pool_size=pool_size,
+            data_format=data_format,
+            name=f"{name}_pool" if name else None,
+        )(x)
+        x = keras.layers.Flatten(name=f"{name}_flatten" if name else None)(x)
     except ValueError:
         x = keras.layers.GlobalAveragePooling2D(data_format=data_format, name=name)(x)
 
@@ -170,3 +168,20 @@ def decode_predictions(preds, top=5, **kwargs):
     ValueError: In case of invalid shape of the `pred` array (must be 2D).
     """
     return keras_decode_predictions(preds, top=top, **kwargs)
+
+
+def TFOpLayer(tf_op: tf.Operation, *args, **kwargs) -> tf.keras.layers.Layer:
+    """Wrap a tensorflow op using a Lambda layer. This facilitates naming the op as a
+    proper keras layer.
+
+    Example: `TFOpLayer(tf.split, groups, axis=-1, name="split")(x)`.
+
+    # Arguments
+    tf_op: tensorflow that needs to be wrapped.
+
+    # Returns
+    A keras layer wrapping `tf_op`.
+
+    """
+    name = kwargs.pop("name", None)
+    return tf.keras.layers.Lambda(lambda x_: tf_op(x_, *args, **kwargs), name=name)
