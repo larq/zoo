@@ -55,7 +55,7 @@ class _SharedBaseFactory(ModelFactory, metaclass=ABCMeta):
     def last_block(self, x: tf.Tensor, name: str = "") -> tf.Tensor:
         """Last block, shared across ResNet, StrongBaselineNet and Real-to-Bin nets."""
 
-        x = tf.keras.layers.GlobalAvgPool2D(name=f"{name}_global_pool")(x)
+        x = utils.global_pool(x, name=f"{name}_global_pool")
         x = tf.keras.layers.Dense(self.num_classes, name=f"{name}_logits",)(x)
         return tf.keras.layers.Softmax(name=f"{name}_probs", dtype=tf.float32)(x)
 
@@ -270,7 +270,7 @@ class RealToBinNetFactory(StrongBaselineNetFactory):
         in_filters = conv_input.shape[-1]
         out_filters = conv_output.shape[-1]
 
-        z = tf.keras.layers.GlobalAvgPool2D(name=f"{name}_scaling_pool")(conv_input)
+        z = utils.global_pool(conv_input, name=f"{name}_scaling_pool")
         dim_reduction = tf.keras.layers.Dense(
             int(in_filters // self.scaling_r),
             activation="relu",
