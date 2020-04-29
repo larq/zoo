@@ -2,12 +2,12 @@ import functools
 import os
 from pathlib import Path
 
+import larq as lq
+import larq_zoo as lqz
 import numpy as np
 import pytest
 from tensorflow import keras
 from zookeeper import cli
-
-import larq_zoo as lqz
 
 
 def keras_test(func):
@@ -34,16 +34,16 @@ def parametrize(func):
         [
             (lqz.literature.BinaryAlexNet, 256),
             (lqz.literature.BiRealNet, 512),
-            # (lqz.literature.BinaryResNetE18, 512),
-            # (lqz.literature.BinaryDenseNet28, 576),
-            # (lqz.literature.BinaryDenseNet37, 640),
-            # (lqz.literature.BinaryDenseNet37Dilated, 640),
-            # (lqz.literature.BinaryDenseNet45, 800),
-            # (lqz.literature.XNORNet, 4096),
-            # (lqz.literature.DoReFaNet, 256),
-            # (lqz.sota.QuickNet, 512),
-            # (lqz.sota.QuickNetLarge, 512),
-            # (lqz.sota.QuickNetXL, 512),
+            (lqz.literature.BinaryResNetE18, 512),
+            (lqz.literature.BinaryDenseNet28, 576),
+            (lqz.literature.BinaryDenseNet37, 640),
+            (lqz.literature.BinaryDenseNet37Dilated, 640),
+            (lqz.literature.BinaryDenseNet45, 800),
+            (lqz.literature.XNORNet, 4096),
+            (lqz.literature.DoReFaNet, 256),
+            (lqz.sota.QuickNet, 512),
+            (lqz.sota.QuickNetLarge, 512),
+            (lqz.sota.QuickNetXL, 512),
         ],
     )(func)
 
@@ -96,25 +96,33 @@ def test_no_top_variable_shape_4(app, last_feature_dim):
 
 
 @parametrize
-def test_model_summary(app, last_feature_dim, snapshot):
+def test_model_summary(app, last_feature_dim):
     input_tensor = keras.layers.Input(shape=(224, 224, 3))
     model = app(weights=None, input_tensor=input_tensor)
-    json = str(model.to_json())
+
+    class PrintToVariable:
+        output = ""
+
+        def __call__(self, x):
+            self.output += f"{x}\n"
+
+    capture = PrintToVariable()
+    lq.models.summary(model, print_fn=capture)
 
     summary_file = (
         Path(__file__).parent
         / "snapshots"
         / "model_summaries"
-        / f"{app.__name__}_{last_feature_dim}.json"
+        / f"{app.__name__}_{last_feature_dim}.txt"
     )
 
     if summary_file.exists():
         with open(summary_file, "r") as file:
             content = file.read()
-        assert content == json
+        assert content == capture.output
     else:
         with open(summary_file, "w") as file:
-            file.write(json)
+            file.write(capture.output)
         raise FileNotFoundError(
             f"Could not find snapshot {summary_file}, so generated a new summary. "
             "If this was intentional, re-running the tests locally will make them pass."
