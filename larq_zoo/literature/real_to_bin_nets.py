@@ -438,6 +438,9 @@ def RealToBinaryNet(
     ```netron
     real-to-bin-net-v0.1.0/r2b.json
     ```
+    ```summary
+    literature.RealToBinaryNet
+    ```
     ```plot-altair
     /plots/r2b_final_stage.vg.json
     ```
