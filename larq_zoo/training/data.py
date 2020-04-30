@@ -95,7 +95,7 @@ def distorted_bounding_box_crop(
     with tf.compat.v1.name_scope(
         scope, "distorted_bounding_box_crop", [image_bytes, bbox]
     ):
-        shape = tf.image.extract_jpeg_shape(image_bytes)
+        shape = get_shape_of_image(image_bytes)
         sample_distorted_bounding_box = tf.image.sample_distorted_bounding_box(
             shape,
             bounding_boxes=bbox,
@@ -121,21 +121,6 @@ def _at_least_x_are_equal(a, b, x):
     match = tf.equal(a, b)
     match = tf.cast(match, tf.int32)
     return tf.greater_equal(tf.reduce_sum(match), x)
-
-
-def get_shape_of_image(image):
-    """Return the shape of an image, whether it is decoded or encoded."""
-
-    # Encoded images have a string dtype.
-    if image.dtype == tf.string:
-        # If we get a JPEG, there's an optimised method.
-        if tf.image.is_jpeg(image):
-            return tf.image.extract_jpeg_shape(image)
-        # For any other encoded image type, decode and get the shape directly.
-        return tf.shape(tf.image.decode_image(image, channels=3))
-    # For any other type, assume we've been passed a decoded image, and just
-    # return the shape.
-    return tf.shape(image)
 
 
 def _decode_and_random_crop(image_bytes, image_size):
@@ -263,3 +248,18 @@ def preprocess_image_tensor(image_tensor, image_size=IMAGE_SIZE):
     image_tensor = tf.cast(image_tensor, dtype=tf.float32)
     image_tensor = _normalize(image_tensor, mean_rgb=MEAN_RGB, stddev_rgb=STDDEV_RGB)
     return image_tensor
+
+
+def get_shape_of_image(image):
+    """Return the shape of an image, whether it is decoded or encoded."""
+
+    # Encoded images have a string dtype.
+    if image.dtype == tf.string:
+        # If we get a JPEG, there's an optimised method.
+        if tf.image.is_jpeg(image):
+            return tf.image.extract_jpeg_shape(image)
+        # For any other encoded image type, decode and get the shape directly.
+        return tf.shape(tf.image.decode_image(image, channels=3))
+    # For any other type, assume we've been passed a decoded image, and just
+    # return the shape.
+    return tf.shape(image)
