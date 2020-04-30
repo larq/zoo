@@ -24,7 +24,7 @@ jobs:
           pip install tensorflow==${{matrix.tf-version}}
           pip install -e .[test]
       - name: Test data and models with pytest
-        run: pytest tests/{data_test.py,model_test.py} -n auto --cov=larq_zoo --cov-report=xml --cov-config=.coveragerc
+        run: pytest tests/{data_test.py,models_test.py} -n auto --cov=larq_zoo --cov-report=xml --cov-config=.coveragerc
       - name: Test training with pytest
         if: matrix.python-version == '3.7' && matrix.tf-version == '2.1.0'
         run: pytest tests/train_test.py -n auto --cov=larq_zoo --cov-report=xml --cov-config=.coveragerc
