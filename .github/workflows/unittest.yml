@@ -27,7 +27,7 @@ jobs:
         run: pytest tests/{data_test.py,models_test.py} -n auto --cov=larq_zoo --cov-report=xml --cov-config=.coveragerc
       - name: Test training with pytest
         if: matrix.python-version == '3.7' && matrix.tf-version == '2.1.0'
-        run: pytest tests/train_test.py -n auto --cov=larq_zoo --cov-report=xml --cov-config=.coveragerc --append-cov
+        run: pytest tests/train_test.py -n auto --cov=larq_zoo --cov-report=xml --cov-config=.coveragerc --cov-append
       - name: Upload coverage to Codecov
         if: matrix.python-version == '3.7' && matrix.tf-version == '2.1.0'
         run: curl -s https://codecov.io/bash | bash -s -- -f ./coverage.xml -F unittests
