@@ -31,6 +31,7 @@ setup(
             "pytest-xdist==1.31.0",
             "Pillow==7.1.2",
             "scipy==1.4.1",
+            "tensorflow_datasets>=1.3.0,<3.1.0",  # TFDS 3.1.0 breaks dataset mocking.
         ],
     },
     entry_points="""
