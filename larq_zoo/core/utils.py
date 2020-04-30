@@ -5,10 +5,6 @@ import sys
 from typing import Optional
 
 import tensorflow as tf
-from tensorflow import keras
-from tensorflow.keras.applications.vgg16 import (
-    decode_predictions as keras_decode_predictions,
-)
 from tensorflow.python.eager.context import num_gpus
 from tensorflow.python.keras.backend import is_keras_tensor
 
@@ -32,7 +28,7 @@ def download_pretrained_model(
     url = slash_join(root_url, model + "-" + version, file)
     cache_subdir = os.path.join("larq/models/", model)
 
-    return keras.utils.get_file(
+    return tf.keras.utils.get_file(
         fname=file,
         origin=url,
         cache_dir=cache_dir,
@@ -49,7 +45,7 @@ def get_current_epoch(output_dir):
         return 0
 
 
-class ModelCheckpoint(keras.callbacks.ModelCheckpoint):
+class ModelCheckpoint(tf.keras.callbacks.ModelCheckpoint):
     def on_epoch_end(self, epoch, logs=None):
         super().on_epoch_end(epoch, logs=logs)
         with open(os.path.join(os.path.dirname(self.filepath), "stats.json"), "w") as f:
@@ -91,7 +87,7 @@ def validate_input(input_shape, weights, include_top, classes):
         input_shape,
         default_size=224,
         min_size=0,
-        data_format=keras.backend.image_data_format(),
+        data_format=tf.keras.backend.image_data_format(),
         require_flatten=include_top,
         weights=weights,
     )
@@ -99,9 +95,9 @@ def validate_input(input_shape, weights, include_top, classes):
 
 def get_input_layer(input_shape, input_tensor):
     if input_tensor is None:
-        return keras.layers.Input(shape=input_shape)
+        return tf.keras.layers.Input(shape=input_shape)
     if not is_keras_tensor(input_tensor):
-        return keras.layers.Input(tensor=input_tensor, shape=input_shape)
+        return tf.keras.layers.Input(tensor=input_tensor, shape=input_shape)
     return input_tensor
 
 
@@ -140,14 +136,16 @@ def global_pool(
         pool_size = (
             input_shape[1:3] if data_format == "channels_last" else input_shape[2:4]
         )
-        x = keras.layers.AveragePooling2D(
+        x = tf.keras.layers.AveragePooling2D(
             pool_size=pool_size,
             data_format=data_format,
             name=f"{name}_pool" if name else None,
         )(x)
-        x = keras.layers.Flatten(name=f"{name}_flatten" if name else None)(x)
+        x = tf.keras.layers.Flatten(name=f"{name}_flatten" if name else None)(x)
     except ValueError:
-        x = keras.layers.GlobalAveragePooling2D(data_format=data_format, name=name)(x)
+        x = tf.keras.layers.GlobalAveragePooling2D(data_format=data_format, name=name)(
+            x
+        )
 
     return x
 
@@ -167,7 +165,7 @@ def decode_predictions(preds, top=5, **kwargs):
     # Raises
     ValueError: In case of invalid shape of the `pred` array (must be 2D).
     """
-    return keras_decode_predictions(preds, top=top, **kwargs)
+    return tf.keras.applications.vgg16.decode_predictions(preds, top=top, **kwargs)
 
 
 def TFOpLayer(tf_op: tf.Operation, *args, **kwargs) -> tf.keras.layers.Layer:

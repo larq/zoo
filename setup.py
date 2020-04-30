@@ -32,6 +32,7 @@ setup(
             "Pillow==7.1.2",
             "scipy==1.4.1",
             "snapshottest>=0.5.1",
+            "tensorflow_datasets>=3.1.0",
         ],
     },
     entry_points="""
