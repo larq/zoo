@@ -123,6 +123,21 @@ def _at_least_x_are_equal(a, b, x):
     return tf.greater_equal(tf.reduce_sum(match), x)
 
 
+def get_shape_of_image(image):
+    """Return the shape of an image, whether it is decoded or encoded."""
+
+    # Encoded images have a string dtype.
+    if image.dtype == tf.string:
+        # If we get a JPEG, there's an optimised method.
+        if tf.image.is_jpeg(image):
+            return tf.image.extract_jpeg_shape(image)
+        # For any other encoded image type, decode and get the shape directly.
+        return tf.shape(tf.image.decode_image(image, channels=3))
+    # For any other type, assume we've been passed a decoded image, and just
+    # return the shape.
+    return tf.shape(image)
+
+
 def _decode_and_random_crop(image_bytes, image_size):
     """Make a random crop of image_size."""
     bbox = tf.constant([0.0, 0.0, 1.0, 1.0], dtype=tf.float32, shape=[1, 1, 4])
@@ -135,7 +150,7 @@ def _decode_and_random_crop(image_bytes, image_size):
         max_attempts=10,
         scope=None,
     )
-    original_shape = tf.image.extract_jpeg_shape(image_bytes)
+    original_shape = get_shape_of_image(image_bytes)
     bad = _at_least_x_are_equal(original_shape, tf.shape(image), 3)
 
     image = tf.cond(
@@ -149,7 +164,7 @@ def _decode_and_random_crop(image_bytes, image_size):
 
 def _decode_and_center_crop(image_bytes, image_size):
     """Crops to center of image with padding then scales image_size."""
-    shape = tf.image.extract_jpeg_shape(image_bytes)
+    shape = get_shape_of_image(image_bytes)
     image_height = shape[0]
     image_width = shape[1]
 
