@@ -3,11 +3,12 @@ import os
 from pathlib import Path
 
 import larq as lq
-import larq_zoo as lqz
 import numpy as np
 import pytest
 from tensorflow import keras
 from zookeeper import cli
+
+import larq_zoo as lqz
 
 
 def keras_test(func):
