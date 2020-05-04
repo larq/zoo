@@ -112,19 +112,19 @@ def global_pool(
     GlobalAveragePooling2D.
 
     # Arguments
-    x: 4D TensorFlow tensor.
-    data_format: A string, one of channels_last (default) or
-        channels_first. The ordering of the dimensions in the inputs. channels_last
-        corresponds to inputs with shape (batch, height, width, channels) while
-        channels_first corresponds to inputs with shape (batch, channels, height,
-        width). It defaults to "channels_last".
-    name: String name of the layer
+        x: 4D TensorFlow tensor.
+        data_format: A string, one of channels_last (default) or
+            channels_first. The ordering of the dimensions in the inputs. channels_last
+            corresponds to inputs with shape (batch, height, width, channels) while
+            channels_first corresponds to inputs with shape (batch, channels, height,
+            width). It defaults to "channels_last".
+        name: String name of the layer
 
     # Returns
-    2D TensorFlow tensor.
+        2D TensorFlow tensor.
 
     # Raises
-    ValueError: if tensor is not 4D or data_format is not recognized.
+        ValueError: if tensor is not 4D or data_format is not recognized.
     """
     if len(x.get_shape()) != 4:
         raise ValueError("Tensor is not 4D.")
@@ -154,16 +154,16 @@ def decode_predictions(preds, top=5, **kwargs):
     """Decodes the prediction of an ImageNet model.
 
     # Arguments
-    preds: Numpy tensor encoding a batch of predictions.
-    top: Integer, how many top-guesses to return.
+        preds: Numpy tensor encoding a batch of predictions.
+        top: Integer, how many top-guesses to return.
 
     # Returns
-    A list of lists of top class prediction tuples
-        `(class_name, class_description, score)`.
-        One list of tuples per sample in batch input.
+        A list of lists of top class prediction tuples
+            `(class_name, class_description, score)`.
+            One list of tuples per sample in batch input.
 
     # Raises
-    ValueError: In case of invalid shape of the `pred` array (must be 2D).
+        ValueError: In case of invalid shape of the `pred` array (must be 2D).
     """
     return tf.keras.applications.vgg16.decode_predictions(preds, top=top, **kwargs)
 
@@ -175,11 +175,10 @@ def TFOpLayer(tf_op: tf.Operation, *args, **kwargs) -> tf.keras.layers.Layer:
     Example: `TFOpLayer(tf.split, groups, axis=-1, name="split")(x)`.
 
     # Arguments
-    tf_op: tensorflow that needs to be wrapped.
+        tf_op: tensorflow that needs to be wrapped.
 
     # Returns
-    A keras layer wrapping `tf_op`.
-
+        A keras layer wrapping `tf_op`.
     """
     name = kwargs.pop("name", None)
     return tf.keras.layers.Lambda(lambda x_: tf_op(x_, *args, **kwargs), name=name)
