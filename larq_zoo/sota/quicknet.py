@@ -328,22 +328,24 @@ def QuickNet(
     | 58.6 %         | 81.0 %         | 10 518 528 | 3.21 MB |
 
     # Arguments
-    input_shape: Optional shape tuple, to be specified if you would like to use a model
-        with an input image resolution that is not (224, 224, 3).
-        It should have exactly 3 inputs channels.
-    input_tensor: optional Keras tensor (i.e. output of `layers.Input()`) to use as
-        image input for the model.
-    weights: one of `None` (random initialization), "imagenet" (pre-training on
-        ImageNet), or the path to the weights file to be loaded.
-    include_top: whether to include the fully-connected layer at the top of the network.
-    num_classes: optional number of classes to classify images into, only to be specified
-        if `include_top` is True, and if no `weights` argument is specified.
+        input_shape: Optional shape tuple, to be specified if you would like to use a
+            model with an input image resolution that is not (224, 224, 3).
+            It should have exactly 3 inputs channels.
+        input_tensor: optional Keras tensor (i.e. output of `layers.Input()`) to use as
+            image input for the model.
+        weights: one of `None` (random initialization), "imagenet" (pre-training on
+            ImageNet), or the path to the weights file to be loaded.
+        include_top: whether to include the fully-connected layer at the top of the
+            network.
+        num_classes: optional number of classes to classify images into, only to be
+            specified if `include_top` is True, and if no `weights` argument is
+            specified.
 
     # Returns
-    A Keras model instance.
+        A Keras model instance.
 
     # Raises
-    ValueError: in case of invalid argument for `weights`, or invalid input shape.
+        ValueError: in case of invalid argument for `weights`, or invalid input shape.
     """
     return QuickNetFactory(
         input_shape=input_shape,
@@ -380,22 +382,24 @@ def QuickNetLarge(
     | 62.7 %         | 84.0 %         | 11 837 696 | 4.56 MB |
 
     # Arguments
-    input_shape: Optional shape tuple, to be specified if you would like to use a model
-        with an input image resolution that is not (224, 224, 3).
-        It should have exactly 3 inputs channels.
-    input_tensor: optional Keras tensor (i.e. output of `layers.Input()`) to use as
-        image input for the model.
-    weights: one of `None` (random initialization), "imagenet" (pre-training on
-        ImageNet), or the path to the weights file to be loaded.
-    include_top: whether to include the fully-connected layer at the top of the network.
-    num_classes: optional number of classes to classify images into, only to be specified
-        if `include_top` is True, and if no `weights` argument is specified.
+        input_shape: Optional shape tuple, to be specified if you would like to use a
+            model with an input image resolution that is not (224, 224, 3).
+            It should have exactly 3 inputs channels.
+        input_tensor: optional Keras tensor (i.e. output of `layers.Input()`) to use as
+            image input for the model.
+        weights: one of `None` (random initialization), "imagenet" (pre-training on
+            ImageNet), or the path to the weights file to be loaded.
+        include_top: whether to include the fully-connected layer at the top of the
+            network.
+        num_classes: optional number of classes to classify images into, only to be
+            specified if `include_top` is True, and if no `weights` argument is
+            specified.
 
     # Returns
-    A Keras model instance.
+        A Keras model instance.
 
     # Raises
-    ValueError: in case of invalid argument for `weights`, or invalid input shape.
+        ValueError: in case of invalid argument for `weights`, or invalid input shape.
     """
     return QuickNetLargeFactory(
         input_shape=input_shape,
@@ -432,22 +436,24 @@ def QuickNetXL(
     | 67.0 %         | 87.3 %         | 22 058 368 | 6.22 MB |
 
     # Arguments
-    input_shape: Optional shape tuple, to be specified if you would like to use a model
-        with an input image resolution that is not (224, 224, 3).
-        It should have exactly 3 inputs channels.
-    input_tensor: optional Keras tensor (i.e. output of `layers.Input()`) to use as
-        image input for the model.
-    weights: one of `None` (random initialization), "imagenet" (pre-training on
-        ImageNet), or the path to the weights file to be loaded.
-    include_top: whether to include the fully-connected layer at the top of the network.
-    num_classes: optional number of classes to classify images into, only to be specified
-        if `include_top` is True, and if no `weights` argument is specified.
+        input_shape: Optional shape tuple, to be specified if you would like to use a
+            model with an input image resolution that is not (224, 224, 3).
+            It should have exactly 3 inputs channels.
+        input_tensor: optional Keras tensor (i.e. output of `layers.Input()`) to use as
+            image input for the model.
+        weights: one of `None` (random initialization), "imagenet" (pre-training on
+            ImageNet), or the path to the weights file to be loaded.
+        include_top: whether to include the fully-connected layer at the top of the
+            network.
+        num_classes: optional number of classes to classify images into, only to be
+            specified if `include_top` is True, and if no `weights` argument is
+            specified.
 
     # Returns
-    A Keras model instance.
+        A Keras model instance.
 
     # Raises
-    ValueError: in case of invalid argument for `weights`, or invalid input shape.
+        ValueError: in case of invalid argument for `weights`, or invalid input shape.
     """
     return QuickNetXLFactory(
         input_shape=input_shape,
