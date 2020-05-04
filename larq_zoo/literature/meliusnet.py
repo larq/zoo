@@ -258,25 +258,28 @@ def MeliusNet22(
     | 62.4 %         | 83.9 %         | 6 944 584  | 3.88 MiB |
 
     # Arguments
-    input_shape: Optional shape tuple, to be specified if you would like to use a model
-        with an input image resolution that is not (224, 224, 3).
-        It should have exactly 3 inputs channels.
-    input_tensor: optional Keras tensor (i.e. output of `layers.Input()`) to use as
-        image input for the model.
-    weights: one of `None` (random initialization), "imagenet" (pre-training on
-        ImageNet), or the path to the weights file to be loaded.
-    include_top: whether to include the fully-connected layer at the top of the network.
-    num_classes: optional number of classes to classify images into, only to be
-        specified if `include_top` is True, and if no `weights` argument is specified.
+        input_shape: Optional shape tuple, to be specified if you would like to use a
+            model with an input image resolution that is not (224, 224, 3).
+            It should have exactly 3 inputs channels.
+        input_tensor: optional Keras tensor (i.e. output of `layers.Input()`) to use as
+            image input for the model.
+        weights: one of `None` (random initialization), "imagenet" (pre-training on
+            ImageNet), or the path to the weights file to be loaded.
+        include_top: whether to include the fully-connected layer at the top of the
+            network.
+        num_classes: optional number of classes to classify images into, only to be
+            specified if `include_top` is True, and if no `weights` argument is
+            specified.
 
     # Returns
-    A Keras model instance.
+        A Keras model instance.
 
     # Raises
-    ValueError: in case of invalid argument for `weights`, or invalid input shape.
+        ValueError: in case of invalid argument for `weights`, or invalid input shape.
 
     # References
-    - [MeliusNet: Can Binary Neural Networks Achieve MobileNet-level Accuracy?](https://arxiv.org/abs/2001.05936)
+        - [MeliusNet: Can Binary Neural Networks Achieve MobileNet-level
+            Accuracy?](https://arxiv.org/abs/2001.05936)
     """
     return MeliusNet22Factory(
         include_top=include_top,
