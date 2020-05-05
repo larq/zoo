@@ -1,0 +1,204 @@
++r2b_bnn stats-----------------------------------------------------------------------------------------------------------------------+
+| Layer                                    Input prec.                 Outputs   # 1-bit  # 32-bit   Memory  1-bit MACs  32-bit MACs |
+|                                                (bit)                               x 1       x 1     (kB)                          |
++------------------------------------------------------------------------------------------------------------------------------------+
+| input_1                                            -  ((None, 224, 224, 3),)         0         0        0           ?            ? |
+| r2b_bnn_block_1_conv2d                             -      (-1, 112, 112, 64)         0      9408    36.75           0    118013952 |
+| r2b_bnn_block_1_batch_norm                         -      (-1, 112, 112, 64)         0       128     0.50           0            0 |
+| r2b_bnn_block_1_prelu                              -      (-1, 112, 112, 64)         0        64     0.25           ?            ? |
+| r2b_bnn_block_1_pool                               -        (-1, 56, 56, 64)         0         0        0           0            0 |
+| r2b_bnn_block_2a_batch_norm                        -        (-1, 56, 56, 64)         0       128     0.50           0            0 |
+| r2b_bnn_block_2a_scaling_pool_pool                 -          (-1, 1, 1, 64)         0         0        0           0            0 |
+| r2b_bnn_block_2a_scaling_pool_flatten              -                (-1, 64)         0         0        0           0            0 |
+| r2b_bnn_block_2a_scaling_dense_reduce              -                 (-1, 8)         0       512     2.00           0          512 |
+| r2b_bnn_block_2a_scaling_dense_expand              -                (-1, 64)         0       512     2.00           0          512 |
+| r2b_bnn_block_2a_conv2d                            1        (-1, 56, 56, 64)     36864         0     4.50   115605504            0 |
+| r2b_bnn_block_2a_scaling_reshape                   -          (-1, 1, 1, 64)         0         0        0           ?            ? |
+| r2b_bnn_block_2a_scaling_multiplication            -        (-1, 56, 56, 64)         0         0        0           ?            ? |
+| r2b_bnn_block_2a_prelu                             -        (-1, 56, 56, 64)         0        64     0.25           ?            ? |
+| r2b_bnn_block_2a_skip_add                          -        (-1, 56, 56, 64)         0         0        0           ?            ? |
+| r2b_bnn_block_2b_batch_norm                        -        (-1, 56, 56, 64)         0       128     0.50           0            0 |
+| r2b_bnn_block_2b_scaling_pool_pool                 -          (-1, 1, 1, 64)         0         0        0           0            0 |
+| r2b_bnn_block_2b_scaling_pool_flatten              -                (-1, 64)         0         0        0           0            0 |
+| r2b_bnn_block_2b_scaling_dense_reduce              -                 (-1, 8)         0       512     2.00           0          512 |
+| r2b_bnn_block_2b_scaling_dense_expand              -                (-1, 64)         0       512     2.00           0          512 |
+| r2b_bnn_block_2b_conv2d                            1        (-1, 56, 56, 64)     36864         0     4.50   115605504            0 |
+| r2b_bnn_block_2b_scaling_reshape                   -          (-1, 1, 1, 64)         0         0        0           ?            ? |
+| r2b_bnn_block_2b_scaling_multiplication            -        (-1, 56, 56, 64)         0         0        0           ?            ? |
+| r2b_bnn_block_2b_prelu                             -        (-1, 56, 56, 64)         0        64     0.25           ?            ? |
+| r2b_bnn_block_2b_skip_add                          -        (-1, 56, 56, 64)         0         0        0           ?            ? |
+| r2b_bnn_block_2_out                                -        (-1, 56, 56, 64)         0         0        0           ?            ? |
+| r2b_bnn_block_3a_batch_norm                        -        (-1, 56, 56, 64)         0       128     0.50           0            0 |
+| r2b_bnn_block_3a_scaling_pool_pool                 -          (-1, 1, 1, 64)         0         0        0           0            0 |
+| r2b_bnn_block_3a_scaling_pool_flatten              -                (-1, 64)         0         0        0           0            0 |
+| r2b_bnn_block_3a_scaling_dense_reduce              -                 (-1, 8)         0       512     2.00           0          512 |
+| r2b_bnn_block_3a_scaling_dense_expand              -                (-1, 64)         0       512     2.00           0          512 |
+| r2b_bnn_block_3a_conv2d                            1        (-1, 56, 56, 64)     36864         0     4.50   115605504            0 |
+| r2b_bnn_block_3a_scaling_reshape                   -          (-1, 1, 1, 64)         0         0        0           ?            ? |
+| r2b_bnn_block_3a_scaling_multiplication            -        (-1, 56, 56, 64)         0         0        0           ?            ? |
+| r2b_bnn_block_3a_prelu                             -        (-1, 56, 56, 64)         0        64     0.25           ?            ? |
+| r2b_bnn_block_3a_skip_add                          -        (-1, 56, 56, 64)         0         0        0           ?            ? |
+| r2b_bnn_block_3b_batch_norm                        -        (-1, 56, 56, 64)         0       128     0.50           0            0 |
+| r2b_bnn_block_3b_scaling_pool_pool                 -          (-1, 1, 1, 64)         0         0        0           0            0 |
+| r2b_bnn_block_3b_scaling_pool_flatten              -                (-1, 64)         0         0        0           0            0 |
+| r2b_bnn_block_3b_scaling_dense_reduce              -                 (-1, 8)         0       512     2.00           0          512 |
+| r2b_bnn_block_3b_scaling_dense_expand              -                (-1, 64)         0       512     2.00           0          512 |
+| r2b_bnn_block_3b_conv2d                            1        (-1, 56, 56, 64)     36864         0     4.50   115605504            0 |
+| r2b_bnn_block_3b_scaling_reshape                   -          (-1, 1, 1, 64)         0         0        0           ?            ? |
+| r2b_bnn_block_3b_scaling_multiplication            -        (-1, 56, 56, 64)         0         0        0           ?            ? |
+| r2b_bnn_block_3b_prelu                             -        (-1, 56, 56, 64)         0        64     0.25           ?            ? |
+| r2b_bnn_block_3b_skip_add                          -        (-1, 56, 56, 64)         0         0        0           ?            ? |
+| r2b_bnn_block_3_out                                -        (-1, 56, 56, 64)         0         0        0           ?            ? |
+| r2b_bnn_block_4a_batch_norm                        -        (-1, 56, 56, 64)         0       128     0.50           0            0 |
+| r2b_bnn_block_4a_scaling_pool_pool                 -          (-1, 1, 1, 64)         0         0        0           0            0 |
+| r2b_bnn_block_4a_scaling_pool_flatten              -                (-1, 64)         0         0        0           0            0 |
+| r2b_bnn_block_4a_scaling_dense_reduce              -                 (-1, 8)         0       512     2.00           0          512 |
+| r2b_bnn_block_4a_scaling_dense_expand              -               (-1, 128)         0      1024     4.00           0         1024 |
+| r2b_bnn_block_4a_conv2d                            1       (-1, 28, 28, 128)     73728         0     9.00    57802752            0 |
+| r2b_bnn_block_4a_scaling_reshape                   -         (-1, 1, 1, 128)         0         0        0           ?            ? |
+| r2b_bnn_block_4a_shortcut_pool                     -        (-1, 28, 28, 64)         0         0        0           0            0 |
+| r2b_bnn_block_4a_scaling_multiplication            -       (-1, 28, 28, 128)         0         0        0           ?            ? |
+| r2b_bnn_block_4a_shortcut_conv2d                   -       (-1, 28, 28, 128)         0      8192    32.00           0      6422528 |
+| r2b_bnn_block_4a_prelu                             -       (-1, 28, 28, 128)         0       128     0.50           ?            ? |
+| r2b_bnn_block_4a_shortcut_batch_norm               -       (-1, 28, 28, 128)         0       256     1.00           0            0 |
+| r2b_bnn_block_4a_skip_add                          -       (-1, 28, 28, 128)         0         0        0           ?            ? |
+| r2b_bnn_block_4b_batch_norm                        -       (-1, 28, 28, 128)         0       256     1.00           0            0 |
+| r2b_bnn_block_4b_scaling_pool_pool                 -         (-1, 1, 1, 128)         0         0        0           0            0 |
+| r2b_bnn_block_4b_scaling_pool_flatten              -               (-1, 128)         0         0        0           0            0 |
+| r2b_bnn_block_4b_scaling_dense_reduce              -                (-1, 16)         0      2048     8.00           0         2048 |
+| r2b_bnn_block_4b_scaling_dense_expand              -               (-1, 128)         0      2048     8.00           0         2048 |
+| r2b_bnn_block_4b_conv2d                            1       (-1, 28, 28, 128)    147456         0    18.00   115605504            0 |
+| r2b_bnn_block_4b_scaling_reshape                   -         (-1, 1, 1, 128)         0         0        0           ?            ? |
+| r2b_bnn_block_4b_scaling_multiplication            -       (-1, 28, 28, 128)         0         0        0           ?            ? |
+| r2b_bnn_block_4b_prelu                             -       (-1, 28, 28, 128)         0       128     0.50           ?            ? |
+| r2b_bnn_block_4b_skip_add                          -       (-1, 28, 28, 128)         0         0        0           ?            ? |
+| r2b_bnn_block_4_out                                -       (-1, 28, 28, 128)         0         0        0           ?            ? |
+| r2b_bnn_block_5a_batch_norm                        -       (-1, 28, 28, 128)         0       256     1.00           0            0 |
+| r2b_bnn_block_5a_scaling_pool_pool                 -         (-1, 1, 1, 128)         0         0        0           0            0 |
+| r2b_bnn_block_5a_scaling_pool_flatten              -               (-1, 128)         0         0        0           0            0 |
+| r2b_bnn_block_5a_scaling_dense_reduce              -                (-1, 16)         0      2048     8.00           0         2048 |
+| r2b_bnn_block_5a_scaling_dense_expand              -               (-1, 128)         0      2048     8.00           0         2048 |
+| r2b_bnn_block_5a_conv2d                            1       (-1, 28, 28, 128)    147456         0    18.00   115605504            0 |
+| r2b_bnn_block_5a_scaling_reshape                   -         (-1, 1, 1, 128)         0         0        0           ?            ? |
+| r2b_bnn_block_5a_scaling_multiplication            -       (-1, 28, 28, 128)         0         0        0           ?            ? |
+| r2b_bnn_block_5a_prelu                             -       (-1, 28, 28, 128)         0       128     0.50           ?            ? |
+| r2b_bnn_block_5a_skip_add                          -       (-1, 28, 28, 128)         0         0        0           ?            ? |
+| r2b_bnn_block_5b_batch_norm                        -       (-1, 28, 28, 128)         0       256     1.00           0            0 |
+| r2b_bnn_block_5b_scaling_pool_pool                 -         (-1, 1, 1, 128)         0         0        0           0            0 |
+| r2b_bnn_block_5b_scaling_pool_flatten              -               (-1, 128)         0         0        0           0            0 |
+| r2b_bnn_block_5b_scaling_dense_reduce              -                (-1, 16)         0      2048     8.00           0         2048 |
+| r2b_bnn_block_5b_scaling_dense_expand              -               (-1, 128)         0      2048     8.00           0         2048 |
+| r2b_bnn_block_5b_conv2d                            1       (-1, 28, 28, 128)    147456         0    18.00   115605504            0 |
+| r2b_bnn_block_5b_scaling_reshape                   -         (-1, 1, 1, 128)         0         0        0           ?            ? |
+| r2b_bnn_block_5b_scaling_multiplication            -       (-1, 28, 28, 128)         0         0        0           ?            ? |
+| r2b_bnn_block_5b_prelu                             -       (-1, 28, 28, 128)         0       128     0.50           ?            ? |
+| r2b_bnn_block_5b_skip_add                          -       (-1, 28, 28, 128)         0         0        0           ?            ? |
+| r2b_bnn_block_5_out                                -       (-1, 28, 28, 128)         0         0        0           ?            ? |
+| r2b_bnn_block_6a_batch_norm                        -       (-1, 28, 28, 128)         0       256     1.00           0            0 |
+| r2b_bnn_block_6a_scaling_pool_pool                 -         (-1, 1, 1, 128)         0         0        0           0            0 |
+| r2b_bnn_block_6a_scaling_pool_flatten              -               (-1, 128)         0         0        0           0            0 |
+| r2b_bnn_block_6a_scaling_dense_reduce              -                (-1, 16)         0      2048     8.00           0         2048 |
+| r2b_bnn_block_6a_scaling_dense_expand              -               (-1, 256)         0      4096    16.00           0         4096 |
+| r2b_bnn_block_6a_conv2d                            1       (-1, 14, 14, 256)    294912         0    36.00    57802752            0 |
+| r2b_bnn_block_6a_scaling_reshape                   -         (-1, 1, 1, 256)         0         0        0           ?            ? |
+| r2b_bnn_block_6a_shortcut_pool                     -       (-1, 14, 14, 128)         0         0        0           0            0 |
+| r2b_bnn_block_6a_scaling_multiplication            -       (-1, 14, 14, 256)         0         0        0           ?            ? |
+| r2b_bnn_block_6a_shortcut_conv2d                   -       (-1, 14, 14, 256)         0     32768   128.00           0      6422528 |
+| r2b_bnn_block_6a_prelu                             -       (-1, 14, 14, 256)         0       256     1.00           ?            ? |
+| r2b_bnn_block_6a_shortcut_batch_norm               -       (-1, 14, 14, 256)         0       512     2.00           0            0 |
+| r2b_bnn_block_6a_skip_add                          -       (-1, 14, 14, 256)         0         0        0           ?            ? |
+| r2b_bnn_block_6b_batch_norm                        -       (-1, 14, 14, 256)         0       512     2.00           0            0 |
+| r2b_bnn_block_6b_scaling_pool_pool                 -         (-1, 1, 1, 256)         0         0        0           0            0 |
+| r2b_bnn_block_6b_scaling_pool_flatten              -               (-1, 256)         0         0        0           0            0 |
+| r2b_bnn_block_6b_scaling_dense_reduce              -                (-1, 32)         0      8192    32.00           0         8192 |
+| r2b_bnn_block_6b_scaling_dense_expand              -               (-1, 256)         0      8192    32.00           0         8192 |
+| r2b_bnn_block_6b_conv2d                            1       (-1, 14, 14, 256)    589824         0    72.00   115605504            0 |
+| r2b_bnn_block_6b_scaling_reshape                   -         (-1, 1, 1, 256)         0         0        0           ?            ? |
+| r2b_bnn_block_6b_scaling_multiplication            -       (-1, 14, 14, 256)         0         0        0           ?            ? |
+| r2b_bnn_block_6b_prelu                             -       (-1, 14, 14, 256)         0       256     1.00           ?            ? |
+| r2b_bnn_block_6b_skip_add                          -       (-1, 14, 14, 256)         0         0        0           ?            ? |
+| r2b_bnn_block_6_out                                -       (-1, 14, 14, 256)         0         0        0           ?            ? |
+| r2b_bnn_block_7a_batch_norm                        -       (-1, 14, 14, 256)         0       512     2.00           0            0 |
+| r2b_bnn_block_7a_scaling_pool_pool                 -         (-1, 1, 1, 256)         0         0        0           0            0 |
+| r2b_bnn_block_7a_scaling_pool_flatten              -               (-1, 256)         0         0        0           0            0 |
+| r2b_bnn_block_7a_scaling_dense_reduce              -                (-1, 32)         0      8192    32.00           0         8192 |
+| r2b_bnn_block_7a_scaling_dense_expand              -               (-1, 256)         0      8192    32.00           0         8192 |
+| r2b_bnn_block_7a_conv2d                            1       (-1, 14, 14, 256)    589824         0    72.00   115605504            0 |
+| r2b_bnn_block_7a_scaling_reshape                   -         (-1, 1, 1, 256)         0         0        0           ?            ? |
+| r2b_bnn_block_7a_scaling_multiplication            -       (-1, 14, 14, 256)         0         0        0           ?            ? |
+| r2b_bnn_block_7a_prelu                             -       (-1, 14, 14, 256)         0       256     1.00           ?            ? |
+| r2b_bnn_block_7a_skip_add                          -       (-1, 14, 14, 256)         0         0        0           ?            ? |
+| r2b_bnn_block_7b_batch_norm                        -       (-1, 14, 14, 256)         0       512     2.00           0            0 |
+| r2b_bnn_block_7b_scaling_pool_pool                 -         (-1, 1, 1, 256)         0         0        0           0            0 |
+| r2b_bnn_block_7b_scaling_pool_flatten              -               (-1, 256)         0         0        0           0            0 |
+| r2b_bnn_block_7b_scaling_dense_reduce              -                (-1, 32)         0      8192    32.00           0         8192 |
+| r2b_bnn_block_7b_scaling_dense_expand              -               (-1, 256)         0      8192    32.00           0         8192 |
+| r2b_bnn_block_7b_conv2d                            1       (-1, 14, 14, 256)    589824         0    72.00   115605504            0 |
+| r2b_bnn_block_7b_scaling_reshape                   -         (-1, 1, 1, 256)         0         0        0           ?            ? |
+| r2b_bnn_block_7b_scaling_multiplication            -       (-1, 14, 14, 256)         0         0        0           ?            ? |
+| r2b_bnn_block_7b_prelu                             -       (-1, 14, 14, 256)         0       256     1.00           ?            ? |
+| r2b_bnn_block_7b_skip_add                          -       (-1, 14, 14, 256)         0         0        0           ?            ? |
+| r2b_bnn_block_7_out                                -       (-1, 14, 14, 256)         0         0        0           ?            ? |
+| r2b_bnn_block_8a_batch_norm                        -       (-1, 14, 14, 256)         0       512     2.00           0            0 |
+| r2b_bnn_block_8a_scaling_pool_pool                 -         (-1, 1, 1, 256)         0         0        0           0            0 |
+| r2b_bnn_block_8a_scaling_pool_flatten              -               (-1, 256)         0         0        0           0            0 |
+| r2b_bnn_block_8a_scaling_dense_reduce              -                (-1, 32)         0      8192    32.00           0         8192 |
+| r2b_bnn_block_8a_scaling_dense_expand              -               (-1, 512)         0     16384    64.00           0        16384 |
+| r2b_bnn_block_8a_conv2d                            1         (-1, 7, 7, 512)   1179648         0   144.00    57802752            0 |
+| r2b_bnn_block_8a_scaling_reshape                   -         (-1, 1, 1, 512)         0         0        0           ?            ? |
+| r2b_bnn_block_8a_shortcut_pool                     -         (-1, 7, 7, 256)         0         0        0           0            0 |
+| r2b_bnn_block_8a_scaling_multiplication            -         (-1, 7, 7, 512)         0         0        0           ?            ? |
+| r2b_bnn_block_8a_shortcut_conv2d                   -         (-1, 7, 7, 512)         0    131072   512.00           0      6422528 |
+| r2b_bnn_block_8a_prelu                             -         (-1, 7, 7, 512)         0       512     2.00           ?            ? |
+| r2b_bnn_block_8a_shortcut_batch_norm               -         (-1, 7, 7, 512)         0      1024     4.00           0            0 |
+| r2b_bnn_block_8a_skip_add                          -         (-1, 7, 7, 512)         0         0        0           ?            ? |
+| r2b_bnn_block_8b_batch_norm                        -         (-1, 7, 7, 512)         0      1024     4.00           0            0 |
+| r2b_bnn_block_8b_scaling_pool_pool                 -         (-1, 1, 1, 512)         0         0        0           0            0 |
+| r2b_bnn_block_8b_scaling_pool_flatten              -               (-1, 512)         0         0        0           0            0 |
+| r2b_bnn_block_8b_scaling_dense_reduce              -                (-1, 64)         0     32768   128.00           0        32768 |
+| r2b_bnn_block_8b_scaling_dense_expand              -               (-1, 512)         0     32768   128.00           0        32768 |
+| r2b_bnn_block_8b_conv2d                            1         (-1, 7, 7, 512)   2359296         0   288.00   115605504            0 |
+| r2b_bnn_block_8b_scaling_reshape                   -         (-1, 1, 1, 512)         0         0        0           ?            ? |
+| r2b_bnn_block_8b_scaling_multiplication            -         (-1, 7, 7, 512)         0         0        0           ?            ? |
+| r2b_bnn_block_8b_prelu                             -         (-1, 7, 7, 512)         0       512     2.00           ?            ? |
+| r2b_bnn_block_8b_skip_add                          -         (-1, 7, 7, 512)         0         0        0           ?            ? |
+| r2b_bnn_block_8_out                                -         (-1, 7, 7, 512)         0         0        0           ?            ? |
+| r2b_bnn_block_9a_batch_norm                        -         (-1, 7, 7, 512)         0      1024     4.00           0            0 |
+| r2b_bnn_block_9a_scaling_pool_pool                 -         (-1, 1, 1, 512)         0         0        0           0            0 |
+| r2b_bnn_block_9a_scaling_pool_flatten              -               (-1, 512)         0         0        0           0            0 |
+| r2b_bnn_block_9a_scaling_dense_reduce              -                (-1, 64)         0     32768   128.00           0        32768 |
+| r2b_bnn_block_9a_scaling_dense_expand              -               (-1, 512)         0     32768   128.00           0        32768 |
+| r2b_bnn_block_9a_conv2d                            1         (-1, 7, 7, 512)   2359296         0   288.00   115605504            0 |
+| r2b_bnn_block_9a_scaling_reshape                   -         (-1, 1, 1, 512)         0         0        0           ?            ? |
+| r2b_bnn_block_9a_scaling_multiplication            -         (-1, 7, 7, 512)         0         0        0           ?            ? |
+| r2b_bnn_block_9a_prelu                             -         (-1, 7, 7, 512)         0       512     2.00           ?            ? |
+| r2b_bnn_block_9a_skip_add                          -         (-1, 7, 7, 512)         0         0        0           ?            ? |
+| r2b_bnn_block_9b_batch_norm                        -         (-1, 7, 7, 512)         0      1024     4.00           0            0 |
+| r2b_bnn_block_9b_scaling_pool_pool                 -         (-1, 1, 1, 512)         0         0        0           0            0 |
+| r2b_bnn_block_9b_scaling_pool_flatten              -               (-1, 512)         0         0        0           0            0 |
+| r2b_bnn_block_9b_scaling_dense_reduce              -                (-1, 64)         0     32768   128.00           0        32768 |
+| r2b_bnn_block_9b_scaling_dense_expand              -               (-1, 512)         0     32768   128.00           0        32768 |
+| r2b_bnn_block_9b_conv2d                            1         (-1, 7, 7, 512)   2359296         0   288.00   115605504            0 |
+| r2b_bnn_block_9b_scaling_reshape                   -         (-1, 1, 1, 512)         0         0        0           ?            ? |
+| r2b_bnn_block_9b_scaling_multiplication            -         (-1, 7, 7, 512)         0         0        0           ?            ? |
+| r2b_bnn_block_9b_prelu                             -         (-1, 7, 7, 512)         0       512     2.00           ?            ? |
+| r2b_bnn_block_9b_skip_add                          -         (-1, 7, 7, 512)         0         0        0           ?            ? |
+| r2b_bnn_block_9_out                                -         (-1, 7, 7, 512)         0         0        0           ?            ? |
+| r2b_bnn_block_10_global_pool_pool                  -         (-1, 1, 1, 512)         0         0        0           0            0 |
+| r2b_bnn_block_10_global_pool_flatten               -               (-1, 512)         0         0        0           0            0 |
+| r2b_bnn_block_10_logits                            -              (-1, 1000)         0    513000  2003.91           0       512000 |
+| r2b_bnn_block_10_probs                             -              (-1, 1000)         0         0        0           ?            ? |
++------------------------------------------------------------------------------------------------------------------------------------+
+| Total                                                                         10985472   1001448  5252.91  1676279808    138087936 |
++------------------------------------------------------------------------------------------------------------------------------------+
++r2b_bnn summary------------------------------+
+| Total params                      12 M      |
+| Trainable params                  12 M      |
+| Non-trainable params              8.7 k     |
+| Model size                        5.13 MiB  |
+| Model size (8-bit FP weights)     2.26 MiB  |
+| Float-32 Equivalent               45.73 MiB |
+| Compression Ratio of Memory       0.11      |
+| Number of MACs                    1.81 B    |
+| Ratio of MACs that are binarized  0.9239    |
++---------------------------------------------+
