@@ -1,12 +1,11 @@
 from pathlib import Path
 
 import larq as lq
+import larq_zoo as lqz
 import numpy as np
 import pytest
 import tensorflow as tf
 from zookeeper import cli
-
-import larq_zoo as lqz
 
 
 @pytest.fixture(autouse=True)
@@ -113,7 +112,7 @@ def test_model_summary(app, last_feature_dim):
     if summary_file.exists():
         with open(summary_file, "r") as file:
             content = file.read()
-        assert content == capture.output
+        assert content.lower() == capture.output.lower()
     else:
         with open(summary_file, "w") as file:
             file.write(capture.output)
