@@ -21,10 +21,10 @@ def preprocess_input(image):
     """Preprocesses a Tensor or Numpy array encoding a image.
 
     # Arguments
-    image: Numpy array or symbolic Tensor, 3D.
+        image: Numpy array or symbolic Tensor, 3D.
 
     # Returns
-    Preprocessed Tensor or Numpy array.
+        Preprocessed Tensor or Numpy array.
     """
     if len(image.shape) != 3:
         raise ValueError("Input must be of size [height, width, C>0]")
