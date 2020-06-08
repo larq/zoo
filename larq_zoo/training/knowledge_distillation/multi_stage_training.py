@@ -1,6 +1,6 @@
 from datetime import datetime
 from pathlib import Path
-from typing import List, Optional, Union
+from typing import List, Optional, Sequence, Union
 
 import tensorflow as tf
 from zookeeper import ComponentField, Field
@@ -106,7 +106,11 @@ class LarqZooModelTrainingPhase(TrainingPhase):
     output_matching_train_teacher: bool = Field(False)
 
     @Field
-    def loss(self) -> Optional[Union[tf.keras.losses.Loss, str]]:
+    def loss(
+        self,
+    ) -> Optional[
+        Union[Sequence[Union[tf.keras.losses.Loss, str]], tf.keras.losses.Loss, str]
+    ]:
         return getattr(self.__base_getattribute__("model"), "classification_loss")
 
     metrics = Field(lambda: ["accuracy", "sparse_top_k_categorical_accuracy"])
