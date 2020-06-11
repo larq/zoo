@@ -36,7 +36,7 @@ setup(
     },
     entry_points="""
         [console_scripts]
-        lqz=larq_zoo.experiments:cli
+        lqz=larq_zoo.training.main:cli
     """,
     classifiers=[
         "Development Status :: 2 - Pre-Alpha",
