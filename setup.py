@@ -28,6 +28,7 @@ setup(
             "pytype>=2019.10.17,<2020.7.0",
             "pytest>=4.3.1",
             "pytest-cov>=2.6.1",
+            "pytest-mock>=3.1.1",
             "pytest-xdist==1.32.0",
             "Pillow==7.1.2",
             "scipy==1.4.1",
