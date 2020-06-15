@@ -1,5 +1,3 @@
-from unittest import mock
-
 import pytest
 import tensorflow_datasets as tfds
 from click.testing import CliRunner
@@ -10,18 +8,22 @@ from larq_zoo.training import basic_experiments, multi_stage_experiments
 
 # tfds doesn't correctly set the encoding_format for some datasets and defaults to png.
 # This breaks mocking and preprocessing so we hardcode it to jpeg in the unittests.
-def set_encoding_format(self, encoding_format):
+def set_encoding(self, encoding_format):
     self._encoding_format = "jpeg"
 
 
+@pytest.fixture(autouse=True)
+def automock(request, mocker):
+    mocker.patch.object(TFDSDataset, "num_examples", return_value=2)
+    mocker.patch.object(tfds.core.features.Image, "set_encoding_format", set_encoding)
+    with tfds.testing.mock_data(num_examples=2, data_dir="gs://tfds-data/dataset_info"):
+        yield
+
+
 @pytest.mark.parametrize(
-    "command",
-    [e for e in list(basic_experiments.cli.commands.keys()) if "R2B" not in e],
+    "command", [e for e in basic_experiments.cli.commands.keys() if "R2B" not in e],
 )
-@tfds.testing.mock_data(num_examples=2, data_dir="gs://tfds-data/dataset_info")
-@mock.patch.object(TFDSDataset, "num_examples", return_value=2)
-@mock.patch.object(tfds.core.features.Image, "set_encoding_format", set_encoding_format)
-def test_cli(_, command):
+def test_cli(command):
     result = CliRunner().invoke(
         basic_experiments.cli,
         [
@@ -42,10 +44,7 @@ def test_cli(_, command):
 @pytest.mark.parametrize(
     "command,phases", [("TrainR2BStrongBaseline", 2), ("TrainR2B", 4)]
 )
-@tfds.testing.mock_data(num_examples=2, data_dir="gs://tfds-data/dataset_info")
-@mock.patch.object(TFDSDataset, "num_examples", return_value=2)
-@mock.patch.object(tfds.core.features.Image, "set_encoding_format", set_encoding_format)
-def test_multi_stage_experiments(_, command, phases):
+def test_multi_stage_experiments(command, phases):
     arguments = [command]
     for phase in range(phases):
         arguments.extend(
