@@ -11,7 +11,7 @@ from tensorflow.python.keras.backend import is_keras_tensor
 try:
     from tensorflow.python.keras.applications.imagenet_utils import obtain_input_shape
 except ImportError:
-    from keras_applications.imagenet_utils import (
+    from keras_applications.imagenet_utils import (  # type: ignore
         _obtain_input_shape as obtain_input_shape,
     )
 
