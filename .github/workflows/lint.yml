@@ -25,6 +25,6 @@ jobs:
       - name: Black code style
         run: black . --check --target-version py36 --exclude 'build/|buck-out/|dzzist/|_build/|\.git/|\.hg/|\.mypy_cache/|\.tox/|\.venv/|larq/snapshots/'
       - name: Check import order with isort
-        run: isort --check-only --diff
+        run: isort . --check --diff
       - name: Type check with PyType
         run: pytype --jobs auto
