@@ -18,13 +18,13 @@ jobs:
           python-version: 3.7
       - name: Install project dependencies
         run: |
-          pip install tensorflow==2.1.0
+          pip install tensorflow-cpu==2.2.0
           pip install -e .[test]
       - name: Run Flake8
         run: flake8
       - name: Black code style
         run: black . --check --target-version py36 --exclude 'build/|buck-out/|dzzist/|_build/|\.git/|\.hg/|\.mypy_cache/|\.tox/|\.venv/|larq/snapshots/'
       - name: Check import order with isort
-        run: isort --check-only --diff
+        run: isort . --check --diff
       - name: Type check with PyType
-        run: pytype --jobs 2
+        run: pytype --jobs auto

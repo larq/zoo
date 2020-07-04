@@ -11,8 +11,15 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.6, 3.7]
-        tf-version: [1.15.2, 2.0.1, 2.1.0, 2.2.0rc3]
+        tf-version: [1.15.3, 2.0.2, 2.1.1, 2.2.0]
+        python-version: [3.7]
+        include:
+          - tf-version: 2.2.0
+            python-version: 3.6
+          - tf-version: 2.2.0
+            python-version: 3.8
+          - tf-version: 2.2.0
+            python-version: 3.7
     steps:
       - uses: actions/checkout@v2
       - name: Set up Python
@@ -21,13 +28,24 @@ jobs:
           python-version: ${{matrix.python-version}}
       - name: Install dependencies
         run: |
-          pip install tensorflow==${{matrix.tf-version}}
+          pip install tensorflow-cpu==${{matrix.tf-version}} || pip install tensorflow==${{matrix.tf-version}}
           pip install -e .[test]
       - name: Test data and models with pytest
         run: pytest . -n auto --ignore=tests/train_test.py --cov=larq_zoo --cov-report=xml --cov-config=.coveragerc
+      - name: Upload coverage to Codecov
+        run: bash <(curl -s https://codecov.io/bash) -f ./coverage.xml -F unittests
+
+  train-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2.0.1
+        with:
+          python-version: 3.7
+      - name: Install dependencies
+        run: pip install tensorflow-cpu==2.2.0 -e .[test]
       - name: Test training with pytest
-        if: matrix.python-version == '3.7' && matrix.tf-version == '2.1.0'
         run: pytest tests/train_test.py -n auto --cov=larq_zoo --cov-report=xml --cov-config=.coveragerc --cov-append
       - name: Upload coverage to Codecov
-        if: matrix.python-version == '3.7' && matrix.tf-version == '2.1.0'
-        run: curl -s https://codecov.io/bash | bash -s -- -f ./coverage.xml -F unittests
+        run: bash <(curl -s https://codecov.io/bash) -f ./coverage.xml -F unittests
