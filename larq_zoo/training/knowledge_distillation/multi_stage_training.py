@@ -179,5 +179,7 @@ class MultiStageExperiment:
         Path(self.parent_output_dir).mkdir(parents=True, exist_ok=True)
 
         for experiment in self.experiments:
+            if experiment.stage < self.initial_stage:
+                continue
             print(f"Starting stage {experiment.stage} at {datetime.now().isoformat()}.")
             experiment.run()
