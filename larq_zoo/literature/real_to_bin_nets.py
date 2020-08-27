@@ -56,7 +56,10 @@ class _SharedBaseFactory(ModelFactory, metaclass=ABCMeta):
         """Last block, shared across ResNet, StrongBaselineNet and Real-to-Bin nets."""
 
         x = utils.global_pool(x, name=f"{name}_global_pool")
-        x = tf.keras.layers.Dense(self.num_classes, name=f"{name}_logits",)(x)
+        x = tf.keras.layers.Dense(
+            self.num_classes,
+            name=f"{name}_logits",
+        )(x)
         return tf.keras.layers.Softmax(name=f"{name}_probs", dtype=tf.float32)(x)
 
     @abstractmethod
@@ -106,7 +109,9 @@ class _SharedBaseFactory(ModelFactory, metaclass=ABCMeta):
             x = self.last_block(x, name=f"{self.model_name}_block_10")
 
         model = tf.keras.Model(
-            inputs=self.image_input, outputs=x, name=self.model_name,
+            inputs=self.image_input,
+            outputs=x,
+            name=self.model_name,
         )
 
         # Load weights.
@@ -138,7 +143,9 @@ class StrongBaselineNetFactory(_SharedBaseFactory):
         """
 
         def __init__(
-            self, regularizer: Optional[tf.keras.regularizers.Regularizer], **kwargs,
+            self,
+            regularizer: Optional[tf.keras.regularizers.Regularizer],
+            **kwargs,
         ) -> None:
             super().__init__(**kwargs)
             self.kernel_regularizer = tf.keras.regularizers.get(regularizer)
@@ -193,7 +200,8 @@ class StrongBaselineNetFactory(_SharedBaseFactory):
         Bulat & Tzimiropoulos
         """
         return self.LearnedRescaleLayer(
-            regularizer=self.kernel_regularizer, name=f"{name}_rescale",
+            regularizer=self.kernel_regularizer,
+            name=f"{name}_rescale",
         )(conv_output)
 
     def half_binary_block(

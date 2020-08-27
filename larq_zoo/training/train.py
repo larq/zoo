@@ -110,7 +110,9 @@ class TrainLarqZooModel(Experiment):
 
         with utils.get_distribution_scope(self.batch_size):
             self.model.compile(
-                optimizer=self.optimizer, loss=self.loss, metrics=self.metrics,
+                optimizer=self.optimizer,
+                loss=self.loss,
+                metrics=self.metrics,
             )
 
             lq.models.summary(self.model)

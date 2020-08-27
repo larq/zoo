@@ -21,7 +21,8 @@ def automock(request, mocker):
 
 
 @pytest.mark.parametrize(
-    "command", [e for e in basic_experiments.cli.commands.keys() if "R2B" not in e],
+    "command",
+    [e for e in basic_experiments.cli.commands.keys() if "R2B" not in e],
 )
 def test_cli(command):
     result = CliRunner().invoke(
