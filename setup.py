@@ -10,7 +10,7 @@ setup(
     name="larq-zoo",
     version="1.0.5",
     author="Plumerai",
-    author_email="lukas@plumerai.co.uk",
+    author_email="opensource@plumerai.com",
     description="Reference implementations of popular Binarized Neural Networks",
     long_description=readme(),
     long_description_content_type="text/markdown",
