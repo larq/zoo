@@ -25,7 +25,7 @@ setup(
             "black==20.8b1",
             "flake8>=3.7.9,<3.9.0",
             "isort==5.4.2",
-            "pytype==2020.8.17",
+            "pytype==2020.8.28",
             "pytest>=4.3.1",
             "pytest-cov>=2.6.1",
             "pytest-mock>=3.1.1",
