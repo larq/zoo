@@ -18,7 +18,7 @@ from larq_zoo.training.learning_schedules import CosineDecayWithWarmup, R2BStepS
 
 # --------- Real-to-Binary: Strong Baseline Model training -------------
 
-# Note: we provide the below classes primarily as an example_of how to use Zoo's multi-
+# Note: we provide the below classes primarily as an example of how to use Zoo's multi-
 # stage infrastructure to implement a set of training steps - this is not the exact
 # setup we used to train the pretrained weights available for our implementation of
 # Real-to- Binary nets. Therefore, these exact steps are not expected to reproduce our
