@@ -26,6 +26,9 @@ jobs:
         uses: actions/setup-python@v2.1.3
         with:
           python-version: ${{matrix.python-version}}
+      - name: Fix TFDS for older TF versions
+        run: pip install tensorflow_datasets==3.2.*
+        if: matrix.tf-version == '1.15.3' || matrix.tf-version == '2.0.2'
       - name: Install dependencies
         run: |
           pip install tensorflow-cpu==${{matrix.tf-version}} || pip install tensorflow==${{matrix.tf-version}}
@@ -44,7 +47,7 @@ jobs:
         with:
           python-version: 3.7
       - name: Install dependencies
-        run: pip install tensorflow-cpu==2.2.0 -e .[test]
+        run: pip install tensorflow-cpu==2.3.0 -e .[test]
       - name: Test training with pytest
         run: pytest tests/train_test.py -n auto --cov=larq_zoo --cov-report=xml --cov-config=.coveragerc --cov-append
       - name: Upload coverage to Codecov
