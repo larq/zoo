@@ -6,16 +6,9 @@ from zookeeper.tf.dataset import TFDSDataset
 from larq_zoo.training import basic_experiments, multi_stage_experiments
 
 
-# tfds doesn't correctly set the encoding_format for some datasets and defaults to png.
-# This breaks mocking and preprocessing so we hardcode it to jpeg in the unittests.
-def set_encoding(self, encoding_format):
-    self._encoding_format = "jpeg"
-
-
 @pytest.fixture(autouse=True)
 def automock(request, mocker):
     mocker.patch.object(TFDSDataset, "num_examples", return_value=2)
-    mocker.patch.object(tfds.core.features.Image, "set_encoding_format", set_encoding)
     with tfds.testing.mock_data(num_examples=2, data_dir="gs://tfds-data/dataset_info"):
         yield
 
