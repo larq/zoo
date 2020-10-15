@@ -12,18 +12,18 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - name: Set up Python 3.7
+      - name: Set up Python 3.8
         uses: actions/setup-python@v2.1.4
         with:
-          python-version: 3.7
+          python-version: 3.8
       - name: Install project dependencies
         run: |
-          pip install tensorflow-cpu==2.2.0
+          pip install tensorflow-cpu==2.3.0
           pip install -e .[test]
       - name: Run Flake8
         run: flake8
       - name: Black code style
-        run: black . --check --target-version py36 --exclude 'build/|buck-out/|dzzist/|_build/|\.git/|\.hg/|\.mypy_cache/|\.tox/|\.venv/|larq/snapshots/'
+        run: black . --check --target-version py36
       - name: Check import order with isort
         run: isort . --check --diff
       - name: Type check with PyType
