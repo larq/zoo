@@ -316,7 +316,7 @@ def QuickNetLarge(
 
     | Top-1 Accuracy | Top-5 Accuracy | Parameters | Memory  |
     | -------------- | -------------- | ---------- | ------- |
-    | 66.0 %         | 87.0 %         | 23 342 248 | 5.40 MB |
+    | 66.9 %         | 87.0 %         | 23 342 248 | 5.40 MB |
 
     # Arguments
         input_shape: Optional shape tuple, to be specified if you would like to use a
