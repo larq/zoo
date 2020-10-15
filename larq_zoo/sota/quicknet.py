@@ -10,6 +10,11 @@ from larq_zoo.core.model_factory import ModelFactory
 
 
 def blurpool_initializer(shape, dtype=None):
+    """Initializer for anti-aliased pooling.
+
+    # References
+        - [Making Convolutional Networks Shift-Invariant Again](https://arxiv.org/abs/1904.11486)
+    """
     ksize, filters = shape[0], shape[2]
 
     if ksize == 2:
