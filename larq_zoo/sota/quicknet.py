@@ -43,7 +43,7 @@ class QuickNetFactory(ModelFactory):
     def imagenet_weights_path(self):
         return utils.download_pretrained_model(
             model="quicknet",
-            version="v1.0.0",
+            version="v1.0",
             file="quicknet_weights.h5",
             file_hash="8aba9e4e5f8d342faef04a0b2ae8e562da57dbb7d15162e8b3e091c951ba756c",
         )
@@ -52,7 +52,7 @@ class QuickNetFactory(ModelFactory):
     def imagenet_no_top_weights_path(self):
         return utils.download_pretrained_model(
             model="quicknet",
-            version="v1.0.0",
+            version="v1.0",
             file="quicknet_weights_notop.h5",
             file_hash="204414e438373f14f6056a1c098249f505a87dd238e18d3a47a9bd8b66227881",
         )
@@ -194,7 +194,7 @@ class QuickNetSmallFactory(QuickNetFactory):
     def imagenet_weights_path(self):
         return utils.download_pretrained_model(
             model="quicknet",
-            version="v1.0.0",
+            version="v1.0",
             file="quicknet_small_weights.h5",
             file_hash="1ac3b07df7f5a911dd0b49febb2486428ddf1ca130297c403815dfae5a1c71a2",
         )
@@ -203,7 +203,7 @@ class QuickNetSmallFactory(QuickNetFactory):
     def imagenet_no_top_weights_path(self):
         return utils.download_pretrained_model(
             model="quicknet",
-            version="v1.0.0",
+            version="v1.0",
             file="quicknet_small_weights_notop.h5",
             file_hash="be8ba657155846be355c5580d1ea56eaf8282616de065ffc39257202f9f164ea",
         )
@@ -218,7 +218,7 @@ class QuickNetLargeFactory(QuickNetFactory):
     def imagenet_weights_path(self):
         return utils.download_pretrained_model(
             model="quicknet",
-            version="v1.0.0",
+            version="v1.0",
             file="quicknet_large_weights.h5",
             file_hash="c5158e8a59147b31370becd937825f4db8a5cdf308314874f678f596629be45c",
         )
@@ -227,7 +227,7 @@ class QuickNetLargeFactory(QuickNetFactory):
     def imagenet_no_top_weights_path(self):
         return utils.download_pretrained_model(
             model="quicknet",
-            version="v1.0.0",
+            version="v1.0",
             file="quicknet_large_weights_notop.h5",
             file_hash="adcf154a2a8007e81bd6af77c035ffbf54cd6413b89a0ba294e23e76a82a1b78",
         )
@@ -246,7 +246,7 @@ def QuickNet(
     Optionally loads weights pre-trained on ImageNet.
 
     ```netron
-    quicknet-v1.0.0/quicknet.json
+    quicknet-v1.0/quicknet.json
     ```
     ```summary
     sota.QuickNet
@@ -303,7 +303,7 @@ def QuickNetLarge(
     Optionally loads weights pre-trained on ImageNet.
 
     ```netron
-    quicknet-v1.0.0/quicknet_large.json
+    quicknet-v1.0/quicknet_large.json
     ```
     ```summary
     sota.QuickNetLarge
@@ -360,7 +360,7 @@ def QuickNetSmall(
     Optionally loads weights pre-trained on ImageNet.
 
     ```netron
-    quicknet-v1.0.0/quicknet_small.json
+    quicknet-v1.0/quicknet_small.json
     ```
     ```summary
     sota.QuickNetSmall
