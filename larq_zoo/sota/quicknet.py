@@ -246,6 +246,9 @@ def QuickNet(
     ```summary
     sota.QuickNet
     ```
+    ```plot-altair
+    /plots/quicknet.vg.json
+    ```
 
     # ImageNet Metrics
 
@@ -300,6 +303,9 @@ def QuickNetLarge(
     ```summary
     sota.QuickNetLarge
     ```
+    ```plot-altair
+    /plots/quicknet_large.vg.json
+    ```
 
     # ImageNet Metrics
 
@@ -353,6 +359,9 @@ def QuickNetSmall(
     ```
     ```summary
     sota.QuickNetSmall
+    ```
+    ```plot-altair
+    /plots/quicknet_small.vg.json
     ```
 
     # ImageNet Metrics
