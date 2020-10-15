@@ -153,8 +153,7 @@ class QuickNetFactory(ModelFactory):
         ):
             for layer in range(layers):
                 if filters != x.shape[-1]:
-                    strides = 1 if (block == 0 or layer != 0) else 2
-                    x = self.transition_block(x, filters, strides)
+                    x = self.transition_block(x, filters, strides=2)
                 x = self.residual_block(x)
 
         if self.include_top:
