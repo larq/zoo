@@ -3,7 +3,13 @@ import tensorflow_datasets as tfds
 from click.testing import CliRunner
 from zookeeper.tf.dataset import TFDSDataset
 
-from larq_zoo.training import basic_experiments, multi_stage_experiments
+from larq_zoo.training import (
+    basic_experiments,
+    multi_stage_experiments,
+    sota_experiments,
+)
+
+assert basic_experiments  # register literature training
 
 
 @pytest.fixture(autouse=True)
@@ -15,11 +21,11 @@ def automock(request, mocker):
 
 @pytest.mark.parametrize(
     "command",
-    [e for e in basic_experiments.cli.commands.keys() if "R2B" not in e],
+    [e for e in sota_experiments.cli.commands.keys() if "R2B" not in e],
 )
 def test_cli(command):
     result = CliRunner().invoke(
-        basic_experiments.cli,
+        sota_experiments.cli,
         [
             command,
             "dataset=ImageNet",
