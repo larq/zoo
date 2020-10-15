@@ -98,27 +98,6 @@ class QuickNetFactory(ModelFactory):
         )(x)
         return tf.keras.layers.BatchNormalization()(x)
 
-    def conv_block(
-        self,
-        x: tf.Tensor,
-        filters: int,
-        strides: int = 1,
-    ) -> tf.Tensor:
-        x = lq.layers.QuantConv2D(
-            filters,
-            (3, 3),
-            activation="relu",
-            input_quantizer=self.input_quantizer,
-            kernel_constraint=self.kernel_constraint,
-            kernel_quantizer=self.kernel_quantizer,
-            kernel_initializer="glorot_normal",
-            padding="same",
-            pad_values=1.0,
-            strides=strides,
-            use_bias=False,
-        )(x)
-        return tf.keras.layers.BatchNormalization(momentum=0.9, epsilon=1e-5)(x)
-
     def residual_block(self, x: tf.Tensor) -> tf.Tensor:
         """Standard residual block, without strides or filter changes."""
 
