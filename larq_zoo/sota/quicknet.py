@@ -1,7 +1,7 @@
-import abc
-from typing import Callable, Optional, Sequence
+from typing import Optional, Sequence
 
 import larq as lq
+import numpy as np
 import tensorflow as tf
 from zookeeper import Field, factory
 
@@ -9,61 +9,48 @@ from larq_zoo.core import utils
 from larq_zoo.core.model_factory import ModelFactory
 
 
-def stem_module(filters: int, x: tf.Tensor) -> tf.Tensor:
-    assert filters % 8 == 0
-    x = tf.keras.layers.Conv2D(
-        filters // 8,
-        (3, 3),
-        strides=2,
-        kernel_initializer="he_normal",
-        padding="same",
-        use_bias=False,
-    )(x)
-    x = tf.keras.layers.DepthwiseConv2D(
-        (3, 3),
-        depth_multiplier=8,
-        strides=2,
-        kernel_initializer="he_normal",
-        padding="same",
-        use_bias=False,
-        activation="relu",
-    )(x)
+def blurpool_initializer(shape, dtype=None):
+    ksize, filters = shape[0], shape[2]
 
-    return tf.keras.layers.BatchNormalization(momentum=0.9, epsilon=1e-5)(x)
+    if ksize == 2:
+        k = np.array([1, 1])
+    elif ksize == 3:
+        k = np.array([1, 2, 1])
+    elif ksize == 5:
+        k = np.array([1, 4, 6, 4, 1])
+    else:
+        raise ValueError("filter size should be in 2, 3, 5")
+
+    k = np.outer(k, k)
+    k = k / np.sum(k)
+    k = np.expand_dims(k, axis=-1)
+    k = np.repeat(k, filters, axis=-1)
+    return np.reshape(k, shape)
 
 
-def squeeze_and_excite(inp: tf.Tensor, filters: int, r: int = 16):
-    """Squeeze and Excite as per [Squeeze-and-Excitation Networks](https://arxiv.org/abs/1709.01507).
+@factory
+class QuickNetFactory(ModelFactory):
+    name = "quicknet"
+    section_blocks: Sequence[int] = Field((4, 4, 4, 4))
+    section_filters: Sequence[int] = Field((64, 128, 256, 512))
 
-    Use of S&E in BNNs was pioneered in [Training binary neural networks with
-    real-to-binary convolutions](https://openreview.net/forum?id=BJg4NgBKvH).
-    """
-    out = utils.global_pool(inp)
-    out = tf.keras.layers.Dense(
-        inp.shape[-1] // r,
-        activation="relu",
-        kernel_initializer="he_normal",
-        use_bias=False,
-        kernel_regularizer=tf.keras.regularizers.l2(1e-5),
-    )(out)
-    out = tf.keras.layers.Dense(
-        filters,
-        activation="sigmoid",
-        kernel_initializer="he_normal",
-        use_bias=False,
-        kernel_regularizer=tf.keras.regularizers.l2(1e-5),
-    )(out)
+    @property
+    def imagenet_weights_path(self):
+        return utils.download_pretrained_model(
+            model="quicknet",
+            version="v1.0.0",
+            file="quicknet_weights.h5",
+            file_hash="7b4fa94f5241c7aad3412ca42b5db6517dbc4847cff710cb82be10c2f83bc0be",
+        )
 
-    return tf.reshape(out, [-1, 1, 1, filters])
-
-
-class QuickNetBaseFactory(ModelFactory, abc.ABC):
-    name: str = "model"
-    blocks_per_section: Sequence[int] = Field()
-    section_filters: Sequence[int] = Field()
-    use_squeeze_and_excite_in_section: Sequence[bool] = Field()
-    transition_block: Callable[..., tf.Tensor] = Field()
-    stem_filters: int = Field(64)
+    @property
+    def imagenet_no_top_weights_path(self):
+        return utils.download_pretrained_model(
+            model="quicknet",
+            version="v1.0.0",
+            file="quicknet_weights_notop.h5",
+            file_hash="359eed6dae43525eddf520ea87ec9b54750ee0e022647775d115a38856be396f",
+        )
 
     @property
     def input_quantizer(self):
@@ -78,117 +65,125 @@ class QuickNetBaseFactory(ModelFactory, abc.ABC):
         return lq.constraints.WeightClip(clip_value=1.25)
 
     def __post_configure__(self):
-        assert (
-            len(self.blocks_per_section)
-            == len(self.section_filters)
-            == len(self.use_squeeze_and_excite_in_section)
-        )
+        assert len(self.section_blocks) == len(self.section_filters)
 
-    @property
-    @abc.abstractmethod
-    def imagenet_weights_path(self) -> str:
-        raise NotImplementedError
+    def stem_module(self, filters: int, x: tf.Tensor) -> tf.Tensor:
+        """Start of network."""
+        assert filters % 4 == 0
 
-    @property
-    @abc.abstractmethod
-    def imagenet_no_top_weights_path(self) -> str:
-        raise NotImplementedError
+        x = lq.layers.QuantConv2D(
+            filters // 4,
+            (3, 3),
+            kernel_initializer="he_normal",
+            padding="same",
+            strides=2,
+            use_bias=False,
+        )(x)
+        x = tf.keras.layers.BatchNormalization()(x)
+        x = tf.keras.layers.Activation("relu")(x)
 
-    def conv_block(
-        self, x: tf.Tensor, filters: int, use_squeeze_and_excite: bool, strides: int = 1
-    ) -> tf.Tensor:
-        """Convolution, batch norm and optionally squeeze & excite attention module."""
-        if use_squeeze_and_excite:
-            y = squeeze_and_excite(x, filters)
+        x = lq.layers.QuantDepthwiseConv2D(
+            (3, 3),
+            padding="same",
+            strides=2,
+            use_bias=False,
+        )(x)
+        x = tf.keras.layers.BatchNormalization(scale=False, center=False)(x)
+
         x = lq.layers.QuantConv2D(
             filters,
-            kernel_size=3,
-            strides=strides,
-            padding="Same",
-            pad_values=1.0,
-            input_quantizer=self.input_quantizer,
-            kernel_quantizer=self.kernel_quantizer,
-            kernel_constraint=self.kernel_constraint,
-            kernel_initializer="glorot_normal",
+            1,
+            kernel_initializer="he_normal",
             use_bias=False,
+        )(x)
+        return tf.keras.layers.BatchNormalization()(x)
+
+    def conv_block(
+        self,
+        x: tf.Tensor,
+        filters: int,
+        strides: int = 1,
+    ) -> tf.Tensor:
+        x = lq.layers.QuantConv2D(
+            filters,
+            (3, 3),
             activation="relu",
+            input_quantizer=self.input_quantizer,
+            kernel_constraint=self.kernel_constraint,
+            kernel_quantizer=self.kernel_quantizer,
+            kernel_initializer="glorot_normal",
+            padding="same",
+            pad_values=1.0,
+            strides=strides,
+            use_bias=False,
+        )(x)
+        return tf.keras.layers.BatchNormalization(momentum=0.9, epsilon=1e-5)(x)
+
+    def residual_block(self, x: tf.Tensor) -> tf.Tensor:
+        """Standard residual block, without strides or filter changes."""
+
+        residual = x
+        x = lq.layers.QuantConv2D(
+            int(x.shape[-1]),
+            (3, 3),
+            activation="relu",
+            input_quantizer=self.input_quantizer,
+            kernel_constraint=self.kernel_constraint,
+            kernel_quantizer=self.kernel_quantizer,
+            kernel_initializer="glorot_normal",
+            padding="same",
+            pad_values=1.0,
+            use_bias=False,
         )(x)
         x = tf.keras.layers.BatchNormalization(momentum=0.9, epsilon=1e-5)(x)
 
-        if use_squeeze_and_excite:
-            x *= y
+        return x + residual
 
-        return x
-
-    def residual_block(self, x: tf.Tensor, use_squeeze_and_excite: bool) -> tf.Tensor:
-        """Standard residual block, without strides or filter changes."""
-        infilters = int(x.shape[-1])
-        residual = x
-        x = self.conv_block(x, infilters, use_squeeze_and_excite)
-        return tf.keras.layers.add([x, residual])
-
-    def concat_transition_block(
-        self, x: tf.Tensor, filters: int, strides: int, use_squeeze_and_excite: bool
+    def transition_block(
+        self,
+        x: tf.Tensor,
+        filters: int,
+        strides: int,
     ) -> tf.Tensor:
-        """Concat transition block.
-
-        Doubles the number of filters by concatenating shortcut with x + shortcut.
-        """
-        infilters = int(x.shape[-1])
-        assert filters == 2 * infilters
-
-        residual = tf.keras.layers.MaxPool2D(pool_size=strides, strides=strides)(x)
-        residual = tf.keras.layers.BatchNormalization(momentum=0.9, epsilon=1e-5)(
-            residual
-        )
-        x = self.conv_block(x, infilters, use_squeeze_and_excite, strides)
-        x = tf.keras.layers.add([x, residual])
-
-        return tf.keras.layers.concatenate([residual, x])
-
-    def fp_pointwise_transition_block(
-        self, x: tf.Tensor, filters: int, strides: int, use_squeeze_and_excite: bool
-    ) -> tf.Tensor:
-        """Pointwise transition block.
-
-        Transition to arbitrary number of filters by inserting pointwise
-        full-precision convolution in shortcut.
-        """
-        residual = tf.keras.layers.MaxPool2D(pool_size=strides, strides=strides)(x)
-        residual = tf.keras.layers.Conv2D(
-            filters, kernel_size=1, use_bias=False, kernel_initializer="glorot_normal"
-        )(residual)
-        residual = tf.keras.layers.BatchNormalization(momentum=0.9, epsilon=1e-5)(
-            residual
-        )
-        x = self.conv_block(x, filters, use_squeeze_and_excite, strides)
-        return tf.keras.layers.add([x, residual])
-
-    def build(self) -> tf.keras.models.Model:
-        x = stem_module(self.stem_filters, self.image_input)
-
-        for block, (layers, filters, use_squeeze_and_excite) in enumerate(
-            zip(
-                self.blocks_per_section,
-                self.section_filters,
-                self.use_squeeze_and_excite_in_section,
-            )
-        ):
-            for layer in range(layers):
-                if filters == x.shape[-1]:
-                    x = self.residual_block(x, use_squeeze_and_excite)
-                else:
-                    strides = 1 if (block == 0 or layer != 0) else 2
-                    x = self.transition_block(
-                        x, filters, strides, use_squeeze_and_excite
-                    )
+        """Pointwise transition block."""
 
         x = tf.keras.layers.Activation("relu")(x)
+        x = tf.keras.layers.MaxPool2D(pool_size=strides, strides=1)(x)
+        x = tf.keras.layers.DepthwiseConv2D(
+            (3, 3),
+            depthwise_initializer=blurpool_initializer,
+            padding="same",
+            strides=strides,
+            trainable=False,
+            use_bias=False,
+        )(x)
+
+        x = lq.layers.QuantConv2D(
+            filters,
+            (1, 1),
+            kernel_initializer="glorot_normal",
+            use_bias=False,
+        )(x)
+        return tf.keras.layers.BatchNormalization(momentum=0.9, epsilon=1e-5)(x)
+
+    def build(self) -> tf.keras.models.Model:
+        x = self.stem_module(self.section_filters[0], self.image_input)
+
+        for block, (layers, filters) in enumerate(
+            zip(self.section_blocks, self.section_filters)
+        ):
+            for layer in range(layers):
+                if filters != x.shape[-1]:
+                    strides = 1 if (block == 0 or layer != 0) else 2
+                    x = self.transition_block(x, filters, strides)
+                x = self.residual_block(x)
 
         if self.include_top:
+            x = tf.keras.layers.Activation("relu")(x)
             x = utils.global_pool(x)
-            x = tf.keras.layers.Dense(
-                self.num_classes, kernel_initializer="glorot_normal"
+            x = lq.layers.QuantDense(
+                self.num_classes,
+                kernel_initializer="glorot_normal",
             )(x)
             x = tf.keras.layers.Activation("softmax", dtype="float32")(x)
 
@@ -208,54 +203,39 @@ class QuickNetBaseFactory(ModelFactory, abc.ABC):
 
 
 @factory
-class QuickNetFactory(QuickNetBaseFactory):
-    """Quicknet - A model designed for fast inference using [Larq Compute Engine](https://github.com/larq/compute-engine)"""
-
-    name = "quicknet"
-    blocks_per_section: Sequence[int] = Field((2, 3, 4, 4))
-    section_filters: Sequence[int] = Field((64, 128, 256, 512))
-    use_squeeze_and_excite_in_section: Sequence[bool] = Field(
-        (False, False, False, False)
-    )
-    transition_block = Field(lambda self: self.concat_transition_block)
+class QuickNetSmallFactory(QuickNetFactory):
+    name = "quicknet_small"
+    section_filters = Field((32, 64, 256, 512))
 
     @property
     def imagenet_weights_path(self):
         return utils.download_pretrained_model(
-            model="quicknet",
-            version="v0.2.1",
-            file="quicknet_weights.h5",
-            file_hash="7b4fa94f5241c7aad3412ca42b5db6517dbc4847cff710cb82be10c2f83bc0be",
+            model="quicknet_small",
+            version="v1.0.0",
+            file="quicknet_small_weights.h5",
+            file_hash="6bf778e243466c678d6da0e3a91c77deec4832460046fca9e6ac8ae97a41299c",
         )
 
     @property
     def imagenet_no_top_weights_path(self):
         return utils.download_pretrained_model(
-            model="quicknet",
-            version="v0.2.1",
-            file="quicknet_weights_notop.h5",
-            file_hash="359eed6dae43525eddf520ea87ec9b54750ee0e022647775d115a38856be396f",
+            model="quicknet_small",
+            version="v1.0.0",
+            file="quicknet_small_weights_notop.h5",
+            file_hash="b65d59dd2d5af63d019997b05faff9e003510e2512aa973ee05eb1b82b8792a9",
         )
 
 
 @factory
-class QuickNetLargeFactory(QuickNetBaseFactory):
-    """QuickNetLarge - A model designed for fast inference using [Larq Compute Engine](https://github.com/larq/compute-engine)
-    and high accuracy. This utilises Squeeze and Excite blocks as per [Training binary neural networks with real-to-binary convolutions](https://openreview.net/forum?id=BJg4NgBKvH)."""
-
+class QuickNetLargeFactory(QuickNetFactory):
     name = "quicknet_large"
-    blocks_per_section: Sequence[int] = Field((4, 4, 4, 4))
-    section_filters: Sequence[int] = Field((64, 128, 256, 512))
-    use_squeeze_and_excite_in_section: Sequence[bool] = Field(
-        (False, False, True, True)
-    )
-    transition_block = Field(lambda self: self.fp_pointwise_transition_block)
+    section_blocks = Field((6, 8, 12, 6))
 
     @property
     def imagenet_weights_path(self):
         return utils.download_pretrained_model(
             model="quicknet_large",
-            version="v0.2.1",
+            version="v1.0.0",
             file="quicknet_large_weights.h5",
             file_hash="6bf778e243466c678d6da0e3a91c77deec4832460046fca9e6ac8ae97a41299c",
         )
@@ -264,41 +244,9 @@ class QuickNetLargeFactory(QuickNetBaseFactory):
     def imagenet_no_top_weights_path(self):
         return utils.download_pretrained_model(
             model="quicknet_large",
-            version="v0.2.1",
+            version="v1.0.0",
             file="quicknet_large_weights_notop.h5",
             file_hash="b65d59dd2d5af63d019997b05faff9e003510e2512aa973ee05eb1b82b8792a9",
-        )
-
-
-@factory
-class QuickNetXLFactory(QuickNetBaseFactory):
-    """QuickNetXL - A model designed for fast inference using [Larq Compute Engine](https://github.com/larq/compute-engine)
-    and high accuracy. This utilises Squeeze and Excite blocks as per [Training binary neural networks with real-to-binary convolutions](https://openreview.net/forum?id=BJg4NgBKvH)."""
-
-    name = "quicknet_xl"
-    blocks_per_section: Sequence[int] = Field((6, 8, 12, 6))
-    section_filters: Sequence[int] = Field((64, 128, 256, 512))
-    use_squeeze_and_excite_in_section: Sequence[bool] = Field(
-        (False, False, True, True)
-    )
-    transition_block = Field(lambda self: self.fp_pointwise_transition_block)
-
-    @property
-    def imagenet_weights_path(self):
-        return utils.download_pretrained_model(
-            model="quicknet_xl",
-            version="v0.1.1",
-            file="quicknet_xl_weights.h5",
-            file_hash="19a41e753dbd4fbc3cbdaecd3627fb536ef55d64702996aae3875a8de3cf8073",
-        )
-
-    @property
-    def imagenet_no_top_weights_path(self):
-        return utils.download_pretrained_model(
-            model="quicknet_xl",
-            version="v0.1.1",
-            file="quicknet_xl_weights_notop.h5",
-            file_hash="ad5cbfa333b0aabde75dc524c9ce4a5ae096061da0e2dcf362ec6e587a83a511",
         )
 
 
@@ -315,7 +263,7 @@ def QuickNet(
     Optionally loads weights pre-trained on ImageNet.
 
     ```netron
-    quicknet-v0.2.0/quicknet.json
+    quicknet-v1.0.0/quicknet.json
     ```
     ```summary
     sota.QuickNet
@@ -325,7 +273,7 @@ def QuickNet(
 
     | Top-1 Accuracy | Top-5 Accuracy | Parameters | Memory  |
     | -------------- | -------------- | ---------- | ------- |
-    | 58.6 %         | 81.0 %         | 10 518 528 | 3.21 MB |
+    | 63.3 %         | 84.6 %         | 13 234 088 | 4.17 MB |
 
     # Arguments
         input_shape: Optional shape tuple, to be specified if you would like to use a
@@ -369,7 +317,7 @@ def QuickNetLarge(
     Optionally loads weights pre-trained on ImageNet.
 
     ```netron
-    quicknet_large-v0.2.0/quicknet_large.json
+    quicknet_large-v1.0.0/quicknet_large.json
     ```
     ```summary
     sota.QuickNetLarge
@@ -379,7 +327,7 @@ def QuickNetLarge(
 
     | Top-1 Accuracy | Top-5 Accuracy | Parameters | Memory  |
     | -------------- | -------------- | ---------- | ------- |
-    | 62.7 %         | 84.0 %         | 11 837 696 | 4.56 MB |
+    | 66.0 %         | 87.0 %         | 23 342 248 | 5.40 MB |
 
     # Arguments
         input_shape: Optional shape tuple, to be specified if you would like to use a
@@ -410,7 +358,7 @@ def QuickNetLarge(
     ).build()
 
 
-def QuickNetXL(
+def QuickNetSmall(
     *,  # Keyword arguments only
     input_shape: Optional[Sequence[Optional[int]]] = None,
     input_tensor: Optional[tf.Tensor] = None,
@@ -418,22 +366,22 @@ def QuickNetXL(
     include_top: bool = True,
     num_classes: int = 1000,
 ) -> tf.keras.models.Model:
-    """Instantiates the QuickNetXL architecture.
+    """Instantiates the QuickNetSmall architecture.
 
     Optionally loads weights pre-trained on ImageNet.
 
     ```netron
-    quicknet_xl-v0.1.0/quicknet_xl.json
+    quicknet_small-v1.0.0/quicknet_small.json
     ```
     ```summary
-    sota.QuickNetXL
+    sota.QuickNetSmall
     ```
 
     # ImageNet Metrics
 
     | Top-1 Accuracy | Top-5 Accuracy | Parameters | Memory  |
     | -------------- | -------------- | ---------- | ------- |
-    | 67.0 %         | 87.3 %         | 22 058 368 | 6.22 MB |
+    | 59.4 %         | 81.8 %         | 12 655 688 | 4.00 MB |
 
     # Arguments
         input_shape: Optional shape tuple, to be specified if you would like to use a
@@ -455,7 +403,7 @@ def QuickNetXL(
     # Raises
         ValueError: in case of invalid argument for `weights`, or invalid input shape.
     """
-    return QuickNetXLFactory(
+    return QuickNetSmallFactory(
         input_shape=input_shape,
         input_tensor=input_tensor,
         weights=weights,

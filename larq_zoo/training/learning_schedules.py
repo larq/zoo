@@ -53,17 +53,18 @@ class CosineDecayWithWarmup(tf.keras.optimizers.schedules.LearningRateSchedule):
 
         self.warm_up_schedule = tf.keras.optimizers.schedules.PolynomialDecay(
             initial_learning_rate=0.0,
-            decay_steps=warmup_steps,
+            decay_steps=warmup_steps - 1,
             end_learning_rate=max_learning_rate,
             power=1.0,
         )
         self.decay_schedule = tf.keras.experimental.CosineDecay(
-            initial_learning_rate=max_learning_rate, decay_steps=decay_steps
+            initial_learning_rate=max_learning_rate,
+            decay_steps=decay_steps - warmup_steps - 1,
         )
 
     def __call__(self, step):
         return tf.cond(
-            step <= self.warmup_steps,
+            step < self.warmup_steps,
             lambda: self.warm_up_schedule(step),
             lambda: self.decay_schedule(step - self.warmup_steps),
         )

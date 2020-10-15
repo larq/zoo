@@ -87,7 +87,7 @@ class TrainFPResnet18(LarqZooModelTrainingPhase):
             CosineDecayWithWarmup(
                 max_learning_rate=self.learning_rate,
                 warmup_steps=self.warmup_duration * self.steps_per_epoch,
-                decay_steps=(self.epochs - self.warmup_duration) * self.steps_per_epoch,
+                decay_steps=self.epochs * self.steps_per_epoch,
             )
         )
     )
@@ -164,7 +164,7 @@ class TrainR2BBNNAlternative(TrainR2BBNN):
             CosineDecayWithWarmup(
                 max_learning_rate=self.learning_rate,
                 warmup_steps=self.steps_per_epoch * self.warmup_duration,
-                decay_steps=self.steps_per_epoch * (self.epochs - self.warmup_duration),
+                decay_steps=self.steps_per_epoch * self.epochs,
             )
         )
     )
