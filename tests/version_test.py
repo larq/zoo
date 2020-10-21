@@ -1,5 +1,5 @@
-import larq
+import larq_zoo
 
 
 def test_version():
-    assert hasattr(larq, "__version__") and "." in larq.__version__
+    assert hasattr(larq_zoo, "__version__") and "." in larq_zoo.__version__
