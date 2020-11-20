@@ -103,7 +103,10 @@ def get_input_layer(input_shape, input_tensor):
 
 
 def global_pool(
-    x: tf.Tensor, data_format: str = "channels_last", name: str = None
+    x: tf.Tensor,
+    data_format: str = "channels_last",
+    name: str = None,
+    flatten: bool = True,
 ) -> tf.Tensor:
     """Global average 2D pooling and flattening.
 
@@ -120,6 +123,7 @@ def global_pool(
             channels_first corresponds to inputs with shape (batch, channels, height,
             width). It defaults to "channels_last".
         name: String name of the layer
+        flatten: Whether to flatten the pooling output.
 
     # Returns
         2D TensorFlow tensor.
@@ -142,7 +146,8 @@ def global_pool(
             data_format=data_format,
             name=f"{name}_pool" if name else None,
         )(x)
-        x = tf.keras.layers.Flatten(name=f"{name}_flatten" if name else None)(x)
+        if flatten:
+            x = tf.keras.layers.Flatten(name=f"{name}_flatten" if name else None)(x)
     except ValueError:
         x = tf.keras.layers.GlobalAveragePooling2D(data_format=data_format, name=name)(
             x
