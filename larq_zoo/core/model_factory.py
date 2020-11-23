@@ -1,6 +1,5 @@
 from typing import Optional, Tuple
 
-import tensorflow as tf
 from zookeeper import ComponentField, Field
 from zookeeper.tf import Dataset
 
@@ -35,10 +34,10 @@ class ModelFactory:
     weights: Optional[str] = Field(None)
 
     input_shape: Optional[Tuple[DimType, DimType, DimType]] = Field(None)
-    input_tensor: Optional[tf.Tensor] = Field(None)
+    input_tensor: Optional[utils.TensorType] = Field(None)
 
     @property
-    def image_input(self) -> tf.Tensor:
+    def image_input(self) -> utils.TensorType:
         if not hasattr(self, "_image_input"):
             input_shape = utils.validate_input(
                 self.input_shape,

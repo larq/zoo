@@ -2,7 +2,7 @@ import contextlib
 import json
 import os
 import sys
-from typing import Optional
+from typing import Optional, Union
 
 import tensorflow as tf
 from tensorflow.python.eager.context import num_gpus
@@ -15,6 +15,14 @@ except ImportError:
     from keras_applications.imagenet_utils import (
         _obtain_input_shape as obtain_input_shape,
     )
+
+try:
+    from tensorflow.python.keras.engine.keras_tensor import KerasTensor
+
+    # Necessary due to https://github.com/tensorflow/tensorflow/issues/44613
+    TensorType = Union[tf.Tensor, KerasTensor]
+except ImportError:
+    TensorType = tf.Tensor
 
 
 def slash_join(*args):

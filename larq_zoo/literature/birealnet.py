@@ -118,7 +118,7 @@ class BiRealNetFactory(ModelFactory):
 def BiRealNet(
     *,  # Keyword arguments only
     input_shape: Optional[Sequence[Optional[int]]] = None,
-    input_tensor: Optional[tf.Tensor] = None,
+    input_tensor: Optional[utils.TensorType] = None,
     weights: Optional[str] = "imagenet",
     include_top: bool = True,
     num_classes: int = 1000,
