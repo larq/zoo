@@ -35,6 +35,7 @@ jobs:
       - name: Install dependencies
         run: |
           pip install tensorflow-cpu==${{matrix.tf-version}} || pip install tensorflow==${{matrix.tf-version}}
+          pip install zookeeper==1.0.4
           pip install -e .[test]
       - name: Test data and models with pytest
         run: pytest . -n auto --ignore=tests/train_test.py --cov=larq_zoo --cov-report=xml --cov-config=.coveragerc
