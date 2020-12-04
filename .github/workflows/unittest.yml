@@ -50,7 +50,7 @@ jobs:
         with:
           python-version: 3.7
       - name: Install dependencies
-        run: pip install tensorflow-cpu==2.3.1 zookeeper==1.0.4 -e .[test]
+        run: pip install tensorflow-cpu==2.3.1 https://github.com/larq/zookeeper/archive/master.zip -e .[test]
       - name: Test training with pytest
         run: pytest tests/train_test.py -n auto --cov=larq_zoo --cov-report=xml --cov-config=.coveragerc --cov-append
       - name: Upload coverage to Codecov
