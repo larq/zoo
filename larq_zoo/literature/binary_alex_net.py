@@ -156,7 +156,7 @@ def BinaryAlexNet(
 
     # Raises
         ValueError: in case of invalid argument for `weights`, or invalid input shape.
-        
+
     # References
         - [Binarized Neural Networks](https://papers.nips.cc/paper/6573-binarized-neural-networks)
     """
