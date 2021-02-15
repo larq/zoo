@@ -8,7 +8,7 @@ def readme():
 
 setup(
     name="larq-zoo",
-    version="2.0.5",
+    version="2.0.6",
     author="Plumerai",
     author_email="opensource@plumerai.com",
     description="Reference implementations of popular Binarized Neural Networks",
@@ -19,7 +19,7 @@ setup(
     license="Apache 2.0",
     install_requires=[
         "numpy~=1.15",
-        "larq>=0.9.2,<0.11.0",
+        "larq>=0.9.2,<0.12.0",
         "zookeeper>=1.0",
         "importlib-metadata ~= 2.0 ; python_version<'3.8'",
     ],
