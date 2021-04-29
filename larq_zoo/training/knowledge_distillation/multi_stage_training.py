@@ -129,7 +129,7 @@ class MultiStageExperiment:
     def experiments(self):
         for i in range(5):
             exp = getattr(self, f"stage_{i}", None)
-            if exp:
+            if exp is not None:
                 yield exp
 
     def __post_configure__(self):
