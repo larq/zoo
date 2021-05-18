@@ -36,7 +36,7 @@ setup(
             "pytest-mock==3.6.1",
             "pytest-xdist==2.2.1",
             "Pillow==8.2.0",
-            "tensorflow-datasets==4.2.0",
+            "tensorflow_datasets>=3.1.0,!=4.3.0",
         ],
     },
     entry_points="""
