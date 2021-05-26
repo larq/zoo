@@ -75,7 +75,11 @@ class BinaryAlexNetFactory(ModelFactory):
 
         # Classifier
         if self.include_top:
-            out = tf.keras.layers.Reshape((1, 1, -1))(out)
+            try:
+                channels = out.shape[-1] * out.shape[-2] * out.shape[-3]
+            except TypeError:
+                channels = -1
+            out = tf.keras.layers.Reshape((1, 1, channels))(out)
             out = self.dense_block(out, units=4096)
             out = self.dense_block(out, units=4096)
             out = self.dense_block(out, self.num_classes)
