@@ -43,12 +43,12 @@ class BinaryAlexNetFactory(ModelFactory):
         )(x)
         if pool:
             x = tf.keras.layers.MaxPool2D(pool_size=3, strides=2)(x)
-        x = tf.keras.layers.BatchNormalization(scale=False, momentum=0.9)(x)
-        return x
+        return tf.keras.layers.BatchNormalization(scale=False, momentum=0.9)(x)
 
     def dense_block(self, x: tf.Tensor, units: int) -> tf.Tensor:
-        x = lq.layers.QuantDense(
+        x = lq.layers.QuantConv2D(
             units,
+            kernel_size=1,
             input_quantizer=self.input_quantizer,
             kernel_quantizer=self.kernel_quantizer,
             kernel_constraint=self.kernel_constraint,
@@ -75,10 +75,15 @@ class BinaryAlexNetFactory(ModelFactory):
 
         # Classifier
         if self.include_top:
-            out = tf.keras.layers.Flatten()(out)
+            try:
+                channels = out.shape[-1] * out.shape[-2] * out.shape[-3]
+            except TypeError:
+                channels = -1
+            out = tf.keras.layers.Reshape((1, 1, channels))(out)
             out = self.dense_block(out, units=4096)
             out = self.dense_block(out, units=4096)
             out = self.dense_block(out, self.num_classes)
+            out = tf.keras.layers.Flatten()(out)
             out = tf.keras.layers.Activation("softmax", dtype="float32")(out)
 
         model = tf.keras.models.Model(
@@ -91,9 +96,9 @@ class BinaryAlexNetFactory(ModelFactory):
             if self.include_top:
                 weights_path = utils.download_pretrained_model(
                     model="binary_alexnet",
-                    version="v0.2.0",
+                    version="v0.3.0",
                     file="binary_alexnet_weights.h5",
-                    file_hash="0f8d3f6c1073ef993e2e99a38f8e661e5efe385085b2a84b43a7f2af8500a3d3",
+                    file_hash="7fc065c47c5c1d92389e0bb988ce6df6a4fa09d803b866e2ba648069d6652d63",
                 )
             else:
                 weights_path = utils.download_pretrained_model(
@@ -122,7 +127,7 @@ def BinaryAlexNet(
     Optionally loads weights pre-trained on ImageNet.
 
     ```netron
-    binary_alexnet-v0.2.0/binary_alexnet.json
+    binary_alexnet-v0.3.0/binary_alexnet.json
     ```
     ```summary
     literature.BinaryAlexNet
