@@ -32,7 +32,7 @@ setup(
             "isort==5.8.0",
             "pytype==2021.5.25",
             "pytest==6.2.4",
-            "pytest-cov==2.12.0",
+            "pytest-cov==2.12.1",
             "pytest-mock==3.6.1",
             "pytest-xdist==2.2.1",
             "Pillow==8.2.0",
