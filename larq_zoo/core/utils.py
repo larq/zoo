@@ -7,9 +7,9 @@ from typing import Optional, Union
 import tensorflow as tf
 from tensorflow.python.eager.context import num_gpus
 
-try:
-    from tensorflow.keras.backend import is_keras_tensor
-except ImportError:
+if tf.__version__[0] > "1":
+    is_keras_tensor = tf.keras.backend.is_keras_tensor
+else:
     from tensorflow.python.keras.backend import is_keras_tensor
 
 try:
