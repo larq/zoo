@@ -6,7 +6,11 @@ from typing import Optional, Union
 
 import tensorflow as tf
 from tensorflow.python.eager.context import num_gpus
-from tensorflow.python.keras.backend import is_keras_tensor
+
+if tf.__version__[0] > "1":
+    is_keras_tensor = tf.keras.backend.is_keras_tensor
+else:
+    from tensorflow.python.keras.backend import is_keras_tensor
 
 try:
     from tensorflow.python.keras.applications.imagenet_utils import obtain_input_shape
@@ -17,7 +21,10 @@ except ImportError:
     )
 
 try:
-    from tensorflow.python.keras.engine.keras_tensor import KerasTensor
+    if tf.__version__[:3] > "2.5":
+        from keras.engine.keras_tensor import KerasTensor
+    else:
+        from tensorflow.python.keras.engine.keras_tensor import KerasTensor
 
     # Necessary due to https://github.com/tensorflow/tensorflow/issues/44613
     TensorType = Union[tf.Tensor, KerasTensor]
