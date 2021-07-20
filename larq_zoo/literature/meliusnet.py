@@ -17,7 +17,7 @@ class MeliusNetFactory(ModelFactory):
     # not be configurable, but set in the various concrete subclasses.
     num_blocks: Sequence[int]
     transition_features: Sequence[int]
-    name: str = None
+    name: Optional[str] = None
     imagenet_weights_path: str
     imagenet_no_top_weights_path: str
 
@@ -39,15 +39,15 @@ class MeliusNetFactory(ModelFactory):
     def kernel_constraint(self):
         return lq.constraints.WeightClip(1.3)
 
-    def pool(self, x: tf.Tensor, name: str = None) -> tf.Tensor:
+    def pool(self, x: tf.Tensor, name: Optional[str] = None) -> tf.Tensor:
         return tf.keras.layers.MaxPool2D(2, strides=2, padding="same", name=name)(x)
 
-    def norm(self, x: tf.Tensor, name: str = None) -> tf.Tensor:
+    def norm(self, x: tf.Tensor, name: Optional[str] = None) -> tf.Tensor:
         return tf.keras.layers.BatchNormalization(
             momentum=self.batch_norm_momentum, epsilon=1e-5, name=name
         )(x)
 
-    def act(self, x: tf.Tensor, name: str = None) -> tf.Tensor:
+    def act(self, x: tf.Tensor, name: Optional[str] = None) -> tf.Tensor:
         return tf.keras.layers.Activation("relu", name=name)(x)
 
     def quant_conv(
@@ -56,7 +56,7 @@ class MeliusNetFactory(ModelFactory):
         filters: int,
         kernel: Union[int, Tuple[int, int]],
         strides: Union[int, Tuple[int, int]] = 1,
-        name: str = None,
+        name: Optional[str] = None,
     ) -> tf.Tensor:
         return lq.layers.QuantConv2D(
             filters,
@@ -77,7 +77,7 @@ class MeliusNetFactory(ModelFactory):
         filters: int,
         kernel: Union[int, Tuple[int, int]],
         groups: int,
-        name: str = None,
+        name: Optional[str] = None,
     ) -> tf.Tensor:
         assert filters % groups == 0
         assert x.shape.as_list()[-1] % groups == 0
@@ -98,7 +98,7 @@ class MeliusNetFactory(ModelFactory):
 
         return utils.TFOpLayer(tf.concat, axis=-1, name=f"{name}_concat")(y_split)
 
-    def group_stem(self, x: tf.Tensor, name: str = None) -> tf.Tensor:
+    def group_stem(self, x: tf.Tensor, name: Optional[str] = None) -> tf.Tensor:
         x = tf.keras.layers.Conv2D(
             32,
             3,
@@ -121,13 +121,13 @@ class MeliusNetFactory(ModelFactory):
 
         return self.pool(x, name=f"{name}_pool")
 
-    def dense_block(self, x: tf.Tensor, name: str = None) -> tf.Tensor:
+    def dense_block(self, x: tf.Tensor, name: Optional[str] = None) -> tf.Tensor:
         w = x
         w = self.norm(w, name=f"{name}_bn")
         w = self.quant_conv(w, 64, 3, name=f"{name}_binconv")
         return utils.TFOpLayer(tf.concat, axis=-1, name=f"{name}_concat")([x, w])
 
-    def improvement_block(self, x: tf.Tensor, name: str = None) -> tf.Tensor:
+    def improvement_block(self, x: tf.Tensor, name: Optional[str] = None) -> tf.Tensor:
         w = x
         w = self.norm(w, name=f"{name}_bn")
         w = self.quant_conv(w, 64, 3, name=f"{name}_binconv")
@@ -138,7 +138,7 @@ class MeliusNetFactory(ModelFactory):
         )([x, w])
 
     def transition_block(
-        self, x: tf.Tensor, filters: int, name: str = None
+        self, x: tf.Tensor, filters: int, name: Optional[str] = None
     ) -> tf.Tensor:
         x = self.norm(x, name=f"{name}_bn")
         x = self.pool(x, name=f"{name}_maxpool")
@@ -151,7 +151,7 @@ class MeliusNetFactory(ModelFactory):
             name=f"{name}_pw",
         )(x)
 
-    def block(self, x: tf.Tensor, name: str = None) -> tf.Tensor:
+    def block(self, x: tf.Tensor, name: Optional[str] = None) -> tf.Tensor:
         x = self.dense_block(x, name=f"{name}_dense")
         return self.improvement_block(x, name=f"{name}_improve")
 
