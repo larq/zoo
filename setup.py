@@ -34,7 +34,7 @@ setup(
             "pytest==6.2.5",
             "pytest-cov==2.12.1",
             "pytest-mock==3.6.1",
-            "pytest-xdist==2.3.0",
+            "pytest-xdist==2.4.0",
             "Pillow==8.3.2",
             "tensorflow_datasets>=3.1.0,!=4.3.0",
         ],
