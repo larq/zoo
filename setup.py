@@ -28,7 +28,7 @@ setup(
         "tensorflow_gpu": ["tensorflow-gpu>=1.15.0"],
         "test": [
             "black==21.7b0",
-            "flake8==3.9.2",
+            "flake8==4.0.1",
             "isort==5.9.3",
             "pytype==2021.10.11",
             "pytest==6.2.5",
