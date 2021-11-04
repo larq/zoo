@@ -50,7 +50,7 @@ jobs:
         with:
           python-version: 3.9
       - name: Install dependencies
-        run: pip install tensorflow-cpu==2.6.0 -e .[test]
+        run: pip install tensorflow-cpu==2.6.0 keras==2.6.0 -e .[test]
       - name: Test training with pytest
         run: pytest tests/train_test.py -n auto --cov=larq_zoo --cov-report=xml --cov-config=.coveragerc --cov-append
       - name: Upload coverage to Codecov
