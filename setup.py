@@ -18,7 +18,7 @@ setup(
     packages=find_packages(),
     license="Apache 2.0",
     install_requires=[
-        "numpy>=1.15.0,<1.22.0",
+        "numpy>=1.15.0,<1.23.0",
         "larq>=0.9.2,<0.13.0",
         "zookeeper>=1.0.0,<1.4.0",
         "importlib-metadata ~= 2.0 ; python_version<'3.8'",
