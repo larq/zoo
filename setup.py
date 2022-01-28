@@ -33,7 +33,7 @@ setup(
             "pytype==2021.10.25",
             "pytest==6.2.5",
             "pytest-cov==3.0.0",
-            "pytest-mock==3.6.1",
+            "pytest-mock==3.7.0",
             "pytest-xdist==2.5.0",
             "Pillow>=8.4.0,<10.0.0",
             "tensorflow_datasets>=3.1.0,!=4.3.0",
