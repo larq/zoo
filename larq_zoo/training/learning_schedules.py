@@ -24,7 +24,7 @@ class R2BStepSchedule(tf.keras.optimizers.schedules.LearningRateSchedule):
                 70 * self.steps_per_epoch,
             ],
             values=[
-                self.initial_learning_rate * self.decay_fraction ** i for i in range(4)
+                self.initial_learning_rate * self.decay_fraction**i for i in range(4)
             ],
         )
 

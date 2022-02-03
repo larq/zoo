@@ -228,7 +228,7 @@ class OutputDistributionMatchingLossLayer(tf.keras.layers.Layer):
         # This means the loss returned here should also be of shape (), otherwise the keras reduction logic fails.
         loss = tf.reduce_mean(
             self.loss_weight
-            * self.softmax_temperature ** 2
+            * self.softmax_temperature**2
             * tf.keras.losses.kullback_leibler_divergence(
                 y_true=tf.math.softmax(teacher_logits / self.softmax_temperature),
                 y_pred=tf.math.softmax(student_logits / self.softmax_temperature),
