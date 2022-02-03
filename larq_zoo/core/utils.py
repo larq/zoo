@@ -16,6 +16,7 @@ if tf.__version__[:3] > "2.5":
     from keras.applications.imagenet_utils import obtain_input_shape
 else:
     try:
+        # type: ignore
         from tensorflow.python.keras.applications.imagenet_utils import (
             obtain_input_shape,
         )
