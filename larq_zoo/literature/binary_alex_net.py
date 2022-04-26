@@ -1,4 +1,4 @@
-from typing import Optional, Sequence, Tuple
+from typing import Optional, Sequence
 
 import larq as lq
 import tensorflow as tf
@@ -25,7 +25,7 @@ class BinaryAlexNetFactory(ModelFactory):
         self,
         x: tf.Tensor,
         features: int,
-        kernel_size: Tuple[int, int],
+        kernel_size: int,
         strides: int = 1,
         pool: bool = False,
         first_layer: bool = False,
