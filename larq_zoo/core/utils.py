@@ -5,14 +5,15 @@ import sys
 from typing import Optional, Union
 
 import tensorflow as tf
+from packaging import version
 from tensorflow.python.eager.context import num_gpus
 
-if tf.__version__[0] > "1":
+if version.parse(tf.__version__) >= version.parse("2"):
     is_keras_tensor = tf.keras.backend.is_keras_tensor
 else:
     from tensorflow.python.keras.backend import is_keras_tensor
 
-if tf.__version__[:3] > "2.5":
+if version.parse(tf.__version__) >= version.parse("2.6"):
     from keras.applications.imagenet_utils import obtain_input_shape
 else:
     try:
@@ -27,7 +28,7 @@ else:
         )
 
 try:
-    if tf.__version__[:3] > "2.5":
+    if version.parse(tf.__version__) >= version.parse("2.6"):
         from keras.engine.keras_tensor import KerasTensor
     else:
         from tensorflow.python.keras.engine.keras_tensor import KerasTensor
