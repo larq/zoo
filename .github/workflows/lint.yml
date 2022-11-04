@@ -23,7 +23,7 @@ jobs:
       - name: Run Flake8
         run: flake8
       - name: Black code style
-        run: black . --check --target-version py36
+        run: black . --check --target-version py37
       - name: Check import order with isort
         run: isort . --check --diff
       - name: Type check with PyType
