@@ -30,7 +30,7 @@ setup(
         "test": [
             "black==22.8.0",
             "flake8==5.0.4",
-            "isort==5.10.1",
+            "isort==5.11.2",
             "pytype>=2022.01.05",
             "pytest==7.0.1",
             "pytest-cov==4.0.0",
