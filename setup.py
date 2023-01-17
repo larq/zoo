@@ -20,7 +20,7 @@ setup(
     install_requires=[
         "numpy>=1.15.0",
         "packaging>=19",
-        "larq>=0.9.2,<0.13.0",
+        "larq>=0.9.2,<0.14.0",
         "zookeeper>=1.0.0,<1.4.0",
         "importlib-metadata ~= 2.0 ; python_version<'3.8'",
     ],
