@@ -18,12 +18,12 @@ jobs:
           python-version: 3.9
       - name: Install project dependencies
         run: |
-          pip install tensorflow-cpu==2.9.0
+          pip install tensorflow-cpu==2.12.0
           pip install -e .[test]
       - name: Run Flake8
         run: flake8
       - name: Black code style
-        run: black . --check --target-version py37
+        run: black . --check --target-version py39
       - name: Check import order with isort
         run: isort . --check --diff
       - name: Type check with PyType
