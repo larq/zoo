@@ -25,8 +25,8 @@ setup(
         "importlib-metadata ~= 2.0 ; python_version<'3.8'",
     ],
     extras_require={
-        "tensorflow": ["tensorflow>=1.15.0"],
-        "tensorflow_gpu": ["tensorflow-gpu>=1.15.0"],
+        "tensorflow": ["tensorflow>=2.4.0", "protobuf==3.20.1"],
+        "tensorflow_gpu": ["tensorflow-gpu>=2.4.0", "protobuf==3.20.1"],
         "test": [
             "black==23.3.0",
             "dill==0.3.6",
