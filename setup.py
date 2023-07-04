@@ -25,13 +25,14 @@ setup(
         "importlib-metadata ~= 2.0 ; python_version<'3.8'",
     ],
     extras_require={
-        "tensorflow": ["tensorflow>=2.4.0", "protobuf==3.20.1"],
-        "tensorflow_gpu": ["tensorflow-gpu>=2.4.0", "protobuf==3.20.1"],
+        "tensorflow": ["tensorflow>=2.4.0"],
+        "tensorflow_gpu": ["tensorflow-gpu>=2.4.0"],
         "test": [
             "black==23.3.0",
             "dill==0.3.6",
             "flake8==6.0.0",
             "isort==5.12.0",
+            "protobuf==3.20.3",
             "pytype==2023.6.16",
             "pytest==7.4.0",
             "pytest-cov==4.1.0",
