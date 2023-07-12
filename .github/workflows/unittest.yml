@@ -28,8 +28,11 @@ jobs:
             python-version: "3.10"
           - tf-version: 2.11.1
             python-version: "3.10"
-          - tf-version: 2.12.0
-            python-version: "3.10"
+          # TF 2.12 testing is disabled for now because it requires protobuf>=3.20, while the other
+          # versions of TF require protobuf<3.20, and tensorflow-datasets is broken in such a way
+          # that it always installs the latest but it also has similar requirements.
+          # - tf-version: 2.12.0
+          #   python-version: "3.10"
 
     steps:
       - uses: actions/checkout@v3
