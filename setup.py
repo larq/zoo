@@ -22,6 +22,7 @@ setup(
         "packaging>=19",
         "larq>=0.9.2",
         "zookeeper>=1.0.0",
+        "typeguard<3.0.0",
         "importlib-metadata ~= 2.0 ; python_version<'3.8'",
     ],
     extras_require={
