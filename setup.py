@@ -20,7 +20,7 @@ setup(
     install_requires=[
         "numpy>=1.15.0",
         "packaging>=19",
-        "larq>=0.9.2",
+        "larq>=0.9.2,<0.13.2",
         "zookeeper>=1.0.0",
         "typeguard<3.0.0",
         "protobuf<3.20",
