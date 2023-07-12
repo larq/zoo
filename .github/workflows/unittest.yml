@@ -55,7 +55,9 @@ jobs:
         with:
           python-version: 3.9
       - name: Install dependencies
-        run: pip install tensorflow-cpu==2.11.1 -e .[test]
+        run: |
+          pip install tensorflow-cpu==2.10.1  # Tests currently don't run with a newer tensorflow
+          pip install -e .[test]
       - name: Test training with pytest
         run: pytest tests/train_test.py -n auto --cov=larq_zoo --cov-report=xml --cov-config=.coveragerc --cov-append
       - name: Upload coverage to Codecov

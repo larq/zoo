@@ -23,6 +23,7 @@ setup(
         "larq>=0.9.2,<0.13.2",
         "zookeeper>=1.0.0",
         "typeguard<3.0.0",
+        "protobuf<3.20",
         "importlib-metadata ~= 2.0 ; python_version<'3.8'",
     ],
     extras_require={
@@ -33,14 +34,13 @@ setup(
             "dill==0.3.6",
             "flake8==6.0.0",
             "isort==5.12.0",
-            "protobuf==3.20.3",
             "pytype==2023.6.16",
             "pytest==7.4.0",
             "pytest-cov==4.1.0",
             "pytest-mock==3.11.1",
             "pytest-xdist==3.3.1",
             "Pillow==10.0.0",
-            "tensorflow_datasets==4.9.2",
+            "tensorflow_datasets>=3.1.0,<4.9.0",
         ],
     },
     entry_points="""
