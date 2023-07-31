@@ -32,7 +32,7 @@ setup(
         "test": [
             "black==23.7.0",
             "dill==0.3.7",
-            "flake8==6.0.0",
+            "flake8==6.1.0",
             "isort==5.12.0",
             "pytype==2023.6.16",
             "pytest==7.4.0",
