@@ -17,6 +17,7 @@ if version.parse(tf.__version__) >= version.parse("2.6"):
     try:
         from keras.applications.imagenet_utils import obtain_input_shape
     except ImportError:
+        # type: ignore
         from keras.src.applications.imagenet_utils import obtain_input_shape
 else:
     try:
