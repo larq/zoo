@@ -14,7 +14,11 @@ else:
     from tensorflow.python.keras.backend import is_keras_tensor
 
 if version.parse(tf.__version__) >= version.parse("2.6"):
-    from keras.applications.imagenet_utils import obtain_input_shape
+    try:
+        from keras.applications.imagenet_utils import obtain_input_shape
+    except ImportError:
+        # type: ignore
+        from keras.src.applications.imagenet_utils import obtain_input_shape
 else:
     try:
         # type: ignore
