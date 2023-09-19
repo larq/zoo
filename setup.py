@@ -34,7 +34,7 @@ setup(
             "dill==0.3.7",
             "flake8==6.1.0",
             "isort==5.12.0",
-            "pytype==2023.6.16",
+            "pytype==2023.9.19",
             "pytest==7.4.2",
             "pytest-cov==4.1.0",
             "pytest-mock==3.11.1",
