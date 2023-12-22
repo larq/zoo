@@ -30,7 +30,7 @@ setup(
         "tensorflow": ["tensorflow>=2.4.0"],
         "tensorflow_gpu": ["tensorflow-gpu>=2.4.0"],
         "test": [
-            "black==23.12.0",
+            "black==23.12.1",
             "dill==0.3.7",
             "flake8==6.1.0",
             "isort==5.12.0",
