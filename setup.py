@@ -31,7 +31,7 @@ setup(
         "tensorflow_gpu": ["tensorflow-gpu>=2.4.0"],
         "test": [
             "black==23.12.1",
-            "dill==0.3.7",
+            "dill==0.3.8",
             "flake8==7.0.0",
             "isort==5.12.0",
             "pytype==2024.1.24",
