@@ -3,6 +3,7 @@ real-to-binary convolutions`
 
 [(Martinez et al., 2019)](https://openreview.net/forum?id=BJg4NgBKvH)
 """
+
 from abc import ABCMeta, abstractmethod
 from typing import Optional, Sequence
 
@@ -235,9 +236,9 @@ class StrongBaselineNetFactory(_SharedBaseFactory):
             input_quantizer=self.input_quantizer,
             kernel_quantizer=self.kernel_quantizer,
             kernel_constraint=self.kernel_constraint,
-            kernel_regularizer=self.kernel_regularizer
-            if self.kernel_quantizer is None
-            else None,
+            kernel_regularizer=(
+                self.kernel_regularizer if self.kernel_quantizer is None else None
+            ),
             kernel_initializer=self.kernel_initializer,
             use_bias=False,
             name=f"{name}_conv2d",
