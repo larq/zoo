@@ -35,7 +35,7 @@ setup(
             "flake8==7.1.0",
             "isort==5.12.0",
             "pytype==2024.2.27",
-            "pytest==8.2.2",
+            "pytest==8.3.1",
             "pytest-cov==5.0.0",
             "pytest-mock==3.12.0",
             "pytest-xdist==3.6.1",
