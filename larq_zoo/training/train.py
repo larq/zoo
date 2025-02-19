@@ -15,6 +15,7 @@ from zookeeper.tf import Experiment
 from larq_zoo.core import utils
 
 
+# pytype: disable=pyi-error
 class TrainLarqZooModel(Experiment):
     # Save model checkpoints.
     use_model_checkpointing: bool = Field(True)
