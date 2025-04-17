@@ -30,11 +30,11 @@ setup(
         "tensorflow_gpu": ["tensorflow-gpu>=2.4.0"],
         "test": [
             "black==25.1.0",
-            "dill==0.3.9",
+            "dill==0.4.0",
             "flake8==7.1.2",
             "isort==6.0.0",
             "pytype==2024.9.13",
-            "pytest==8.3.4",
+            "pytest==8.3.5",
             "pytest-cov==6.0.0",
             "pytest-mock==3.14.0",
             "pytest-xdist==3.6.1",
