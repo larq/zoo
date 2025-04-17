@@ -23,7 +23,7 @@ setup(
         "larq>=0.9.2,<0.13.2",
         "zookeeper>=1.0.0",
         "typeguard<3.0.0",
-        "protobuf<3.21",
+        "protobuf<6.31",
     ],
     extras_require={
         "tensorflow": ["tensorflow>=2.4.0"],
