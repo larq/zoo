@@ -18,7 +18,7 @@ setup(
     packages=find_packages(),
     license="Apache 2.0",
     install_requires=[
-        "numpy>=1.15.0,<2.0",
+        "numpy>=1.15.0,<3.0",
         "packaging>=19",
         "larq>=0.9.2,<0.13.2",
         "zookeeper>=1.0.0",
