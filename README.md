@@ -10,8 +10,8 @@ For more information, see [larq.dev/zoo](https://docs.larq.dev/zoo/).
 
 Before installing Larq Zoo, please install:
 
-- [Python](https://python.org) version `3.8`, `3.9`, or `3.10`
-- [Tensorflow](https://www.tensorflow.org/install) version `2.4` up to `2.12` (latest at time of writing).
+- [Python](https://python.org) version `3.9` or `3.10`
+- [Tensorflow](https://www.tensorflow.org/install) version `2.4` up to `2.12`.
 
 ## Installation
 
