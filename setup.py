@@ -35,7 +35,7 @@ setup(
             "isort==6.0.0",
             "pytype==2024.9.13",
             "pytest==8.4.2",
-            "pytest-cov==6.2.1",
+            "pytest-cov==7.0.0",
             "pytest-mock==3.15.1",
             "pytest-xdist==3.8.0",
             "Pillow==11.3.0",
