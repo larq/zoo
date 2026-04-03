@@ -25,4 +25,4 @@ jobs:
       - name: Ruff lint check
         run: ruff check .
       - name: Type check with PyType
-        run: pytype --jobs auto
+        run: pytype --config setup.cfg --jobs auto
