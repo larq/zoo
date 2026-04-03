@@ -107,7 +107,7 @@ class LarqZooModelTrainingPhase(TrainingPhase):
 
     @Field
     def loss(self):
-        return getattr(self.__base_getattribute__("model"), "classification_loss")
+        return self.__base_getattribute__("model").classification_loss
 
     metrics = Field(lambda: ["accuracy", "sparse_top_k_categorical_accuracy"])
 

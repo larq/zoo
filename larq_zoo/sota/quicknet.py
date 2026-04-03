@@ -154,10 +154,10 @@ class QuickNetFactory(ModelFactory):
     def build(self) -> tf.keras.models.Model:
         x = self.stem_module(self.section_filters[0], self.image_input)
 
-        for block, (layers, filters) in enumerate(
+        for _block, (layers, filters) in enumerate(
             zip(self.section_blocks, self.section_filters)
         ):
-            for layer in range(layers):
+            for _layer in range(layers):
                 if filters != x.shape[-1]:
                     x = self.transition_block(x, filters, strides=2)
                 x = self.residual_block(x)
