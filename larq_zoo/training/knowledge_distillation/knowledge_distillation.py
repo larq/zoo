@@ -35,7 +35,7 @@ class AttentionMatchingLossLayer(tf.keras.layers.Layer):
             [
                 x,
                 [teacher.block1_output, teacher.block2_output],
-                [student.block1_output, student.block2_output]
+                [student.block1_output, student.block2_output],
             ]
         )
         ```
@@ -273,9 +273,9 @@ def get_unique_layer_with_partial_name(
         in its `layer.name`
     """
     results = [layer for layer in model.layers if partial_name in layer.name]
-    assert (
-        len(results) == 1
-    ), f"Expected to find one layer matching {partial_name} in {model.name}, found {len(results)}"
+    assert len(results) == 1, (
+        f"Expected to find one layer matching {partial_name} in {model.name}, found {len(results)}"
+    )
     return results[0]
 
 
@@ -393,7 +393,9 @@ class TeacherStudentModelFactory(ModelFactory):
         else:
             assert (
                 self.output_matching_weight > 0 or self.attention_matching_weight > 0
-            ), "Teacher model loaded but all teacher-student knowledge distillation losses are 0"
+            ), (
+                "Teacher model loaded but all teacher-student knowledge distillation losses are 0"
+            )
 
         assert (
             len(self.teacher_model.inputs) == 1 and len(self.student_model.inputs) == 1

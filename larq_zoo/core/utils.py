@@ -82,9 +82,9 @@ class ModelCheckpoint(tf.keras.callbacks.ModelCheckpoint):
 def get_distribution_scope(batch_size):
     if num_gpus() > 1:
         strategy = tf.distribute.MirroredStrategy()
-        assert (
-            batch_size % strategy.num_replicas_in_sync == 0
-        ), f"Batch size {batch_size} cannot be divided onto {num_gpus()} GPUs"
+        assert batch_size % strategy.num_replicas_in_sync == 0, (
+            f"Batch size {batch_size} cannot be divided onto {num_gpus()} GPUs"
+        )
         distribution_scope = strategy.scope
     else:
         if sys.version_info >= (3, 7):
@@ -105,8 +105,7 @@ def validate_input(input_shape, weights, include_top, classes):
 
     if weights == "imagenet" and include_top and classes != 1000:
         raise ValueError(
-            "If using `weights` as `imagenet` with `include_top` as true, "
-            "`classes` should be 1000"
+            "If using `weights` as `imagenet` with `include_top` as true, `classes` should be 1000"
         )
 
     # Determine proper input shape

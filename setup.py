@@ -29,11 +29,9 @@ setup(
         "tensorflow": ["tensorflow>=2.8.4"],
         "tensorflow_gpu": ["tensorflow-gpu>=2.8.4"],
         "test": [
-            "black==26.3.1",
             "dill==0.4.1",
-            "flake8==7.3.0",
-            "isort==8.0.1",
             "pytype==2024.10.11",
+            "ruff==0.11.4",
             "pytest==9.0.2",
             "pytest-cov==7.1.0",
             "pytest-mock==3.15.1",

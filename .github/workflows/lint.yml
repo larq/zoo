@@ -20,11 +20,9 @@ jobs:
         run: |
           pip install tensorflow-cpu==2.10.1
           pip install -e .[test]
-      - name: Run Flake8
-        run: flake8
-      - name: Black code style
-        run: black . --check --target-version py310
-      - name: Check import order with isort
-        run: isort . --check --diff
+      - name: Ruff format check
+        run: ruff format . --check
+      - name: Ruff lint check
+        run: ruff check .
       - name: Type check with PyType
-        run: pytype --jobs auto
+        run: pytype --config setup.cfg --jobs auto

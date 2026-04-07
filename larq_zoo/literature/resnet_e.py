@@ -38,8 +38,10 @@ class BinaryResNetE18Factory(ModelFactory):
         }
         try:
             return spec[self.num_layers]
-        except Exception:
-            raise ValueError(f"Only specs for layers {list(self.spec.keys())} defined.")
+        except Exception as e:
+            raise ValueError(
+                f"Only specs for layers {list(self.spec.keys())} defined."
+            ) from e
 
     def residual_block(self, x: tf.Tensor, filters: int, strides: int = 1) -> tf.Tensor:
         downsample = x.get_shape().as_list()[-1] != filters
