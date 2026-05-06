@@ -105,12 +105,10 @@ class AttentionMatchingLossLayer(tf.keras.layers.Layer):
                     )
                 bad_input = False
                 description = ""
+                # Length already validated above; can't use `strict=` because
+                # this runs inside tf.autograph, which rewrites `zip`.
                 for idx, (tv, sv) in enumerate(
-                    zip(
-                        teacher_activation_volumes,
-                        student_activation_volumes,
-                        strict=True,
-                    )
+                    zip(teacher_activation_volumes, student_activation_volumes)  # noqa: B905
                 ):
                     if tf.is_tensor(tv) and tf.is_tensor(sv):
                         description += f"\n {idx} - teacher: Tensor(shape={tv.shape}) student: Tensor(shape={sv.shape})"
@@ -144,9 +142,11 @@ class AttentionMatchingLossLayer(tf.keras.layers.Layer):
                 tf.keras.backend.stop_gradient(tav) for tav in teacher_volumes
             ]
 
+        # Lengths are guaranteed equal by `_process_inputs`; can't use `strict=`
+        # because this runs inside tf.autograph, which rewrites `zip`.
         layer_losses = [
             self._layer_attention_loss(sa, ta)
-            for sa, ta in zip(student_volumes, teacher_volumes, strict=True)
+            for sa, ta in zip(student_volumes, teacher_volumes)  # noqa: B905
         ]
         # Keras models can add  regularization losses which are shape=(); already reduced over the batch dimension.
         # This means the loss returned here should also be of shape (), otherwise the keras reduction logic fails.
