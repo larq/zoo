@@ -99,7 +99,7 @@ class BinaryResNetE18Factory(ModelFactory):
             x = tf.keras.layers.MaxPool2D(3, strides=2, padding="same")(x)
             x = tf.keras.layers.BatchNormalization(momentum=0.9, epsilon=1e-5)(x)
 
-        for block, (layers, filters) in enumerate(zip(*self.spec)):
+        for block, (layers, filters) in enumerate(zip(*self.spec, strict=True)):
             # This trick adds shortcut connections between original ResNet
             # blocks. We wultiply the number of blocks by two, but add only one
             # layer instead of two in each block

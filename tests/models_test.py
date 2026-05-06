@@ -53,7 +53,9 @@ def test_prediction(app, last_feature_dim, test_image):
     assert "African_elephant" in names
 
     notop_model = app(weights="imagenet", include_top=False)
-    for weight, notop_weight in zip(model.get_weights(), notop_model.get_weights()):
+    for weight, notop_weight in zip(
+        model.get_weights(), notop_model.get_weights(), strict=False
+    ):
         np.testing.assert_allclose(notop_weight, weight)
 
 

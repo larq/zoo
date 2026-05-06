@@ -158,7 +158,9 @@ class MeliusNetFactory(ModelFactory):
     def build(self) -> tf.keras.models.Model:
         x = self.image_input
         x = self.group_stem(x, name="stem")
-        for i, (n, f) in enumerate(zip(self.num_blocks, self.transition_features)):
+        for i, (n, f) in enumerate(
+            zip(self.num_blocks, self.transition_features, strict=True)
+        ):
             for j in range(n):
                 x = self.block(x, f"section_{i}_block_{j}")
             if f:

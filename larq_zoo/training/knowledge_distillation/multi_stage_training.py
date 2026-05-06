@@ -146,6 +146,7 @@ class MultiStageExperiment:
         for prev_exp, next_exp in zip(
             list(self.experiments)[self.initial_stage :],
             list(self.experiments)[self.initial_stage + 1 :],
+            strict=False,
         ):
             if prev_exp is None:
                 assert next_exp is None
