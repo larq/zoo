@@ -155,7 +155,7 @@ class QuickNetFactory(ModelFactory):
         x = self.stem_module(self.section_filters[0], self.image_input)
 
         for _block, (layers, filters) in enumerate(
-            zip(self.section_blocks, self.section_filters)
+            zip(self.section_blocks, self.section_filters, strict=True)
         ):
             for _layer in range(layers):
                 if filters != x.shape[-1]:
