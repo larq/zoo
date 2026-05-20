@@ -25,7 +25,7 @@ class XNORNetFactory(ModelFactory):
     """Implementation of [XNOR-Net](https://arxiv.org/abs/1603.05279)"""
 
     input_quantizer = "ste_sign"
-    kernel_quantizer = "xnor_weight_scale"
+    kernel_quantizer = staticmethod(xnor_weight_scale)
     kernel_constraint = "weight_clip"
 
     @property
