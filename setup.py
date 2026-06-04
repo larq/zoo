@@ -30,7 +30,7 @@ setup(
         "test": [
             "dill==0.4.1",
             "pytype==2024.10.11",
-            "ruff==0.15.13",
+            "ruff==0.15.15",
             "pytest==9.0.3",
             "pytest-cov==7.1.0",
             "pytest-mock==3.15.1",
