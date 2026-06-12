@@ -1,3 +1,7 @@
+> [!WARNING]
+> **This repository is no longer maintained and has been archived; it is kept available in read-only mode.**
+> For information about products by the creators of this repository, visit [plumerai.com](https://plumerai.com).
+
 # Larq Zoo
 
 [![GitHub Actions](https://github.com/larq/zoo/workflows/Unittest/badge.svg)](https://github.com/larq/zoo/actions?workflow=Unittest) [![Codecov](https://img.shields.io/codecov/c/github/larq/zoo)](https://codecov.io/github/larq/zoo?branch=main) [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/larq-zoo.svg)](https://pypi.org/project/larq-zoo/) [![PyPI](https://img.shields.io/pypi/v/larq-zoo.svg)](https://pypi.org/project/larq-zoo/) [![PyPI - License](https://img.shields.io/pypi/l/larq-zoo.svg)](https://github.com/plumerai/larq-zoo/blob/main/LICENSE) [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/ambv/black)
